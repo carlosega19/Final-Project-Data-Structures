@@ -1,0 +1,16 @@
+{
+     "C_Cpp.errorSquiggles": "disabled",
+     "files.associations": {
+          "iostream": "cpp",
+          "ostream": "cpp",
+          "new": "cpp",
+          "optional": "cpp",
+          "istream": "cpp",
+          "system_error": "cpp",
+          "array": "cpp",
+          "functional": "cpp",
+          "tuple": "cpp",
+          "type_traits": "cpp",
+          "utility": "cpp"
+     }
+}
