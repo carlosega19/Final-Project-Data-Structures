@@ -1,3 +1,6 @@
+#ifndef MENU_H
+#define MENU_H
+
 #include <iostream>
 #include <iomanip>
 using namespace std;
@@ -14,7 +17,7 @@ int length(string& line) {
 }
 
 void printCreators() {
-    string names = "REALIZADO POR:      Andres De Quintal   Y   Carlos Galiño";
+    string names = "REALIZADO POR:      Andres De Quintal   Y   Carlos Galiï¿½o";
     cout << setw((lineWidth + names.length()) / 2) << names << endl;
     cout << line << endl;
 }
@@ -98,3 +101,5 @@ void menuMantProds() {
 	cout << setw((lineWidth + length(msg)) / 2) << msg << endl;
 	cout << line << endl;
 }
+
+#endif // MENU_H

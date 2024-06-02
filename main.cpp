@@ -15,11 +15,13 @@ using namespace std;
 
 
 /*---------------------------------------*/
+
+
 int main()
 {
     /*Variables*/
-
     int op;
+
     /*CODE HERE*/
     do
     {
@@ -27,8 +29,6 @@ int main()
         menu();
         cin >> op;
     } while (op != 0);
-    
-
     return EXIT_SUCCESS;
 }
 
