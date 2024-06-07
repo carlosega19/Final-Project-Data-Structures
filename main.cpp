@@ -6,6 +6,7 @@
 #include "libs/product.h"
 #include "libs/branch.h"
 #include "libs/menu.h"
+#include "libs/helper.h"
 using namespace std;
 
 /*               FUNCTIONS               */
@@ -84,7 +85,7 @@ int main() {
                                     case 3: // DELETE A PRODUCT
                                         menuDelProduct(&products , &lastP);
                                         break;
-                                    case 4:
+                                    case 4: // CONSULT A PRODUCT BY CODE
                                         menuConsultProductByCode(products);
                                         break;
                                     case 5:

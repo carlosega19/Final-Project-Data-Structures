@@ -18,7 +18,30 @@
 
 
 
-/*      FUNCTIONS HELPERS       */
+/*     FUNCTIONS      */
+
+int length(string& line) {
+    int count = 0;
+    while (line[count] != '\0') {
+        count++;
+    }
+    return count;
+}
+
+bool onlySpace(const std::string & str) {
+    bool result = true;
+    for (size_t i = 0; i < sizeof(str); i++) {
+        if (!isspace(static_cast<unsigned char>(str[i]))) {
+            result = false;
+            break;
+        }
+    }
+    return result;
+}
+
+bool isValid(string str){
+    return !onlySpace(str) && length(str) > 0 && length(str) < 35;
+}
 
 bool find(const char* arr, int size, char charc) {
     for (int i = 0; i < size; i++) {
@@ -44,7 +67,7 @@ void replaceTrash(string& line) {
 
 
 /*---------------------------------*/
-//          FILE MANAGMENT
+//        FILE MANAGMENT
 void readBranchs(branch**B , branch**L , unordered_map<std::string, branch*>& tableB){ // Update the function to delete the trash in line
     ifstream archivo("branchs.txt");
     if (archivo.fail()) return; 
@@ -145,7 +168,7 @@ void saveProducts(product* P) {
 }
 
 // Take the products inside each branch
-void readProductsOfBranch(branch*B , product*P , unordered_map<std::string, branch*>& tableB){
+void readProductsOfBranch(branch*B , product*P , unordered_map<string, branch*>& tableB){
     ifstream archivo("inventory.txt");
     if (archivo.fail()) return;
     string codeB, codeP , line;
@@ -183,7 +206,7 @@ void readProductsOfBranch(branch*B , product*P , unordered_map<std::string, bran
                     break;
             }
         }
-        selectedB = tableB[codeB];
+        selectedB = tableB[codeB]; //searchBranchByCode(B , codeB);
         selectedP = searchProductByCode(P , codeP);
         if (selectedB && selectedP && am >= minAm && price > 0)
         {
