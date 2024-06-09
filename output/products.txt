@@ -1,1 +1,7 @@
-010,Banana,Frutas
+101,Café,Marca Maria Café CA  1 kg
+112,Margarina,Marca Leguminosa SA  500 gr
+137,Azucar Morena,Marca Artica  1 kg
+254,Acetaminofen,Marca LabNacional  75 mg
+378,Complejo Vitaminico,Marca LabNacional  500 comprimidos
+1137,Azucar Morena,Marca Letisoy CA  1kg
+1101,Cafe,Marca Jose CA  1kg

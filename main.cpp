@@ -9,18 +9,6 @@
 #include "libs/helper.h"
 using namespace std;
 
-/*               FUNCTIONS               */
-
-
-
-
-
-/*---------------------------------------*/
-
-
-
-
-
 
 int main() {
     setlocale(LC_ALL, "es_ES.UTF-8");
@@ -159,8 +147,5 @@ int main() {
     saveProducts(products);
 	saveBranchs(branchs);
     saveProductsOfBranch(branchs);
-    return 0;
+    return EXIT_SUCCESS;
 }
-
-// Ahora si funciona
-// Para el mas culon
