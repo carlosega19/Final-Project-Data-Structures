@@ -12,7 +12,6 @@ using namespace std;
 int main() {
     setlocale(LC_ALL, "es_ES.UTF-8");
 	int op;
-    unordered_map<string, branch*> hashB;
     branch* branchs = NULL;
     branch* lastB = NULL;
 
@@ -21,9 +20,9 @@ int main() {
     // READ PRODUCTS
     readProducts(&products, &lastP);
     // READ BRANCHS
-    readBranchs(&branchs , &lastB , hashB);
+    readBranchs(&branchs , &lastB );
     // READ PRODUCTS INSIDE BRANCHS
-    readProductsOfBranch(branchs , products , hashB);
+    readProductsOfBranch(branchs , products);
 	do
 	{
 		menu();
@@ -102,7 +101,7 @@ int main() {
                                 switch (op)
                                 {
                                     case 1: // Add Branch
-                                        createBranch(&branchs , &lastB , hashB);
+                                        createBranch(&branchs , &lastB);
                                         break;
                                     case 2: // Modify Branch
                                         menuModBranch(branchs);

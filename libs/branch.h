@@ -2,7 +2,6 @@
 #define BRANCH_H
 
 #include <iostream>
-#include <unordered_map>
 #include "product.h"
 using namespace std;
 
@@ -42,7 +41,7 @@ branch* searchBranchByCity(branch* B, string str) {
     return searchBranchByCity(B->next, str);
 }
 
-void addBranch(branch** B, branch** L, string codeB, string name, string city, string state, string address, string tlf, unordered_map<string, branch*>& tableB) {
+void addBranch(branch** B, branch** L, string codeB, string name, string city, string state, string address, string tlf) {
     branch* newB = new branch;
     newB->code = codeB;
     newB->name = name;
@@ -63,7 +62,6 @@ void addBranch(branch** B, branch** L, string codeB, string name, string city, s
         (*L)->next = newB;
         *L = newB;
     }
-    tableB[newB->code] = newB;
 }
 
 void deleteBranch(branch** B, branch** L, string z) {
@@ -97,4 +95,3 @@ void addProductToBranch(branch*B , product*P ,int amount , int minAmount , float
 }
 
 #endif // BRANCH_H
-// HOla

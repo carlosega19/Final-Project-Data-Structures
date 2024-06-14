@@ -478,7 +478,7 @@ void menuMantBranchs(){
 	cout << line << endl;
 }
 
-void createBranch(branch**B , branch**L , unordered_map<string, branch*> &tableB) {
+void createBranch(branch**B , branch**L) {
 	string name , city , state , address , tlf , code;
     bool invalidCode = true;
     cin.ignore();
@@ -516,7 +516,7 @@ void createBranch(branch**B , branch**L , unordered_map<string, branch*> &tableB
 	}
 	else
 	{
-		addBranch(B, L, code, name, city, state, address, tlf, tableB); 
+		addBranch(B, L, code, name, city, state, address, tlf); 
         cout << "\n\t\t-- SUCURSAL AGREGADA --\n\n\n\t";
 	}
     system("pause");

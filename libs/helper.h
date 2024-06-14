@@ -68,7 +68,7 @@ void replaceTrash(string& line) {
 
 /*---------------------------------*/
 //        FILE MANAGMENT
-void readBranchs(branch**B , branch**L , unordered_map<std::string, branch*>& tableB){ // Update the function to delete the trash in line
+void readBranchs(branch**B , branch**L){ // Update the function to delete the trash in line
     ifstream archivo("branchs.txt");
     if (archivo.fail()) return; 
     string n, s , c , a , t , code ,line;
@@ -101,9 +101,9 @@ void readBranchs(branch**B , branch**L , unordered_map<std::string, branch*>& ta
                     break;
             }
         }
-        if (!tableB[code])
+        if (!searchBranchByCode(*B , code))
         {
-            addBranch(B, L, code, n, c, s, a, t, tableB);
+            addBranch(B, L, code, n, c, s, a, t);
         }
     }
     archivo.close();
@@ -168,7 +168,7 @@ void saveProducts(product* P) {
 }
 
 // Take the products inside each branch
-void readProductsOfBranch(branch*B , product*P , unordered_map<string, branch*>& tableB){
+void readProductsOfBranch(branch*B , product*P ){
     ifstream archivo("inventory.txt");
     if (archivo.fail()) return;
     string codeB, codeP , line;
@@ -206,7 +206,7 @@ void readProductsOfBranch(branch*B , product*P , unordered_map<string, branch*>&
                     break;
             }
         }
-        selectedB = tableB[codeB]; //searchBranchByCode(B , codeB);
+        selectedB = searchBranchByCode(B , codeB);
         selectedP = searchProductByCode(P , codeP);
         if (selectedB && selectedP && am >= minAm && price > 0)
         {
