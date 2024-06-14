@@ -15,29 +15,6 @@
 #include <cmath>
 
 
-slista *split(string input, char charray) {
-    slista *result = SL("", NULL);
-    slista *temp = NULL;
-    if (input.length() > 0) {
-    
-        for (int i = 0; i < input.length(); i++) {
-            if (input[i] != charray) {
-                result->cont += input[i];
-            }
-            else {
-                agregar(&result, "");
-            }
-        }
-        if (result->cont == "") {
-            temp = result;
-            result = result->prox;
-            delete temp;
-        }
-    }
-    invertir(&result);
-    return result;
-}
-
 
 void invertir(slista **s) {
     slista *actual = *s;
@@ -78,6 +55,31 @@ void agregar(slista **s, string cont) {
         *s = r;
     }
 }
+
+
+slista *split(string input, char charray) {
+    slista *result = SL("", NULL);
+    slista *temp = NULL;
+    if (input.length() > 0) {
+    
+        for (int i = 0; i < input.length(); i++) {
+            if (input[i] != charray) {
+                result->cont += input[i];
+            }
+            else {
+                agregar(&result, "");
+            }
+        }
+        if (result->cont == "") {
+            temp = result;
+            result = result->prox;
+            delete temp;
+        }
+    }
+    invertir(&result);
+    return result;
+}
+
 
 // ------------------------
 // ------------------------
