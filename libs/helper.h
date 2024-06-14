@@ -7,8 +7,8 @@
 #include <fstream>
 #include <stdlib.h>
 #include <iomanip>
-#include <conio.h>
-#include <windows.h>
+//#include <conio.h>
+//#include <windows.h>
 #include <locale.h>
 #include <string>
 #include <sstream>

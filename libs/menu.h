@@ -15,6 +15,388 @@ int lineWidth = 120;
 string line(lineWidth, '-');
 
 
+struct mensajeInformativo {
+    string data;
+};
+
+mensajeInformativo *MI() {
+    mensajeInformativo *m = new mensajeInformativo;
+    m->data = "";
+    return m;
+}
+
+static mensajeInformativo *Mensajero = MI();
+const string NUM_VALIDO = "1234567890";
+const int NS = 10; /* ver si los string son terminados en NULL para eliminar este campo*/
+
+
+void actualizarMensaje(string m) {
+    Mensajero->data = m;
+}
+
+
+
+struct menuItem {
+    menuItem *parent;
+    string encabezado;
+    int (*comportamiento)(menuItem**, int, branch**);
+};
+
+
+void print(string s) {
+    cout << s << endl;
+} 
+
+void print(int s) {
+    cout << s << endl;
+} 
+
+
+void mostrarMenuActivo(menuItem *mi) {
+    print(mi->encabezado);
+}
+
+int entradaValidar(string entrada) {
+    int i = 0;
+    char t;
+    if (entrada[0]) {
+        t = entrada[0];
+    }
+    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
+        i++;
+    }
+    if (t == NUM_VALIDO[i]) {
+        return (((int) t) - 48);
+    } else {
+        return (-1);
+    }
+}
+
+
+void obtenerEntrada(string input, string *res) {
+    cout << input << endl;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
+// signature de las funciones de menu
+menuItem *menuMantenimiento(menuItem*);
+menuItem *controlProductos(menuItem*);
+menuItem *controlSucursales(menuItem*);
+
+int operarMenuPrincipal(menuItem **activo, int selec, branch **principal) {
+    menuItem *temp = NULL;
+    branch *cache = NULL;
+    if (*activo) {
+        switch (selec) {
+            case 0:
+                cache = *principal;
+                if (!(*activo)->parent) {
+                    //guardarLocal(cache, "Data.txt");
+                    cache = NULL;
+                    return 0;
+                } // refactorizar antes de merge
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+
+            case 1:
+                *activo = menuMantenimiento(*activo);
+                return 1;
+
+            default:
+                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+                return 1;
+
+
+        }
+    } return 0;
+}
+ // 1 productos 2 sucursales 3 personas  0 regresar
+
+int operarMenuMantenimiento(menuItem **activo, int selec, branch **principal) {
+    menuItem *temp = NULL;
+    branch *cache = NULL;
+    if (*activo) {
+        switch (selec) {
+            case 0:
+                cache = *principal;
+                if (!(*activo)->parent) {
+                    //guardarLocal(cache, "Data.txt");
+                    cache = NULL;
+                    return 0;
+                } // refactorizar antes de merge
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+
+            case 1:
+                *activo = controlProductos(*activo);
+                return 1;
+            case 2:
+                *activo = controlSucursales(*activo);
+                return 1;
+
+            default:
+                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+                return 1;
+
+
+        }
+    } return 0;
+}
+
+
+
+
+int controladorMenuProductos(menuItem **activo, int selec, branch **principal) {
+    string entrada = "";
+    branch *s = NULL;
+    int conf;
+    product *p = NULL;
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                // guardarLocal(*principal, "Data.txt");
+                return 1;
+            }
+            break;
+        case 1:
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de branch para agregar: ", &entrada);
+            // s = buscar(*principal, to_int(entrada));
+            if (s) {
+                // agregar(s, iNuevoProducto(s));
+                // mostrarSolo(s);
+            } else {
+                print("No existen sucursales para agregar productos...");
+            }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 2: // modificar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de product para modificar: ", &entrada);
+            // p = buscar_global(*principal, to_int(entrada));
+            // if (p) {
+            //     modificar(p, iNuevoProducto(s));
+            //     mostrarSolo(p);
+            // } else {
+            //     print("No existen sucursales para agregar productos...");
+            // }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 3: // eliminar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
+            // conf = eliminar_pglobal(principal, to_int(entrada));
+            // if (conf) {
+            //     print("Elemento eliminado correctamente.");
+        
+            // } else {
+            //     print("No existe el elemento para eliminar.");
+            // }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 4: // consultar por codigo
+            actualizarMensaje("");
+
+            obtenerEntrada("Indique el codigo de product para mostrar: ", &entrada);
+            // conf = buscar_global_multi(principal, to_int(entrada));
+            // if (!conf) {
+            //     print("El product indicado no existe.");
+            // }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 5:
+            actualizarMensaje("");
+            obtenerEntrada("Indique la descripcion de product para mostrar: ", &entrada);
+            // conf = buscar_global_multi(principal, entrada);
+            // if (!conf) {
+            //     print("El product indicado no existe.");
+            // }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        default:
+            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+            return 1;
+            break;
+    }
+    return 1;
+
+}
+
+
+
+int controladorMenuSucursales(menuItem **activo, int selec, branch **principal) {
+    string entrada = "";
+    branch *s = NULL;
+    int conf;
+    product *p = NULL;
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                //guardarLocal(*principal, "Data.txt");
+                *activo = (*activo)->parent;
+                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
+                return 1;
+            }
+            break;
+        case 1: // agregar
+            actualizarMensaje("");
+            // s = iNuevaSucursal(*principal);
+            // mostrar(s);
+            if (*principal) {
+                //agregar(principal, s);
+            } else {
+                *principal = s;
+            }
+
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 2: // modificar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a modificar: ", &entrada);
+
+            // s = buscar(*principal, to_int(entrada));
+            // modificar(s, iNuevaSucursal(*principal));
+            // mostrar(s);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 3: // eliminar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
+            // eliminar_sucursal(principal, to_int(entrada));
+            // mostrar(*principal);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 4: // consultar por codigo
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
+
+            // s = buscar(*principal, to_int(entrada));
+            // mostrarSolo(s);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 5:
+            actualizarMensaje("");
+            // if (*principal) {
+            //     mostrar(*principal);
+            // } else {
+            //     print("No hay sucursales registradas en el sistema.");
+            // }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        default:
+            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+            return 1;
+            break;
+    }
+    return 1;
+
+}
+
+menuItem *controlSucursales(menuItem *parent) {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE SUCURSALES GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. MOSTRAR TODAS LAS SUCURSALES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = parent->parent;
+    // refactor m->prox = NULL;
+    m->comportamiento = controladorMenuSucursales;
+    return m;
+}
+
+
+menuItem *controlProductos(menuItem *parent) {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE PRODUCTOS GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = parent;
+    //refactor m->prox = controlSucursales(m);
+    m->comportamiento = controladorMenuProductos;
+    return m;
+}
+
+
+menuItem *menuMantenimiento(menuItem *parent) {
+    menuItem *m = new menuItem;
+    //refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\t1. MANTENIMIENTO\n---------------------------------------------------------------------------\nOPCIONES DE MENU\n\t1. PRODUCTOS\n\t2. SUCURSALES\n\t3. PERSONAS\n\t0. REGRESAR\n---------------------------------------------------------------------------";
+    m->parent = parent;
+    // refactor m->prox = controlProductos(m);
+    m->comportamiento = operarMenuMantenimiento;
+    return m;
+
+}
+
+menuItem *menuPrincipal() {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = cargarLocal("Data.txt");
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nMENU PRINCIPAL\n\t1. MANTENIMIENTO\n\t2. FACTURACION\n\t3. REPORTES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = NULL;
+    // refactor m->prox = menuMantenimiento(m);
+    m->comportamiento = operarMenuPrincipal;
+    return m;
+}
+
+
+
+
+
+void run() {
+    int activo = 1;
+    int val = 0;
+    string entrada = "";
+    menuItem *menuActivo = menuPrincipal();
+    branch *sucursalActiva = NULL; //cargarLocal("Data.txt");
+    while (activo) {
+        //clScr(); // Refrescar la pantalla y borrar el terminal
+        system("clear");
+        print(Mensajero->data);
+        if (menuActivo) {
+            obtenerEntrada(menuActivo->encabezado, &entrada);
+            val = entradaValidar(entrada);
+            activo = menuActivo->comportamiento(&menuActivo, val, &sucursalActiva);
+        } else {
+            activo = 0;
+        }
+
+    }
+    system("clear");
+    //clScr(); // Refrescar la pantalla y borrar el terminal
+}
+
+
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+
+
+
+
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+
+
+
 
 void printCreators() {
     string names = "REALIZADO POR:    Andres De Quintal   Y   Carlos Gali�o";
@@ -164,15 +546,15 @@ void createProduct(product**P){
     cin.ignore();
     do // IF THE CODE IS ALREADY TAKES, THE USER IS OBLIGATED TO TRY ANOTHER CODE
     {
-        cout << "\n\t- Escribe el CODIGO del nuevo PRODUCTO: ";
+        cout << "\n\t- Escribe el CODIGO del nuevo product: ";
         getline(cin, code);
         invalidCode = searchProductByCode(*P , code);
         if (invalidCode) cout << "\n\t\t-- CODIGO YA EXISTENTE --\n\n";
     } while (invalidCode);
 
-    cout << "\n\t- Escribe el NOMBRE del nuevo PRODUCTO: ";
+    cout << "\n\t- Escribe el NOMBRE del nuevo product: ";
     getline(cin, name);
-    cout << "\n\t- Escribe la DESCRIPCION del nuevo PRODUCTO: ";
+    cout << "\n\t- Escribe la DESCRIPCION del nuevo product: ";
     getline(cin, description);
     if (cin.fail())
     {
@@ -184,7 +566,7 @@ void createProduct(product**P){
     }
     else
     {
-        cout << "\n\n\t\t-- PRODUCTO AGREGADO --\n\n";
+        cout << "\n\n\t\t-- product AGREGADO --\n\n";
         addProduct(P , code , name , description , 0 , 0 , 0);
     }
     system("pause");
@@ -240,7 +622,7 @@ product* selectProductByCode(product* P) {
     string codeSelect;
     showAllProducts(P);
     cin.ignore();
-    cout << "\n\n\n\tIngrese el codigo del producto entre []: ";
+    cout << "\n\n\n\tIngrese el codigo del product entre []: ";
     getline(cin, codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;
     return searchProductByCode(P, codeSelect);
@@ -249,7 +631,7 @@ product* selectProductByCode(product* P) {
 void menuModProduct(product* P) {
     system("cls");
     menuHeader();
-    string subtitle = "CONSULTAR SUCURSAL POR DESCRIPCION";
+    string subtitle = "CONSULTAR branch POR DESCRIPCION";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
@@ -257,7 +639,7 @@ void menuModProduct(product* P) {
     product* selected = selectProductByCode(P); // THE USER SELECT A PRODUCT
     if (!selected)
     {
-        cout << "\n\n\t\t\t-- PRODUCTO NO SELECCIONADO --\n\n";
+        cout << "\n\n\t\t\t-- product NO SELECCIONADO --\n\n";
     }
     else {
         int op;
@@ -336,7 +718,7 @@ void menuModProduct(product* P) {
 void menuConsultProductByCode(product* B) {
     system("cls");
     menuHeader();
-    string subtitle = "CONSULTAR PRODUCTO POR CODIGO";
+    string subtitle = "CONSULTAR product POR CODIGO";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << line << endl;
     product* selected = selectProductByCode(B);
@@ -352,7 +734,7 @@ void menuConsultProductByCode(product* B) {
         system("pause");
     }
     else {
-        cout << "\n -- PRODUCTO INEXISTENTE --\n\n\n";
+        cout << "\n -- product INEXISTENTE --\n\n\n";
     }
 }
 
@@ -388,7 +770,7 @@ void menuConsultProductByType(product* B) { // CAMBIAR EL "TYPE"
 }
 
 void menuConsultProductByDesc(product* B) {
-    string subtitle = "CONSULTAR PRODUCTO POR DESCRIPCION";
+    string subtitle = "CONSULTAR product POR DESCRIPCION";
     string op1 = "1. DESCRIPCION";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     int op;
@@ -421,7 +803,7 @@ void menuConsultProductByDesc(product* B) {
 void menuDelProduct(product**P) {
     system("cls");
     menuHeader();
-    string subtitle = "ELIMINAR PRODUCTO";
+    string subtitle = "ELIMINAR product";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
@@ -443,7 +825,7 @@ void menuDelProduct(product**P) {
         if (op == 1)
         {
             deleteProduct(P , selected->code);
-            cout << "\n\n\t\t-- PRODUCTO ELIMINADO --\n\n";
+            cout << "\n\n\t\t-- product ELIMINADO --\n\n";
         }
     }
     system("pause");
@@ -484,7 +866,7 @@ void createBranch(branch**B) {
     cin.ignore();
     do
     {
-        cout << "\n\t- Escribe el CODIGO de la nueva SUCURSAL: ";
+        cout << "\n\t- Escribe el CODIGO de la nueva branch: ";
         getline(cin, code);
         fflush(stdin);
         invalidCode = searchBranchByCode(*B, code);
@@ -495,19 +877,19 @@ void createBranch(branch**B) {
     } while (invalidCode);
 
     fflush(stdin);
-	cout << "\n\t- Escribe el NOMBRE de la nueva SUCURSAL (max.30): "; 
+	cout << "\n\t- Escribe el NOMBRE de la nueva branch (max.30): "; 
 	getline(cin ,name);
 	fflush(stdin);
-	cout << "\n\t- Escribe el ESTADO de la nueva SUCURSAL (max.30): ";  
+	cout << "\n\t- Escribe el ESTADO de la nueva branch (max.30): ";  
 	getline(cin, state);
 	fflush(stdin);
-	cout << "\n\t- Escribe la CIUDAD de la nueva SUCURSAL (max.30): ";  
+	cout << "\n\t- Escribe la CIUDAD de la nueva branch (max.30): ";  
 	getline(cin, city);
 	fflush(stdin);
-	cout << "\n\t- Escribe la DIRECCION de la nueva SUCURSAL (max.30): ";  
+	cout << "\n\t- Escribe la DIRECCION de la nueva branch (max.30): ";  
 	getline(cin, address);
 	fflush(stdin);
-	cout << "\n\t- Escribe el NUMERO TELEFONICO de la nueva SUCURSAL - (xxx) xxxxxxx: ";  
+	cout << "\n\t- Escribe el NUMERO TELEFONICO de la nueva branch - (xxx) xxxxxxx: ";  
 	getline(cin, tlf);
 	fflush(stdin);
 
@@ -517,7 +899,7 @@ void createBranch(branch**B) {
 	else
 	{
 		addBranch(B, code, name, city, state, address, tlf); 
-        cout << "\n\t\t-- SUCURSAL AGREGADA --\n\n\n\t";
+        cout << "\n\t\t-- branch AGREGADA --\n\n\n\t";
 	}
     system("pause");
 }
@@ -569,7 +951,7 @@ branch* selectBranchByCode(branch* B) {
     string codeSelect;
     printBranchs(B);
     cin.ignore();
-    cout << "\n\n\n\tIngrese el codigo de la sucursal: ";
+    cout << "\n\n\n\tIngrese el codigo de la branch: ";
     getline(cin, codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;  
     return searchBranchByCode(B, codeSelect);
@@ -580,7 +962,7 @@ void menuModBranch(branch *B){
     branch* selected = selectBranchByCode(B);
     if (!selected)
     {
-        cout << "\n\n\t\t-- SUCURSAL NO SELECCIONADA --\n\n";
+        cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
         system("pause");
     }
     else{
@@ -755,7 +1137,7 @@ void menuModBranch(branch *B){
 void menuConsultBranchByCode(branch*B){
     system("cls");
     menuHeader();
-    string subtitle = "CONSULTAR SUCURSAL POR CODIGO";
+    string subtitle = "CONSULTAR branch POR CODIGO";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
 	cout << line << endl;
     branch* selected = selectBranchByCode(B);
@@ -772,7 +1154,7 @@ void menuConsultBranchByCode(branch*B){
         system("pause");
     }
     else{
-        cout<<"\n -- Sucursal INEXISTENTE --\n\n\n";
+        cout<<"\n -- branch INEXISTENTE --\n\n\n";
     }
 }
 
@@ -782,7 +1164,7 @@ void menuConsultByState(branch*B ){
     system("cls");
     menuHeader();
     string userInput;
-    string subtitle = "CONSULTAR SUCURSAL POR ESTADO";
+    string subtitle = "CONSULTAR branch POR ESTADO";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
 	cout << line << endl;
@@ -813,7 +1195,7 @@ void menuConsultByCity(branch* B) {
     system("cls");
     menuHeader();
     string userInput;
-    string subtitle = "CONSULTAR SUCURSAL POR CIUDAD";
+    string subtitle = "CONSULTAR branch POR CIUDAD";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << line << endl;
@@ -841,7 +1223,7 @@ void menuConsultByCity(branch* B) {
 }
 
 void menuConsultBranchByDesc(branch*B){
-    string subtitle = "CONSULTAR SUCURSAL POR DESCRIPCION";
+    string subtitle = "CONSULTAR branch POR DESCRIPCION";
     string op1 = "1. ESTADO";
 	string op2 = "2. CIUDAD";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
@@ -873,7 +1255,7 @@ void menuConsultBranchByDesc(branch*B){
 void menuDeleBranch(branch**B){
     system("cls");
     menuHeader();
-    string subtitle = "ELIMINAR SUCURSAL";
+    string subtitle = "ELIMINAR branch";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << line << endl;
 
@@ -889,11 +1271,11 @@ void menuDeleBranch(branch**B){
         cin >> op;
         if (op == 1) {
             deleteBranch(B,  selected->code);
-            cout << "\n\t-- SUCURSAL ELIMINADA --\n\n";
+            cout << "\n\t-- branch ELIMINADA --\n\n";
         }
     }
     else{
-        cout << "\n\n\t\t-- SUCURSAL NO SELECCIONADA --\n\n";
+        cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
     }
     system("pause");
 }
@@ -904,7 +1286,7 @@ void menuAddProductToBranch(branch*B, product*P) {
     float price;
     system("cls");
     menuHeader();
-    string subtitle = "1.2.7.2 AGREGAR PRODUTO A SUCURSAL";
+    string subtitle = "1.2.7.2 AGREGAR PRODUTO A branch";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
@@ -914,15 +1296,15 @@ void menuAddProductToBranch(branch*B, product*P) {
     {
         if (searchProductByCode(B->products , selected->code))
         {
-            cout << "\n\n\t-- Este producto ya esta agregado --\n\n\n";
+            cout << "\n\n\t-- Este product ya esta agregado --\n\n\n";
             system("pause");
             return;
         }
         cout << "\n\t - " << selected->name << " [" << selected->code << "]";
         cout << "\n\t\t ~ Descripcion: " << selected->description << "\n\t\t ~ Precio: " << selected->price << "$\n\n";
-        cout << "\n\tIngresa la cantidad minima del producto: "; cin >> minAm;
-        cout << "\n\tIngresa la cantidad del producto: "; cin >> am;
-        cout << "\n\tIngresa el precio del producto: "; cin >> price;
+        cout << "\n\tIngresa la cantidad minima del product: "; cin >> minAm;
+        cout << "\n\tIngresa la cantidad del product: "; cin >> am;
+        cout << "\n\tIngresa el precio del product: "; cin >> price;
         if ((am < minAm) || price < 0 || cin.fail())
         {
             cout << "\n\t-- DATOS INVALIDOS --\n\n";
@@ -942,13 +1324,13 @@ void menuAddProductToBranch(branch*B, product*P) {
             if (op == 1)
             {
                 addProductToBranch(B, selected , am , minAm , price);
-                cout << "\n\n\t\t-- PRODUCTO AGREGADO A SUCURSAL --\n\n";
+                cout << "\n\n\t\t-- product AGREGADO A branch --\n\n";
             }
         }
     }
     else
     {
-        cout << "\n -- PRODUCTO INEXISTENTE --\n\n\n";
+        cout << "\n -- product INEXISTENTE --\n\n\n";
     }
     system("pause");
 }
@@ -993,7 +1375,7 @@ void tableProductsOfBranch(product* P) {
 void menuDelProductOfBranch(product**P) {
     system("cls");
     menuHeader();
-    string subtitle = "1.2.7.2. 3 BORRAR PRODUCTO DE SUCURSAL";
+    string subtitle = "1.2.7.2. 3 BORRAR product DE branch";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
@@ -1015,12 +1397,12 @@ void menuDelProductOfBranch(product**P) {
         if (op == 1)
         {
             deleteProduct(P,  selected->code);
-            cout << "\n\t-- PRODUCTO ELIMINADO --\n\n";
+            cout << "\n\t-- product ELIMINADO --\n\n";
         }
     }
     else
     {
-        cout << "\n -- PRODUCTO INEXISTENTE --\n\n";
+        cout << "\n -- product INEXISTENTE --\n\n";
     }
     system("pause");
 }
@@ -1028,7 +1410,7 @@ void menuDelProductOfBranch(product**P) {
 void optionsMenuInventory(branch*selected){
     system("cls");
         menuHeader();
-        string op1 = "1.2.7.1. SELECCIONAR SUCURSAL";
+        string op1 = "1.2.7.1. SELECCIONAR branch";
         string op2 = "1.2.7.2. AGREGAR PRODUCTOS";
         string op3 = "1.2.7.3. ELIMINAR PRODUCTOS";
         string op4 = "1.2.7.4. MODIFICAR INVENTARIO";
@@ -1047,7 +1429,7 @@ void optionsMenuInventory(branch*selected){
         cout << "\n\tSucursal seleccionada: ";
         if (!selected)
         {
-            cout << "\t\tSeleccone una sucursal para continuar...\n";
+            cout << "\t\tSeleccone una branch para continuar...\n";
         }
         else
         {
@@ -1266,7 +1648,7 @@ void menuInventory(branch*B , product*P) {
         fflush(stdin);
         if (!selected && (op != 0 && op != 1))
         {
-            cout << "\n\t\t\t-- SUCURSAL NO SELECCIONADA --\n\n\n";
+            cout << "\n\t\t\t-- branch NO SELECCIONADA --\n\n\n";
             op = -1;
             system("pause");
         }

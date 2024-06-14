@@ -8,7 +8,7 @@
 #include "libs/helper.h"
 using namespace std;
 
-
+/*
 int main() {
     setlocale(LC_ALL, "es_ES.UTF-8");
 	int op;
@@ -126,7 +126,7 @@ int main() {
                             op = -1;
 							break;
 					}
-					/* ---------- FIN MANTENIMIENTO ---------- */
+					// ---------- FIN MANTENIMIENTO ---------- 
 				} while (op != 0);
 				op = -1;
 				break;
@@ -144,4 +144,11 @@ int main() {
 	saveBranchs(branchs);
     saveProductsOfBranch(branchs);
     return EXIT_SUCCESS;
+}
+*/
+
+
+int main() {
+    run();
+
 }
