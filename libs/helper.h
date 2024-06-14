@@ -15,6 +15,11 @@
 #include <cmath>
 
 
+struct slista {
+    string cont;
+    slista *prox;
+};
+
 
 void invertir(slista **s) {
     slista *actual = *s;
@@ -37,10 +42,6 @@ void mostrar(slista *s) {
     }
 }
 
-struct slista {
-    string cont;
-    slista *prox;
-};
 
 slista *SL(string val, slista *p) {
     slista *r = new slista;
