@@ -39,7 +39,7 @@ void actualizarMensaje(string m) {
 struct menuItem {
     menuItem *parent;
     string encabezado;
-    int (*comportamiento)(menuItem**, int, branch**);
+    int (*comportamiento)(menuItem**, int , product**);
 };
 
 
@@ -83,7 +83,7 @@ menuItem *menuMantenimiento(menuItem*);
 menuItem *controlProductos(menuItem*);
 menuItem *controlSucursales(menuItem*);
 
-int operarMenuPrincipal(menuItem **activo, int selec, branch **principal) {
+int operarMenuPrincipal(menuItem **activo, int selec, branch**principal) {
     menuItem *temp = NULL;
     branch *cache = NULL;
     if (*activo) {
@@ -106,20 +106,18 @@ int operarMenuPrincipal(menuItem **activo, int selec, branch **principal) {
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
-
-
         }
     } return 0;
 }
  // 1 productos 2 sucursales 3 personas  0 regresar
 
-int operarMenuMantenimiento(menuItem **activo, int selec, branch **principal) {
+int operarMenuMantenimiento(menuItem **activo, int selec, branch **branches, product**products) {
     menuItem *temp = NULL;
     branch *cache = NULL;
     if (*activo) {
         switch (selec) {
             case 0:
-                cache = *principal;
+                cache = *branches;
                 if (!(*activo)->parent) {
                     //guardarLocal(cache, "Data.txt");
                     cache = NULL;
@@ -148,9 +146,8 @@ int operarMenuMantenimiento(menuItem **activo, int selec, branch **principal) {
 
 
 
-int controladorMenuProductos(menuItem **activo, int selec, branch **principal) {
+int controladorMenuProductos(menuItem **activo, int selec , product**P) {
     string entrada = "";
-    branch *s = NULL;
     int conf;
     product *p = NULL;
     switch (selec) {
@@ -164,14 +161,7 @@ int controladorMenuProductos(menuItem **activo, int selec, branch **principal) {
             break;
         case 1:
             actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de branch para agregar: ", &entrada);
-            // s = buscar(*principal, to_int(entrada));
-            if (s) {
-                // agregar(s, iNuevoProducto(s));
-                // mostrarSolo(s);
-            } else {
-                print("No existen sucursales para agregar productos...");
-            }
+            createProduct(P);
             print("Presione ENTER para continuar.");
             getchar(); // espera nuevo \n para tomar;
             break;
@@ -362,7 +352,7 @@ void run() {
     branch *sucursalActiva = NULL; //cargarLocal("Data.txt");
     while (activo) {
         //clScr(); // Refrescar la pantalla y borrar el terminal
-        system("clear");
+        system("cls");
         print(Mensajero->data);
         if (menuActivo) {
             obtenerEntrada(menuActivo->encabezado, &entrada);
@@ -373,7 +363,7 @@ void run() {
         }
 
     }
-    system("clear");
+    system("cls");
     //clScr(); // Refrescar la pantalla y borrar el terminal
 }
 
