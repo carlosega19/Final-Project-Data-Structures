@@ -13,7 +13,6 @@ struct branch {
     string address;
     string tlf;
     product* products;
-    product* lastP;
     branch* next;
 };
 
@@ -41,7 +40,7 @@ branch* searchBranchByCity(branch* B, string str) {
     return searchBranchByCity(B->next, str);
 }
 
-void addBranch(branch** B, branch** L, string codeB, string name, string city, string state, string address, string tlf) {
+void addBranch(branch** B, string codeB, string name, string city, string state, string address, string tlf) {
     branch* newB = new branch;
     newB->code = codeB;
     newB->name = name;
@@ -50,21 +49,11 @@ void addBranch(branch** B, branch** L, string codeB, string name, string city, s
     newB->address = address;
     newB->tlf = tlf;
     newB->products = NULL;
-    newB->lastP = NULL;
-
-    if (!(*B)) {
-        newB->next = *B;
-        *B = newB;
-        *L = newB;
-    }
-    else {
-        newB->next = NULL;
-        (*L)->next = newB;
-        *L = newB;
-    }
+    newB->next = *B;
+    *B = newB;
 }
 
-void deleteBranch(branch** B, branch** L, string z) {
+void deleteBranch(branch** B, string z) {
     if (!(*B)) return;
     branch* ax = *B, * temp;
     if (tolow(ax->code) == tolow(z)) {
@@ -73,25 +62,17 @@ void deleteBranch(branch** B, branch** L, string z) {
         delete temp;
     }
     else {
-        while (ax->next && tolow(ax->next->code) != tolow(z)) ax = ax->next;
+        while (ax->next && ax->next->code != z) ax = ax->next;
         if (ax->next) {
-            if (ax->next == *L) {
-                temp = ax->next;
-                ax->next = temp->next;
-                delete temp;
-                *L = ax;
-            }
-            else {
-                temp = ax->next;
-                ax->next = temp->next;
-                delete temp;
-            }
+            temp = ax->next;
+            ax->next = temp->next;
+            delete temp;
         }
     }
 }
 
 void addProductToBranch(branch*B , product*P ,int amount , int minAmount , float price) {
-    addProduct(&B->products, &B->lastP, P->code, P->name, P->description, price , amount , minAmount);
+    addProduct(&B->products, P->code, P->name, P->description, price , amount , minAmount);
 }
 
 #endif // BRANCH_H

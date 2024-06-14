@@ -103,7 +103,7 @@ void readBranchs(branch**B , branch**L){ // Update the function to delete the tr
         }
         if (!searchBranchByCode(*B , code))
         {
-            addBranch(B, L, code, n, c, s, a, t);
+            addBranch(B, code, n, c, s, a, t);
         }
     }
     archivo.close();
@@ -149,7 +149,7 @@ void readProducts(product** P, product** L) { // Update the function to delete t
                     break;
             }
         }
-        addProduct(P, L, code, n, d, 0, 0 , 0);
+        addProduct(P, code, n, d, 0, 0 , 0);
     }
     archivo.close();
 }

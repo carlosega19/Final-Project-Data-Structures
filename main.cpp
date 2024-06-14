@@ -13,14 +13,12 @@ int main() {
     setlocale(LC_ALL, "es_ES.UTF-8");
 	int op;
     branch* branchs = NULL;
-    branch* lastB = NULL;
 
     product* products = NULL;
-    product* lastP = NULL;
     // READ PRODUCTS
-    readProducts(&products, &lastP);
+    //readProducts(&products);
     // READ BRANCHS
-    readBranchs(&branchs , &lastB );
+    //readBranchs(&branchs);
     // READ PRODUCTS INSIDE BRANCHS
     readProductsOfBranch(branchs , products);
 	do
@@ -63,13 +61,13 @@ int main() {
                                 switch (op)
                                 {
                                     case 1: // Add Product
-                                        createProduct(&products, &lastP);
+                                        createProduct(&products);
                                         break;
                                     case 2: // MODIFY A PRODUCT
                                         menuModProduct(products);
                                         break;
                                     case 3: // DELETE A PRODUCT
-                                        menuDelProduct(&products , &lastP);
+                                        menuDelProduct(&products);
                                         break;
                                     case 4: // CONSULT A PRODUCT BY CODE
                                         menuConsultProductByCode(products);
@@ -101,13 +99,13 @@ int main() {
                                 switch (op)
                                 {
                                     case 1: // Add Branch
-                                        createBranch(&branchs , &lastB);
+                                        createBranch(&branchs);
                                         break;
                                     case 2: // Modify Branch
                                         menuModBranch(branchs);
                                         break;
                                     case 3: // Delete Branch
-                                        menuDeleBranch(&branchs , &lastB);
+                                        menuDeleBranch(&branchs );
                                         break;
                                     case 4: // Consult By Code
                                         menuConsultBranchByCode(branchs);

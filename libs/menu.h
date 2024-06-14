@@ -158,7 +158,7 @@ void optionsModBranch(branch*selected){
 }
 
 /*--------------- BRANCHES AND PRODUCTS MENUS ---------------*/
-void createProduct(product**P , product**L){
+void createProduct(product**P){
     string code , name , description;
     bool invalidCode = true;
     cin.ignore();
@@ -185,7 +185,7 @@ void createProduct(product**P , product**L){
     else
     {
         cout << "\n\n\t\t-- PRODUCTO AGREGADO --\n\n";
-        addProduct(P , L , code , name , description , 0 , 0 , 0);
+        addProduct(P , code , name , description , 0 , 0 , 0);
     }
     system("pause");
 }
@@ -418,7 +418,7 @@ void menuConsultProductByDesc(product* B) {
     } while (op != 0);
 }
 
-void menuDelProduct(product**P , product**L) {
+void menuDelProduct(product**P) {
     system("cls");
     menuHeader();
     string subtitle = "ELIMINAR PRODUCTO";
@@ -442,7 +442,7 @@ void menuDelProduct(product**P , product**L) {
         }
         if (op == 1)
         {
-            deleteProduct(P , L , selected->code);
+            deleteProduct(P , selected->code);
             cout << "\n\n\t\t-- PRODUCTO ELIMINADO --\n\n";
         }
     }
@@ -478,7 +478,7 @@ void menuMantBranchs(){
 	cout << line << endl;
 }
 
-void createBranch(branch**B , branch**L) {
+void createBranch(branch**B) {
 	string name , city , state , address , tlf , code;
     bool invalidCode = true;
     cin.ignore();
@@ -516,7 +516,7 @@ void createBranch(branch**B , branch**L) {
 	}
 	else
 	{
-		addBranch(B, L, code, name, city, state, address, tlf); 
+		addBranch(B, code, name, city, state, address, tlf); 
         cout << "\n\t\t-- SUCURSAL AGREGADA --\n\n\n\t";
 	}
     system("pause");
@@ -870,7 +870,7 @@ void menuConsultBranchByDesc(branch*B){
     } while (op != 0);
 }
 
-void menuDeleBranch(branch**B,branch**L){
+void menuDeleBranch(branch**B){
     system("cls");
     menuHeader();
     string subtitle = "ELIMINAR SUCURSAL";
@@ -888,7 +888,7 @@ void menuDeleBranch(branch**B,branch**L){
         int op;
         cin >> op;
         if (op == 1) {
-            deleteBranch(B, L, selected->code);
+            deleteBranch(B,  selected->code);
             cout << "\n\t-- SUCURSAL ELIMINADA --\n\n";
         }
     }
@@ -990,7 +990,7 @@ void tableProductsOfBranch(product* P) {
     cout << line << "\n\n\t";
 }
 
-void menuDelProductOfBranch(product**P , product**L) {
+void menuDelProductOfBranch(product**P) {
     system("cls");
     menuHeader();
     string subtitle = "1.2.7.2. 3 BORRAR PRODUCTO DE SUCURSAL";
@@ -1014,7 +1014,7 @@ void menuDelProductOfBranch(product**P , product**L) {
         }
         if (op == 1)
         {
-            deleteProduct(P, L, selected->code);
+            deleteProduct(P,  selected->code);
             cout << "\n\t-- PRODUCTO ELIMINADO --\n\n";
         }
     }
@@ -1280,7 +1280,7 @@ void menuInventory(branch*B , product*P) {
                 menuAddProductToBranch(selected, P);
                 break;
             case 3:
-                menuDelProductOfBranch(&selected->products, &selected->lastP);
+                menuDelProductOfBranch(&selected->products);
                 break;    
             case 4:
                 menuModProductOfBranch(selected->products);
