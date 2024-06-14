@@ -36,356 +36,6 @@ void actualizarMensaje(string m) {
 
 
 
-struct menuItem {
-    menuItem *parent;
-    string encabezado;
-    int (*comportamiento)(menuItem**, int , product**);
-};
-
-
-void print(string s) {
-    cout << s << endl;
-} 
-
-void print(int s) {
-    cout << s << endl;
-} 
-
-
-void mostrarMenuActivo(menuItem *mi) {
-    print(mi->encabezado);
-}
-
-int entradaValidar(string entrada) {
-    int i = 0;
-    char t;
-    if (entrada[0]) {
-        t = entrada[0];
-    }
-    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
-        i++;
-    }
-    if (t == NUM_VALIDO[i]) {
-        return (((int) t) - 48);
-    } else {
-        return (-1);
-    }
-}
-
-
-void obtenerEntrada(string input, string *res) {
-    cout << input << endl;
-    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
-}
-
-// signature de las funciones de menu
-menuItem *menuMantenimiento(menuItem*);
-menuItem *controlProductos(menuItem*);
-menuItem *controlSucursales(menuItem*);
-
-int operarMenuPrincipal(menuItem **activo, int selec, branch**principal) {
-    menuItem *temp = NULL;
-    branch *cache = NULL;
-    if (*activo) {
-        switch (selec) {
-            case 0:
-                cache = *principal;
-                if (!(*activo)->parent) {
-                    //guardarLocal(cache, "Data.txt");
-                    cache = NULL;
-                    return 0;
-                } // refactorizar antes de merge
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
-
-            case 1:
-                *activo = menuMantenimiento(*activo);
-                return 1;
-
-            default:
-                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-                return 1;
-        }
-    } return 0;
-}
- // 1 productos 2 sucursales 3 personas  0 regresar
-
-int operarMenuMantenimiento(menuItem **activo, int selec, branch **branches, product**products) {
-    menuItem *temp = NULL;
-    branch *cache = NULL;
-    if (*activo) {
-        switch (selec) {
-            case 0:
-                cache = *branches;
-                if (!(*activo)->parent) {
-                    //guardarLocal(cache, "Data.txt");
-                    cache = NULL;
-                    return 0;
-                } // refactorizar antes de merge
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
-
-            case 1:
-                *activo = controlProductos(*activo);
-                return 1;
-            case 2:
-                *activo = controlSucursales(*activo);
-                return 1;
-
-            default:
-                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-                return 1;
-
-
-        }
-    } return 0;
-}
-
-
-
-
-int controladorMenuProductos(menuItem **activo, int selec , product**P) {
-    string entrada = "";
-    int conf;
-    product *p = NULL;
-    switch (selec) {
-        case 0:
-            if (*activo) {
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                // guardarLocal(*principal, "Data.txt");
-                return 1;
-            }
-            break;
-        case 1:
-            actualizarMensaje("");
-            createProduct(P);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 2: // modificar
-            actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de product para modificar: ", &entrada);
-            // p = buscar_global(*principal, to_int(entrada));
-            // if (p) {
-            //     modificar(p, iNuevoProducto(s));
-            //     mostrarSolo(p);
-            // } else {
-            //     print("No existen sucursales para agregar productos...");
-            // }
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 3: // eliminar
-            actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
-            // conf = eliminar_pglobal(principal, to_int(entrada));
-            // if (conf) {
-            //     print("Elemento eliminado correctamente.");
-        
-            // } else {
-            //     print("No existe el elemento para eliminar.");
-            // }
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 4: // consultar por codigo
-            actualizarMensaje("");
-
-            obtenerEntrada("Indique el codigo de product para mostrar: ", &entrada);
-            // conf = buscar_global_multi(principal, to_int(entrada));
-            // if (!conf) {
-            //     print("El product indicado no existe.");
-            // }
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 5:
-            actualizarMensaje("");
-            obtenerEntrada("Indique la descripcion de product para mostrar: ", &entrada);
-            // conf = buscar_global_multi(principal, entrada);
-            // if (!conf) {
-            //     print("El product indicado no existe.");
-            // }
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        default:
-            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-            return 1;
-            break;
-    }
-    return 1;
-
-}
-
-
-
-int controladorMenuSucursales(menuItem **activo, int selec, branch **principal) {
-    string entrada = "";
-    branch *s = NULL;
-    int conf;
-    product *p = NULL;
-    switch (selec) {
-        case 0:
-            if (*activo) {
-                actualizarMensaje("");
-                //guardarLocal(*principal, "Data.txt");
-                *activo = (*activo)->parent;
-                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
-                return 1;
-            }
-            break;
-        case 1: // agregar
-            actualizarMensaje("");
-            // s = iNuevaSucursal(*principal);
-            // mostrar(s);
-            if (*principal) {
-                //agregar(principal, s);
-            } else {
-                *principal = s;
-            }
-
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 2: // modificar
-            actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de la branch a modificar: ", &entrada);
-
-            // s = buscar(*principal, to_int(entrada));
-            // modificar(s, iNuevaSucursal(*principal));
-            // mostrar(s);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 3: // eliminar
-            actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
-            // eliminar_sucursal(principal, to_int(entrada));
-            // mostrar(*principal);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 4: // consultar por codigo
-            actualizarMensaje("");
-            obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
-
-            // s = buscar(*principal, to_int(entrada));
-            // mostrarSolo(s);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        case 5:
-            actualizarMensaje("");
-            // if (*principal) {
-            //     mostrar(*principal);
-            // } else {
-            //     print("No hay sucursales registradas en el sistema.");
-            // }
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
-            break;
-        default:
-            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-            return 1;
-            break;
-    }
-    return 1;
-
-}
-
-menuItem *controlSucursales(menuItem *parent) {
-    menuItem *m = new menuItem;
-    // refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE SUCURSALES GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. MOSTRAR TODAS LAS SUCURSALES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
-    m->parent = parent->parent;
-    // refactor m->prox = NULL;
-    m->comportamiento = controladorMenuSucursales;
-    return m;
-}
-
-
-menuItem *controlProductos(menuItem *parent) {
-    menuItem *m = new menuItem;
-    // refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE PRODUCTOS GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
-    m->parent = parent;
-    //refactor m->prox = controlSucursales(m);
-    m->comportamiento = controladorMenuProductos;
-    return m;
-}
-
-
-menuItem *menuMantenimiento(menuItem *parent) {
-    menuItem *m = new menuItem;
-    //refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\t1. MANTENIMIENTO\n---------------------------------------------------------------------------\nOPCIONES DE MENU\n\t1. PRODUCTOS\n\t2. SUCURSALES\n\t3. PERSONAS\n\t0. REGRESAR\n---------------------------------------------------------------------------";
-    m->parent = parent;
-    // refactor m->prox = controlProductos(m);
-    m->comportamiento = operarMenuMantenimiento;
-    return m;
-
-}
-
-menuItem *menuPrincipal() {
-    menuItem *m = new menuItem;
-    // refactor m->cabeza = cargarLocal("Data.txt");
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nMENU PRINCIPAL\n\t1. MANTENIMIENTO\n\t2. FACTURACION\n\t3. REPORTES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
-    m->parent = NULL;
-    // refactor m->prox = menuMantenimiento(m);
-    m->comportamiento = operarMenuPrincipal;
-    return m;
-}
-
-
-
-
-
-void run() {
-    int activo = 1;
-    int val = 0;
-    string entrada = "";
-    menuItem *menuActivo = menuPrincipal();
-    branch *sucursalActiva = NULL; //cargarLocal("Data.txt");
-    while (activo) {
-        //clScr(); // Refrescar la pantalla y borrar el terminal
-        system("cls");
-        print(Mensajero->data);
-        if (menuActivo) {
-            obtenerEntrada(menuActivo->encabezado, &entrada);
-            val = entradaValidar(entrada);
-            activo = menuActivo->comportamiento(&menuActivo, val, &sucursalActiva);
-        } else {
-            activo = 0;
-        }
-
-    }
-    system("cls");
-    //clScr(); // Refrescar la pantalla y borrar el terminal
-}
-
-
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-
-
-
-
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-// ------------------------------------------
-
-
 
 
 void printCreators() {
@@ -1668,4 +1318,351 @@ void menuInventory(branch*B , product*P) {
     } while (op != 0);
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
+
+
+
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+
+
+
+
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+
+
+struct context {
+    product** products;
+    branch** branches;
+};
+
+context *newContext(product **p, branch **b) {
+    context *c = new context;
+    c->products = p;
+    c->branches = b;
+    return c;
+}
+
+struct menuItem {
+    menuItem *parent;
+    string encabezado;
+    int (*comportamiento)(menuItem**, int, context*);
+};
+
+
+void print(string s) {
+    cout << s << endl;
+} 
+
+void print(int s) {
+    cout << s << endl;
+} 
+
+
+void mostrarMenuActivo(menuItem *mi) {
+    print(mi->encabezado);
+}
+
+int entradaValidar(string entrada) {
+    int i = 0;
+    char t;
+    if (entrada[0]) {
+        t = entrada[0];
+    }
+    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
+        i++;
+    }
+    if (t == NUM_VALIDO[i]) {
+        return (((int) t) - 48);
+    } else {
+        return (-1);
+    }
+}
+
+
+void obtenerEntrada(string input, string *res) {
+    cout << input << endl;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
+// signature de las funciones de menu
+menuItem *menuMantenimiento(menuItem*);
+menuItem *controlProductos(menuItem*);
+menuItem *controlSucursales(menuItem*);
+
+int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
+    menuItem *temp = NULL;
+    //branch *cache = NULL;
+    if (*activo) {
+        switch (selec) {
+            case 0:
+                //cache = *ct->branches;
+                if (!(*activo)->parent) {
+                    //guardarLocal(cache, "Data.txt");
+                    //cache = NULL;
+                    return 0;
+                } // refactorizar antes de merge
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+
+            case 1:
+                *activo = menuMantenimiento(*activo);
+                return 1;
+
+            default:
+                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+                return 1;
+        }
+    } return 0;
+}
+ // 1 productos 2 sucursales 3 personas  0 regresar
+
+int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
+    menuItem *temp = NULL;
+    if (*activo) {
+        switch (selec) {
+            case 0:
+                if (!(*activo)->parent) {
+                    return 0;
+                } 
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+
+            case 1:
+                *activo = controlProductos(*activo);
+                return 1;
+            case 2:
+                *activo = controlSucursales(*activo);
+                return 1;
+
+            default:
+                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+                return 1;
+        }
+    } return 0;
+}
+
+
+
+
+int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
+    string entrada = "";
+    int conf;
+    product *p = NULL;
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                // guardarLocal(*principal, "Data.txt");
+                return 1;
+            }
+            break;
+        case 1:
+            actualizarMensaje("");
+            createProduct(ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 2: // modificar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de product para modificar: ", &entrada);
+            menuModProduct(*ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 3: // eliminar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
+            menuDelProduct(ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 4: // consultar por codigo
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de product para mostrar: ", &entrada);
+            menuConsultProductByCode(*ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 5:
+            actualizarMensaje("");
+            obtenerEntrada("Indique la descripcion de product para mostrar: ", &entrada);
+            menuConsultProductByDesc(*ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 6:
+            actualizarMensaje("");
+            tableProducts(*ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        default:
+            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+            return 1;
+            break;
+    }
+    return 1;
+
+}
+
+
+
+int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
+    string entrada = "";
+    branch *s = NULL;
+    int conf;
+    product *p = NULL;
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
+                return 1;
+            }
+            break;
+        case 1: // agregar
+            actualizarMensaje("");
+            createBranch(ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 2: // modificar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a modificar: ", &entrada);
+            menuModBranch(*ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 3: // eliminar
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
+            menuDeleBranch(ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 4: // consultar por codigo
+            actualizarMensaje("");
+            obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
+            menuConsultBranchByCode(*ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 5: // Consult by description
+            actualizarMensaje("");
+            menuConsultBranchByDesc(*ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        case 6:
+            actualizarMensaje("");
+            tableBranchs(*ct->branches);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
+        default:
+            actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+            return 1;
+            break;
+    }
+    return 1;
+
+}
+
+menuItem *controlSucursales(menuItem *parent) {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE SUCURSALES GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. MOSTRAR TODAS LAS SUCURSALES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = parent->parent;
+    // refactor m->prox = NULL;
+    m->comportamiento = controladorMenuSucursales;
+    return m;
+}
+
+
+menuItem *controlProductos(menuItem *parent) {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE PRODUCTOS GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t6. MOSTRAR PRODUCTOS\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = parent;
+    //refactor m->prox = controlSucursales(m);
+    m->comportamiento = controladorMenuProductos;
+    return m;
+}
+
+
+menuItem *menuMantenimiento(menuItem *parent) {
+    menuItem *m = new menuItem;
+    //refactor m->cabeza = parent->cabeza;
+    m->encabezado = "---------------------------------------------------------------------------\n\t\t1. MANTENIMIENTO\n---------------------------------------------------------------------------\nOPCIONES DE MENU\n\t1. PRODUCTOS\n\t2. SUCURSALES\n\t3. PERSONAS\n\t0. REGRESAR\n---------------------------------------------------------------------------";
+    m->parent = parent;
+    // refactor m->prox = controlProductos(m);
+    m->comportamiento = operarMenuMantenimiento;
+    return m;
+
+}
+
+menuItem *menuPrincipal() {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = cargarLocal("Data.txt");
+    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nMENU PRINCIPAL\n\t1. MANTENIMIENTO\n\t2. FACTURACION\n\t3. REPORTES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n---------------------------------------------------------------------------";
+    m->parent = NULL;
+    // refactor m->prox = menuMantenimiento(m);
+    m->comportamiento = operarMenuPrincipal;
+    return m;
+}
+
+
+
+
+
+void run() {
+    int activo = 1;
+    int val = 0;
+    string entrada = "";
+    menuItem *menuActivo = menuPrincipal();
+    branch *branches = NULL; //cargarLocal("Data.txt");
+    product *products = NULL;
+    context*ct = newContext(&products , &branches);
+    while (activo) {
+        //clScr(); // Refrescar la pantalla y borrar el terminal
+        system("cls");
+        print(Mensajero->data);
+        if (menuActivo) {
+            obtenerEntrada(menuActivo->encabezado, &entrada);
+            val = entradaValidar(entrada);
+            activo = menuActivo->comportamiento(&menuActivo, val, ct);
+        } else {
+            activo = 0;
+        }
+
+    }
+    system("cls");
+    //clScr(); // Refrescar la pantalla y borrar el terminal
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 #endif // MENU_H
