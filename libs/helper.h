@@ -15,6 +15,74 @@
 #include <cmath>
 
 
+slista *split(string input, char charray) {
+    slista *result = SL("", NULL);
+    slista *temp = NULL;
+    if (input.length() > 0) {
+    
+        for (int i = 0; i < input.length(); i++) {
+            if (input[i] != charray) {
+                result->cont += input[i];
+            }
+            else {
+                agregar(&result, "");
+            }
+        }
+        if (result->cont == "") {
+            temp = result;
+            result = result->prox;
+            delete temp;
+        }
+    }
+    invertir(&result);
+    return result;
+}
+
+
+void invertir(slista **s) {
+    slista *actual = *s;
+    slista *prox = NULL;
+    slista *prev = NULL;
+    while (actual) {
+        prox = actual->prox;
+        actual->prox = prev;
+        prev = actual;
+        actual = prox;
+    }
+    *s = prev;
+
+}
+
+void mostrar(slista *s) {
+    while (s) {
+        cout << s->cont << endl << "----------------" << endl;
+        s = s->prox;
+    }
+}
+
+struct slista {
+    string cont;
+    slista *prox;
+};
+
+slista *SL(string val, slista *p) {
+    slista *r = new slista;
+    r->cont = val;
+    r->prox = p;
+    return r;
+}
+
+void agregar(slista **s, string cont) {
+    if (*s) {
+        slista *r = SL(cont, *s);
+        *s = r;
+    }
+}
+
+// ------------------------
+// ------------------------
+// ------------------------
+// ------------------------
 
 
 
