@@ -3,6 +3,7 @@
 
 #include "branch.h"
 #include "product.h"
+//#include "menu.h"
 #include <iostream>
 
 
@@ -81,6 +82,24 @@ slista *split(string input, char charray) {
 
 
 /*     FUNCTIONS      */
+const string NUM_VALIDO = "1234567890";
+const int NS = 10; 
+int entradaValidar(string entrada) {
+    int i = 0;
+    char t;
+    if (entrada[0]) {
+        t = entrada[0];
+    }
+    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
+        i++;
+    }
+    if (t == NUM_VALIDO[i]) {
+        return (((int) t) - 48);
+    } else {
+        return (-1);
+    }
+}
+
 
 int confirm() {
     if (entradaValidar("\n\tSeguro que desea modificar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ")) return 1;
@@ -182,7 +201,7 @@ void stringToBranch(char* s , branch **B) {
 void readProducts(product**P) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("output/products.txt" , "r");
+    archivo = fopen("products.txt" , "r");
     if (!archivo) return;
 
     while (!feof(archivo))
@@ -199,7 +218,7 @@ void readProducts(product**P) {
 void readBranches(branch**B) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("output/branches.txt" , "r");
+    archivo = fopen("branches.txt" , "r");
     if (!archivo) return;
 
     while (!feof(archivo))
@@ -217,7 +236,7 @@ void readBranches(branch**B) {
 void readInventory(branch*B , product*P) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("output/inventory.txt" , "r");
+    archivo = fopen("inventory.txt" , "r");
     if (!archivo) return;
     branch *sB = NULL;
     product *sP = NULL;
@@ -252,7 +271,7 @@ void readInventory(branch*B , product*P) {
 
 // Write branchs in .txt
 void saveBranchs(branch*B) { 
-    FILE*archivo = fopen("output/branches.txt" , "w");
+    FILE*archivo = fopen("branches.txt" , "w");
     while (B)
     {
         fprintf(archivo , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
@@ -262,39 +281,10 @@ void saveBranchs(branch*B) {
     fclose(archivo);
 }
 
-// Take products of .txt
-/*void readProducts(product** P, product** L) { // Update the function to delete the trash in line
-    ifstream archivo("products.txt");
-    if (archivo.fail()) return;
-    string code, n, d,line;
-    while (getline(archivo, line))
-    {
-        replaceTrash(line);
-        istringstream ss(line);
-        string dato;
 
-        for (int i = 1; i < 4; i++)
-        {
-            getline(ss, dato, ',');
-            switch (i)
-            {
-                case 1:
-                    code = dato;
-                case 2:
-                    n = dato;
-                    break;
-                case 3:
-                    d = dato;
-                    break;
-            }
-        }
-        addProduct(P, code, n, d, 0, 0 , 0);
-    }
-    archivo.close();
-}*/
 // Write products in .txt
 void saveProducts(product* P) {
-    FILE*archivo = fopen("output/products.txt" , "w");
+    FILE*archivo = fopen("products.txt" , "w");
     while (P)
     {
         fprintf(archivo , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
@@ -304,7 +294,7 @@ void saveProducts(product* P) {
 }
 
 void saveProductsOfBranch(branch*B){
-    FILE* file = fopen("output/inventory.txt" , "w");
+    FILE* file = fopen("inventory.txt" , "w");
     product*P;
     while (B)
     {

@@ -44,7 +44,7 @@ mensajeInformativo *MI() {
 }
 
 static mensajeInformativo *Mensajero = MI();
-const string NUM_VALIDO = "1234567890";
+/*const string NUM_VALIDO = "1234567890";
 const int NS = 10; /* ver si los string son terminados en NULL para eliminar este campo */
 
 
@@ -388,24 +388,7 @@ void menuDelProduct(product**P) {
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*----------- BRANCHES -----------*/
 // 
-void menuDeleBranch(branch**B){
-    system("cls");
-    menuHeader();
-    cout << line << "\nELIMINAR SUSCURSAL\n" << line << endl;
-    branch*selected = selectBranchByCode(*B);
-    if (selected)
-    {
-        cout << "\n\tSUCURSAL ENCONTRADA: \n";
-        cout << "\n\t - " << selected->name << " [" << selected->code << "]";
-        cout << "\n\t\t ~ Direccion: " << selected->city << ", " << selected->state << ", " << selected->address;
-        cout << "\n\t\t ~ Telefono: " << selected->tlf << "\n\n";
-        if (confirm()) deleteBranch(B , selected->code);
-    }
-    else{
-        cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
-    }
-    getchar();
-}
+
 
 void menuMantBranchs(){
     system("cls");
@@ -635,6 +618,25 @@ void menuConsultBranchByDesc(branch*B){
     } while (op != 0);
 }
 */
+
+void menuDeleBranch(branch**B){
+    system("cls");
+    menuHeader();
+    cout << line << "\nELIMINAR SUSCURSAL\n" << line << endl;
+    branch*selected = selectBranchByCode(*B);
+    if (selected)
+    {
+        cout << "\n\tSUCURSAL ENCONTRADA: \n";
+        cout << "\n\t - " << selected->name << " [" << selected->code << "]";
+        cout << "\n\t\t ~ Direccion: " << selected->city << ", " << selected->state << ", " << selected->address;
+        cout << "\n\t\t ~ Telefono: " << selected->tlf << "\n\n";
+        if (confirm()) deleteBranch(B , selected->code);
+    }
+    else{
+        cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
+    }
+    getchar();
+}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*          MENU INVENTORY MANAGMENT      */
@@ -1015,21 +1017,6 @@ void mostrarMenuActivo(menuItem *mi) {
     print(mi->encabezado);
 }
 
-int entradaValidar(string entrada) {
-    int i = 0;
-    char t;
-    if (entrada[0]) {
-        t = entrada[0];
-    }
-    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
-        i++;
-    }
-    if (t == NUM_VALIDO[i]) {
-        return (((int) t) - 48);
-    } else {
-        return (-1);
-    }
-}
 
 
 void obtenerEntrada(string input, string *res) {
@@ -1064,6 +1051,8 @@ menuItem *controlSucursales(menuItem*);
 menuItem *menuModBranchs(menuItem*);     
 menuItem *menuConsultBranchByDesc(menuItem*);
 menuItem *menuInventory(menuItem*);
+/* PRODUCTOS */
+
 
 // Original
 /*
@@ -1093,12 +1082,14 @@ int controllerMenuInventory(menuItem **activo, int selec, context *ct) { // por 
                 return 1;
             }
         case 1:
-            selected = selectBranchByCode(*(ct->branches));
+            cout << "\n\t\tSucursal seleccionada: \t";
+            if (selected) cout << selected->name << "\n\n";
+            else cout << "Ninguna...\n\n";
+            selected = selectBranchByCode(*ct->branches);
             cout << "\n\n";
             break;
         case 2:
-            if (selected) menuAddProductToBranch(selected, (*ct)->products);
-            
+            if (selected) menuAddProductToBranch(selected, *(ct)->products);
             break;
         case 3:
             if (selected) menuDelProductOfBranch(&selected->products);
@@ -1117,69 +1108,6 @@ int controllerMenuInventory(menuItem **activo, int selec, context *ct) { // por 
     getchar(); 
     return 1;
 }
-
-/*
-void optionsMenuInventory(branch*selected){
-    system("cls");
-        menuHeader();
-        string op1 = "1. SELECCIONAR branch";
-        string op2 = "1.2.7.2. AGREGAR PRODUCTOS";
-        string op3 = "1.2.7.";
-        string op4 = "1.2.7.4. MODIFICAR INVENTARIO";
-        string op5 = "1.2.7.";
-        string op0 = "0. VOLVER A MENU ANTERIOR.";
-        string msg = "\n\n\tSu opcion (0-5) : _";
-
-        cout << setw((lineWidth + length(op1)) / 2) << op1 << endl;
-        cout << setw((lineWidth + length(op2)) / 2) << op2 << endl;
-        cout << setw((lineWidth + length(op3)) / 2) << op3 << endl;
-        cout << setw((lineWidth + length(op4)) / 2) << op4 << endl;
-        cout << setw((lineWidth + length(op5)) / 2) << op5 << endl;
-        cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
-        cout << setw((lineWidth + length(msg)) / 2) << msg << endl;
-        cout << line << endl;
-        cout << "\n\tSucursal seleccionada: ";
-        if (!selected)
-        {
-            cout << "\t\tSeleccone una branch para continuar...\n";
-        }
-        else
-        {
-            cout << selected->name << " [" << selected->code << "]\n\n";
-        }
-        cout << msg;
-}
-
-void menuInventory(branch*B , product*P) {
-    int op;
-    branch* selected = NULL;
-    do
-    {
-        optionsMenuInventory(selected);
-        cin >> op;
-        if (cin.fail())
-        {
-            cin.clear();
-            cin.ignore();
-            op = -1;
-        }
-        fflush(stdin);
-        if (!selected && (op != 0 && op != 1))
-        {
-            cout << "\n\t\t\t-- branch NO SELECCIONADA --\n\n\n";
-            op = -1;
-            system("pause");
-        }
-        
-    } while (op != 0);
-}
-*/
-
-
-
-
-
-
 
 int controllerMenuModBranch(menuItem **activo, int selec, context *ct) {
     branch* selected = selectBranchByCode(*ct->branches);
@@ -1259,11 +1187,9 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
-
             case 1:
                 *activo = menuMantenimiento(*activo);
                 return 1;
-
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
@@ -1283,14 +1209,12 @@ int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
-
             case 1:
                 *activo = controlProductos(*activo);
                 return 1;
             case 2:
                 *activo = controlSucursales(*activo);
                 return 1;
-
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
@@ -1420,7 +1344,7 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
             break;
         case 7:
             actualizarMensaje("");
-            menuInventory(*ct->branches , *ct->products);
+            *activo =  menuInventory(*activo);
             print("Presione ENTER para continuar.");
             getchar(); // espera nuevo \n para tomar;
             break;
@@ -1511,7 +1435,7 @@ void run() {
     int val = 0;
     string entrada = "";
     menuItem *menuActivo = menuPrincipal();
-    branch *branches = NULL; //cargarLocal("Data.txt");
+    branch *branches = NULL; 
     product *products = NULL;
     readProducts(&products);
     readBranches(&branches);
