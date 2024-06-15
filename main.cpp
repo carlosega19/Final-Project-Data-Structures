@@ -10,7 +10,7 @@ using namespace std;
 
 /*
 int main() {
-    setlocale(LC_ALL, "es_ES.UTF-8");
+    
 	int op;
     branch* branchs = NULL;
 
@@ -149,5 +149,6 @@ int main() {
 
 
 int main() {
+    setlocale(LC_ALL, "es_ES.UTF-8");
     run();
 }

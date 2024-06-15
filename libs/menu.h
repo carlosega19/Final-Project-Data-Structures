@@ -34,10 +34,6 @@ void actualizarMensaje(string m) {
     Mensajero->data = m;
 }
 
-
-
-
-
 void printCreators() {
     string names = "REALIZADO POR:    Andres De Quintal   Y   Carlos Gali�o";
     cout << setw((lineWidth + names.length()) / 2) << names << endl;
@@ -501,7 +497,7 @@ void menuMantBranchs(){
 }
 
 void createBranch(branch**B) {
-	string name , city , state , address , tlf , code;
+	string name, city, state, address, tlf, code;
     bool invalidCode = true;
     cin.ignore();
     do
@@ -538,7 +534,7 @@ void createBranch(branch**B) {
 	}
 	else
 	{
-		addBranch(B, code, name, city, state, address, tlf); 
+		addBranch(B, code, name, city, state, tlf , address); 
         cout << "\n\t\t-- branch AGREGADA --\n\n\n\t";
 	}
     system("pause");
@@ -1572,6 +1568,12 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
             print("Presione ENTER para continuar.");
             getchar(); // espera nuevo \n para tomar;
             break;
+        case 7:
+            actualizarMensaje("");
+            menuInventory(*ct->branches , *ct->products);
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            break;
         default:
             actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
             return 1;
@@ -1636,6 +1638,9 @@ void run() {
     branch *branches = NULL; //cargarLocal("Data.txt");
     product *products = NULL;
     context*ct = newContext(&products , &branches);
+    readProducts(&products);
+    readBranches(&branches);
+    readInventory(branches, products);
     while (activo) {
         //clScr(); // Refrescar la pantalla y borrar el terminal
         system("cls");

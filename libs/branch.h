@@ -40,7 +40,7 @@ branch* searchBranchByCity(branch* B, string str) {
     return searchBranchByCity(B->next, str);
 }
 
-void addBranch(branch** B, string codeB, string name, string city, string state, string address, string tlf) {
+void addBranch(branch** B, string codeB, string name, string city, string state, string tlf, string address) {
     branch* newB = new branch;
     newB->code = codeB;
     newB->name = name;

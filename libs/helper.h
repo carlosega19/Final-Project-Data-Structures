@@ -139,31 +139,119 @@ void replaceTrash(string& line) {
 
 /*---------------------------------*/
 //        FILE MANAGMENT
-void readBranches(branch**B){
-    void readBranches(){
+
+void destroy(slista **n) {
+    slista *temp = NULL;
+    while (*n) {
+        temp = *n;
+        delete temp;
+        *n = (*n)->prox;
+    }
+}
+
+int len(slista *s) {
+    int c = 0;
+    while (s) { c++; s = s->prox; }
+    return c;
+}
+
+slista *next(slista **n) {
+    slista *temp = *n;
+    *n = (*n)->prox;
+    delete temp;
+    return *n;
+}
+
+product *stringToProduct(char* s , product **P) {
+    if (s) {
+        slista *attrs = split(s, ',');
+        int sl = len(attrs);
+        if (sl >= 3) {
+            addProduct(P , attrs->cont , attrs->prox->cont , attrs->prox->prox->cont , 0 , 0 , 0);
+        }
+    }
+}
+
+branch *stringToBranch(char* s , branch **B) {
+    if (s) {
+        slista *attrs = split(s, ',');
+        int sl = len(attrs);
+        if (sl >= 6) {
+            addBranch(B , attrs->cont , attrs->prox->cont , attrs->prox->prox->cont, attrs->prox->prox->prox->cont, 
+            attrs->prox->prox->prox->prox->cont, attrs->prox->prox->prox->prox->prox->cont);
+        }
+    }
+}
+
+void readProducts(product**P) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("inventory.txt" , "r");
+    archivo = fopen("products.txt" , "r");
     if (!archivo) return;
 
     while (!feof(archivo))
     {
-        fscanf(archivo, "%m[^\n]", &i);
-        //fgets(&i, sizeof(i), archivo);
-        size_t len = strlen(i); 
-        slista*n = split(i,'|');
-        memset(i, '\0', sizeof(i));
-        mostrar(n);
-        system("pause");
-        n = split(n->prox->cont , ';');
-        mostrar(n);
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            stringToProduct(i , P);
+            i = NULL;
+        }
     }
     delete i;
 }
+
+void readBranches(branch**B) {
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("branches.txt" , "r");
+    if (!archivo) return;
+
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            stringToBranch(i , B);
+            i = NULL;
+        }
+    }
+    delete i;
 }
 
+
+void readInventory(branch*B , product*P) {
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("inventory.txt" , "r");
+    if (!archivo) return;
+    branch *sB = NULL;
+    product *sP = NULL;
+    slista *branchCode, *productList, *pttr;
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            branchCode = split(i, '|');
+            if (len(branchCode) >= 2) {
+                sB = searchBranchByCode(B , branchCode->cont); 
+                productList = split(branchCode->prox->cont, ';'); 
+                while (productList) {
+                    pttr = split(productList->cont, ',');
+                    if (pttr && len(pttr) >= 4) {
+                        sP = searchProductByCode(P , pttr->cont);
+                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
+                    }
+                    productList = next(&productList);
+                    destroy(&pttr);
+                }
+                i = NULL;
+            }
+        }
+    }
+    // Vaciado de memoria
+    if (i) {delete i;}
+    destroy(&branchCode);
+}
+
+
 // Write branchs in .txt
-void saveBranchs(branch*B){ 
+void saveBranchs(branch*B) { 
     ofstream archivo("branchs.txt");
     if (archivo.is_open())
     {
@@ -177,7 +265,7 @@ void saveBranchs(branch*B){
 }
 
 // Take products of .txt
-void readProducts(product** P, product** L) { // Update the function to delete the trash in line
+/*void readProducts(product** P, product** L) { // Update the function to delete the trash in line
     ifstream archivo("products.txt");
     if (archivo.fail()) return;
     string code, n, d,line;
@@ -205,7 +293,7 @@ void readProducts(product** P, product** L) { // Update the function to delete t
         addProduct(P, code, n, d, 0, 0 , 0);
     }
     archivo.close();
-}
+}*/
 // Write products in .txt
 void saveProducts(product* P) {
     ofstream file("products.txt");
