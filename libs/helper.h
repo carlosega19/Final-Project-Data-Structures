@@ -82,6 +82,11 @@ slista *split(string input, char charray) {
 
 /*     FUNCTIONS      */
 
+int confirm() {
+    if (entradaValidar("\n\tSeguro que desea modificar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ")) return 1;
+    return 0;
+}
+
 int length(string& line) {
     int count = 0;
     while (line[count] != '\0') {
