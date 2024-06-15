@@ -1,0 +1,7 @@
+1101,Cafe,Marca Jose C.A  1kg
+1137,Azucar Morena,Marca Letisoy C.A  1kg
+378,Complejo Vitaminico,Marca LabNacional.  500 comprimidos
+254,Acetaminofen,Marca LabNacional.  75 mg
+137,Azucar Morena,Marca Artica.  1 kg
+112,Margarina,Marca Leguminosa S.A  500 gr
+101,Café,Marca Maria Café C.A.  1 kg

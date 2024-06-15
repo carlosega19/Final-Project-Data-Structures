@@ -1637,10 +1637,10 @@ void run() {
     menuItem *menuActivo = menuPrincipal();
     branch *branches = NULL; //cargarLocal("Data.txt");
     product *products = NULL;
-    context*ct = newContext(&products , &branches);
     readProducts(&products);
     readBranches(&branches);
     readInventory(branches, products);
+    context*ct = newContext(&products , &branches);
     while (activo) {
         //clScr(); // Refrescar la pantalla y borrar el terminal
         system("cls");
@@ -1654,6 +1654,8 @@ void run() {
         }
     }
     saveProducts(products);
+    saveBranchs(branches);
+    saveProductsOfBranch(branches);
     //clScr(); // Refrescar la pantalla y borrar el terminal
 }
 

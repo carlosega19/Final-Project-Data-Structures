@@ -4,11 +4,6 @@
 #include "branch.h"
 #include "product.h"
 #include <iostream>
-#include <fstream>
-#include <stdlib.h>
-#include <iomanip>
-//#include <conio.h>
-//#include <windows.h>
 #include <locale.h>
 #include <string>
 #include <sstream>
@@ -162,7 +157,7 @@ slista *next(slista **n) {
     return *n;
 }
 
-product *stringToProduct(char* s , product **P) {
+void stringToProduct(char* s , product **P) {
     if (s) {
         slista *attrs = split(s, ',');
         int sl = len(attrs);
@@ -172,7 +167,7 @@ product *stringToProduct(char* s , product **P) {
     }
 }
 
-branch *stringToBranch(char* s , branch **B) {
+void stringToBranch(char* s , branch **B) {
     if (s) {
         slista *attrs = split(s, ',');
         int sl = len(attrs);
@@ -232,13 +227,13 @@ void readInventory(branch*B , product*P) {
             branchCode = split(i, '|');
             if (len(branchCode) >= 2) {
                 sB = searchBranchByCode(B , branchCode->cont); 
-                productList = split(branchCode->prox->cont, ';'); 
+                productList = split(branchCode->prox->cont, ';');
+                mostrar(productList);
                 while (productList) {
                     pttr = split(productList->cont, ',');
                     if (pttr && len(pttr) >= 4) {
                         sP = searchProductByCode(P , pttr->cont);
-                        if (sB && sP)
-                            addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
+                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
                     }
                     productList = next(&productList);
                     destroy(&pttr);
@@ -255,18 +250,16 @@ void readInventory(branch*B , product*P) {
 
 
 // Write branchs in .txt
-/*void saveBranchs(branch*B) { 
-    ofstream archivo("branchs.txt");
-    if (archivo.is_open())
+void saveBranchs(branch*B) { 
+    FILE*archivo = fopen("branches.txt" , "w");
+    while (B)
     {
-        while (B)
-        {
-            archivo << B->code << "," << B->name << "," << B->city << "," << B->state << "," << B->tlf << "," << B->address << "\n";
-            B = B->next;
-        }
+        fprintf(archivo , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
+            B->name.c_str(), B->city.c_str(), B->state.c_str(), B->tlf.c_str(), B->address.c_str());
+        B = B->next;
     }
-    archivo.close();
-}*/
+    fclose(archivo);
+}
 
 // Take products of .txt
 /*void readProducts(product** P, product** L) { // Update the function to delete the trash in line
@@ -301,83 +294,29 @@ void readInventory(branch*B , product*P) {
 // Write products in .txt
 void saveProducts(product* P) {
     FILE*archivo = fopen("products.txt" , "w");
-    int cont = 0;
-    while (cont < 5)
+    while (P)
     {
-        fprintf(archivo , "%*c,%*c,%*c,%*c,%*c,%*c\n" , P->code, P->name, P->description);
+        fprintf(archivo , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
         P = P->next;
-        cont++;
     }
     fclose(archivo);
 }
 
-// Take the products inside each branch
-void readProductsOfBranch(branch*B , product*P ){
-    ifstream archivo("inventory.txt");
-    if (archivo.fail()) return;
-    string codeB, codeP , line;
-    int am , minAm;
-    float price , temp;
-    branch*selectedB;
-    product*selectedP;
-    while (getline(archivo , line))
-    {
-        replaceTrash(line);
-        istringstream ss(line);
-        string data;
-        for (int i = 0; i < 5; i++)
-        {
-            getline(ss , data , ',');
-            switch (i)
-            {
-                case 0:
-                    codeB = data;
-                    break;
-                case 1:
-                    codeP = data;
-                    break;
-                case 2:
-                    am = stoi(data);
-                    break;
-                case 3:
-                    minAm = stoi(data);
-                    break;
-                case 4:
-                    price = stof(data);
-                    getline(ss, data, ',');
-                    temp = stof(data) / 100;
-                    price += temp;
-                    break;
-            }
-        }
-        selectedB = searchBranchByCode(B , codeB);
-        selectedP = searchProductByCode(P , codeP);
-        if (selectedB && selectedP && am >= minAm && price > 0)
-        {
-            addProductToBranch(selectedB , selectedP , am , minAm, price);
-        }
-    }
-    archivo.close();
-}
-
 void saveProductsOfBranch(branch*B){
-    ofstream archivo("inventory.txt");
-    if (archivo.fail()) return;
+    FILE* file = fopen("inventory.txt" , "w");
+    product*P;
     while (B)
     {
-        product*P = B->products; 
+        fprintf(file, "%s|" , B->code.c_str());
+        P = B->products;
         while (P)
         {
-            double p = P->price;
-            double temp1;
-            double temp2 = modf(p, &temp1);
-            int temp3 = static_cast<int>(temp2 * 100);
-            archivo << B->code<<","<<P->code<<","<<P->amount<<","<<P->minAmount<<","<<temp1<<","<<temp3<<"\n";
+            fprintf(file , "%s,%d,%d,%.2f;" , P->code.c_str(), P->amount, P->minAmount, P->price);
             P = P->next;
         }
+        fprintf(file , "\n");
         B = B->next;
     }
-    archivo.close();
 }
 
 
