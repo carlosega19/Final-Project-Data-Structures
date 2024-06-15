@@ -4,10 +4,6 @@
 #include "branch.h"
 #include "product.h"
 #include <iostream>
-#include <locale.h>
-#include <string>
-#include <sstream>
-#include <cmath>
 
 
 struct slista {

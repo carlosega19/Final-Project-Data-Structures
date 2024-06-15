@@ -1,7 +1,6 @@
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include <iostream>
-#include <stdlib.h>
 
 #include "libs/branch.h"
 #include "libs/menu.h"
