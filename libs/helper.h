@@ -177,7 +177,7 @@ void stringToBranch(char* s , branch **B) {
 void readProducts(product**P) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("products.txt" , "r");
+    archivo = fopen("output/products.txt" , "r");
     if (!archivo) return;
 
     while (!feof(archivo))
@@ -194,7 +194,7 @@ void readProducts(product**P) {
 void readBranches(branch**B) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("branches.txt" , "r");
+    archivo = fopen("output/branches.txt" , "r");
     if (!archivo) return;
 
     while (!feof(archivo))
@@ -212,7 +212,7 @@ void readBranches(branch**B) {
 void readInventory(branch*B , product*P) {
     char *i = NULL;
     FILE *archivo;
-    archivo = fopen("inventory.txt" , "r");
+    archivo = fopen("output/inventory.txt" , "r");
     if (!archivo) return;
     branch *sB = NULL;
     product *sP = NULL;
@@ -247,7 +247,7 @@ void readInventory(branch*B , product*P) {
 
 // Write branchs in .txt
 void saveBranchs(branch*B) { 
-    FILE*archivo = fopen("branches.txt" , "w");
+    FILE*archivo = fopen("output/branches.txt" , "w");
     while (B)
     {
         fprintf(archivo , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
@@ -289,7 +289,7 @@ void saveBranchs(branch*B) {
 }*/
 // Write products in .txt
 void saveProducts(product* P) {
-    FILE*archivo = fopen("products.txt" , "w");
+    FILE*archivo = fopen("output/products.txt" , "w");
     while (P)
     {
         fprintf(archivo , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
@@ -299,7 +299,7 @@ void saveProducts(product* P) {
 }
 
 void saveProductsOfBranch(branch*B){
-    FILE* file = fopen("inventory.txt" , "w");
+    FILE* file = fopen("output/inventory.txt" , "w");
     product*P;
     while (B)
     {

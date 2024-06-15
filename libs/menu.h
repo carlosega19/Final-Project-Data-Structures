@@ -10,6 +10,24 @@
 #include "product.h"
 #include "helper.h"
 using namespace std;
+
+
+#if defined(__linux__)
+    #define PLATFORM_NAME "linux"
+#else
+    #define PLATFORM_NAME "windows"
+#endif
+
+
+
+void clScr() {
+    if (PLATFORM_NAME == "linux") {
+        cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal
+    } else {
+        system("cls");
+    }
+}
+
 /*------ MENU MANAGMENT ------*/
 int lineWidth = 120;
 string line(lineWidth, '-');
@@ -725,7 +743,6 @@ void menuConsultBranchByCode(branch*B){
 /**/
 
 void menuConsultByState(branch*B ){
-    system("cls");
     menuHeader();
     string userInput;
     string subtitle = "CONSULTAR branch POR ESTADO";
@@ -742,7 +759,6 @@ void menuConsultByState(branch*B ){
     branch* selected = searchBranchByState(B , userInput);
     if (!selected) {
         cout << "\n\n\t\tNINGUNA...\n\n\t";
-        system("pause");
         return;
     }
     headerBranchs(line);
@@ -752,11 +768,9 @@ void menuConsultByState(branch*B ){
         selected = searchBranchByState(selected->next, userInput);
     }
     cout << line << "\n\n\t\t\t";
-    system("pause");
 }
 
 void menuConsultByCity(branch* B) {
-    system("cls");
     menuHeader();
     string userInput;
     string subtitle = "CONSULTAR branch POR CIUDAD";
@@ -785,12 +799,12 @@ void menuConsultByCity(branch* B) {
     cout << line << "\n\n\t\t\t";
     system("pause");
 }
-
+/*
 void menuConsultBranchByDesc(branch*B){
-    string subtitle = "CONSULTAR branch POR DESCRIPCION";
-    string op1 = "1. ESTADO";
-	string op2 = "2. CIUDAD";
-    string op0 = "0. VOLVER A MENU ANTERIOR.";
+    cout << "CONSULTAR branch POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.";
+    string op1 = "";
+	string op2 = "";
+    string op0 = "";
     int op = -1;
     do
     {
@@ -815,7 +829,7 @@ void menuConsultBranchByDesc(branch*B){
         }
     } while (op != 0);
 }
-
+*/
 void menuDeleBranch(branch**B){
     system("cls");
     menuHeader();
@@ -1321,6 +1335,28 @@ void obtenerEntrada(string input, string *res) {
 menuItem *menuMantenimiento(menuItem*);
 menuItem *controlProductos(menuItem*);
 menuItem *controlSucursales(menuItem*);
+menuItem *menuConsultBranchByDesc(menuItem*);
+
+int controllerConsultBranchByDesc(menuItem **activo, int selec, context*ct) {
+    switch (selec)
+    {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
+        case 1:
+            menuConsultByState(*(ct->branches));
+            break;
+        case 2:
+            menuConsultByCity(*(ct->branches));
+            break;
+    }
+    print("Presione ENTER para continuar.");
+    getchar(); // espera nuevo \n para tomar;
+    return 1;
+}
 
 int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
     menuItem *temp = NULL;
@@ -1486,7 +1522,8 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
             break;
         case 5: // Consult by description
             actualizarMensaje("");
-            menuConsultBranchByDesc(*ct->branches);
+            //menuConsultBranchByDesc(*ct->branches);
+            *activo = menuConsultBranchByDesc(*activo);
             print("Presione ENTER para continuar.");
             getchar(); // espera nuevo \n para tomar;
             break;
@@ -1510,6 +1547,8 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     return 1;
 
 }
+
+
 
 menuItem *controlSucursales(menuItem *parent) {
     menuItem *m = new menuItem;
@@ -1555,7 +1594,26 @@ menuItem *menuPrincipal() {
 }
 
 
+menuItem *menuConsultBranchByDesc(menuItem *parent) {
+    menuItem *m = new menuItem;
+    // refactor m->cabeza = cargarLocal("Data.txt");
+    m->encabezado = line + "\nCONSULTAR branch POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
+;
+    m->parent = parent;
+    // refactor m->prox = menuMantenimiento(m);
+    m->comportamiento = controllerConsultBranchByDesc;
+    return m;
+}
 
+
+/*
+void menuHeader() {
+    string title = "SISTEMA DE INVENTARIO Y FACTURACION";
+    cout << line << endl;
+    cout << setw((lineWidth + title.length()) / 2) << title << endl;
+    cout << line << endl;
+}
+*/
 
 
 void run() {
@@ -1570,8 +1628,7 @@ void run() {
     readInventory(branches, products);
     context*ct = newContext(&products , &branches);
     while (activo) {
-        //clScr(); // Refrescar la pantalla y borrar el terminal
-        system("cls");
+        clScr(); // Refrescar la pantalla y borrar el terminal
         print(Mensajero->data);
         if (menuActivo) {
             obtenerEntrada(menuActivo->encabezado, &entrada);
@@ -1584,7 +1641,7 @@ void run() {
     saveProducts(products);
     saveBranchs(branches);
     saveProductsOfBranch(branches);
-    //clScr(); // Refrescar la pantalla y borrar el terminal
+    clScr(); // Refrescar la pantalla y borrar el terminal
 }
 
 
