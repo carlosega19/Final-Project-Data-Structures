@@ -197,6 +197,7 @@ void readProducts(product**P) {
         }
     }
     delete i;
+    fclose(archivo);
 }
 
 void readBranches(branch**B) {
@@ -213,6 +214,7 @@ void readBranches(branch**B) {
         }
     }
     delete i;
+    fclose(archivo);
 }
 
 
@@ -235,7 +237,8 @@ void readInventory(branch*B , product*P) {
                     pttr = split(productList->cont, ',');
                     if (pttr && len(pttr) >= 4) {
                         sP = searchProductByCode(P , pttr->cont);
-                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
+                        if (sB && sP)
+                            addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
                     }
                     productList = next(&productList);
                     destroy(&pttr);
@@ -247,11 +250,12 @@ void readInventory(branch*B , product*P) {
     // Vaciado de memoria
     if (i) {delete i;}
     destroy(&branchCode);
+    fclose(archivo);
 }
 
 
 // Write branchs in .txt
-void saveBranchs(branch*B) { 
+/*void saveBranchs(branch*B) { 
     ofstream archivo("branchs.txt");
     if (archivo.is_open())
     {
@@ -262,7 +266,7 @@ void saveBranchs(branch*B) {
         }
     }
     archivo.close();
-}
+}*/
 
 // Take products of .txt
 /*void readProducts(product** P, product** L) { // Update the function to delete the trash in line
@@ -296,16 +300,15 @@ void saveBranchs(branch*B) {
 }*/
 // Write products in .txt
 void saveProducts(product* P) {
-    ofstream file("products.txt");
-    if (file.is_open())
+    FILE*archivo = fopen("products.txt" , "w");
+    int cont = 0;
+    while (cont < 5)
     {
-        while (P)
-        {
-            file << P->code << "," << P->name << "," << P->description << "\n";
-            P = P->next;
-        }
+        fprintf(archivo , "%*c,%*c,%*c,%*c,%*c,%*c\n" , P->code, P->name, P->description);
+        P = P->next;
+        cont++;
     }
-    file.close();
+    fclose(archivo);
 }
 
 // Take the products inside each branch

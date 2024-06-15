@@ -1652,9 +1652,8 @@ void run() {
         } else {
             activo = 0;
         }
-
     }
-    system("cls");
+    saveProducts(products);
     //clScr(); // Refrescar la pantalla y borrar el terminal
 }
 
