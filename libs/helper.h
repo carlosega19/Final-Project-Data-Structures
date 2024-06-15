@@ -139,45 +139,27 @@ void replaceTrash(string& line) {
 
 /*---------------------------------*/
 //        FILE MANAGMENT
-void readBranchs(branch**B , branch**L){ // Update the function to delete the trash in line
-    ifstream archivo("branchs.txt");
-    if (archivo.fail()) return; 
-    string n, s , c , a , t , code ,line;
-    while (getline(archivo , line))
+void readBranches(branch**B){
+    void readBranches(){
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("inventory.txt" , "r");
+    if (!archivo) return;
+
+    while (!feof(archivo))
     {
-        replaceTrash(line);
-        istringstream ss(line);
-        string dato;
-        for (int i = 1; i < 7; i++)
-        {
-            getline(ss , dato , ',');
-            switch (i)
-            {
-                case 1:
-                    code = dato;
-                case 2:
-                    n = dato;
-                    break;
-                case 3:
-                    c = dato;
-                    break;
-                case 4:
-                    s = dato;
-                    break;
-                case 5:
-                    t=dato;
-                    break;
-                case 6:
-                    a=dato;
-                    break;
-            }
-        }
-        if (!searchBranchByCode(*B , code))
-        {
-            addBranch(B, code, n, c, s, a, t);
-        }
+        fscanf(archivo, "%m[^\n]", &i);
+        //fgets(&i, sizeof(i), archivo);
+        size_t len = strlen(i); 
+        slista*n = split(i,'|');
+        memset(i, '\0', sizeof(i));
+        mostrar(n);
+        system("pause");
+        n = split(n->prox->cont , ';');
+        mostrar(n);
     }
-    archivo.close();
+    delete i;
+}
 }
 
 // Write branchs in .txt

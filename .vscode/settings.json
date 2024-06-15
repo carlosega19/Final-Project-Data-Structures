@@ -14,6 +14,7 @@
         "utility": "cpp",
         "iomanip": "cpp",
         "*.tcc": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "iosfwd": "cpp"
     }
 }
