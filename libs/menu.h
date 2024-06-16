@@ -9,34 +9,16 @@
 #include "branch.h"
 #include "product.h"
 #include "helper.h"
+#include "client.h"
 using namespace std;
 
 
-#if defined(__linux__)
-    #define PLATFORM_NAME "linux"
-#else
-    #define PLATFORM_NAME "windows"
-#endif
 
-
-
-void clScr() {
-    if (PLATFORM_NAME == "linux") {
-        cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal
-    } else {
-        system("cls");
-    }
-}
 
 /*------ MENU MANAGMENT ------*/
 int lineWidth = 120;
 string line(lineWidth, '-');
 const string header = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line;
-
-
-
-
-
 
 struct mensajeInformativo {
     string data;
@@ -62,18 +44,6 @@ void printCreators() {
     cout << setw((lineWidth + names.length()) / 2) << names << endl;
     cout << line << endl;
 }
-
-void menuHeader() {
-    string title = "SISTEMA DE INVENTARIO Y FACTURACION";
-    cout << line << endl;
-    cout << setw((lineWidth + title.length()) / 2) << title << endl;
-    cout << line << endl;
-}
-
-
-
-
-
 
 /*--------------- BRANCHES AND PRODUCTS MENUS ---------------*/
 void createProduct(product**P){
@@ -107,8 +77,7 @@ void printProducts(product*P) {
 }
 
 void showAllProducts(product*P) {
-    system("cls");
-    menuHeader();
+    cout << header;
     string subtitle = "LISTA DE PRODUCTOS";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
     cout << line << endl;
@@ -385,9 +354,9 @@ void menuConsultBranchByCode(branch*B){
 
 
 void menuConsultByState(branch*B ){
-    menuHeader();
+    cout << header;
     string userInput;
-    string subtitle = "CONSULTAR branch POR ESTADO";
+    string subtitle = "CONSULTAR SUCURSAL POR ESTADO";
     string op0 = "0. VOLVER A MENU ANTERIOR.";
     cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
 	cout << line << endl;
@@ -395,7 +364,7 @@ void menuConsultByState(branch*B ){
     cout << line <<endl;
     cin.ignore();
     cout << "\nIngresa el estado: ";
-    getline(cin , userInput);
+    obtenerEntrada2("\nIngresa el estado: " , &userInput);
     if (userInput == "0") return;
     cout << "\n\tSUCURSALES ENCONTRADAS: \n";
     branch* selected = searchBranchByState(B , userInput);
@@ -416,7 +385,7 @@ void menuConsultByCity(branch* B) {
     cout << header << endl;
     cout << "\n\tCONSULTAR SUCURSAL POR CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
     string userInput = "";
-    obtenerEntrada2("\nIngresa la ciudad: ", &userinput);
+    obtenerEntrada2("\nIngresa la ciudad: ", &userInput);
     if (userInput == "0") return;
     cout << "\n\tSUCURSALES ENCONTRADAS: \n";
     branch* selected = searchBranchByCity(B, userInput);
@@ -699,15 +668,17 @@ void menuInventory(branch*B , product*P) {
 
 
 struct context {
-    product** products;
-    branch** branches;
+    product **products;
+    branch **branches;
+    people **clients;
 };
 
-context *newContext(product **p, branch **b) {
-    context *c = new context;
-    c->products = p;
-    c->branches = b;
-    return c;
+context *newContext(product **p, branch **b, people **c) {
+    context *result = new context;
+    result->products = p;
+    result->branches = b;
+    result->clients = c;
+    return result;
 }
 
 struct menuItem {
@@ -887,6 +858,12 @@ int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
             case 2:
                 *activo = controlSucursales(*activo);
                 return 1;
+            case 3:
+            {
+                people *p = getLast(*ct->clients);
+                maintenancePeople(ct->clients, &p);
+                return 1;
+            }
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
@@ -1096,10 +1073,12 @@ void run() {
     menuItem *menuActivo = menuPrincipal();
     branch *branches = NULL; 
     product *products = NULL;
+    people *clients = NULL;
+    people *lastclient = NULL;
     readProducts(&products);
     readBranches(&branches);
     readInventory(branches, products);
-    context*ct = newContext(&products , &branches);
+    context*ct = newContext(&products , &branches, &clients);
     while (activo) {
         clScr(); // Refrescar la pantalla y borrar el terminal
         print(Mensajero->data);

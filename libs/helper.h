@@ -7,10 +7,30 @@
 #include <iostream>
 
 
+#if defined(__linux__)
+    #define PLATFORM_NAME "linux"
+#else
+    #define PLATFORM_NAME "windows"
+#endif
+
+
+
+
+void clScr() {
+    if (PLATFORM_NAME == "linux") {
+        cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal
+    } else {
+        system("cls");
+    }
+}
+
+
+
 struct slista {
     string cont;
     slista *prox;
 };
+
 
 
 void invertir(slista **s) {

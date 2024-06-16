@@ -1,17 +1,25 @@
+#ifndef CLIENT_H
+#define CLIENT_H
 #include <iostream>
-#include <cstring>
-
+#include <string.h>
+#include "helper.h"
 using namespace std;
 
 struct people {
-    char ID[10];
-    char nameAndSecondName[40];
+    char ID[10];                // Esto NO es un string
+    char nameAndSecondName[30]; // cambiar de char [n] a string, para que sea complatible con funciones auxiliares
     people* next;
 };
 
-// Función para limpiar la pantalla
-void clearScreen() {
-    cout << "\033[2J\033[H";
+
+people *getLast(people *p) {
+    if (p) {
+        while (p && p->next) {
+            p = p->next;
+        }
+        return p;
+    } return NULL;
+
 }
 
 // Función para validar que el nombre y apellido no contengan números
@@ -133,7 +141,7 @@ void loadPeopleFromFile(const char* nombreArchivo, people** head, people** last)
 }
 
 //Función para guardar personas en un archivo
-void guardarPersonasEnArchivo(const char* nombreArchivo, const people* cabeza) {
+/*void guardarPersonasEnArchivo(const char* nombreArchivo, const people* cabeza) {
     FILE* archivo = fopen("D://people.txt", "w");
 
     if (!archivo) {
@@ -153,8 +161,7 @@ void guardarPersonasEnArchivo(const char* nombreArchivo, const people* cabeza) {
 
     fclose(archivo);
     cout << nombreArchivo << endl;
-}
-
+}*/
 
 // Función para eliminar una persona de la lista
 void deletePeople(people** head, people** last, people* personaEliminar) {
@@ -244,7 +251,7 @@ void consultCustomer(const people* head) {
     char consulta[20]; // Para almacenar el nombre, apellido o cédula a consultar
 
     do {
-        clearScreen();
+        clScr();
         cout << "\n\tCONSULTAR CLIENTE" << endl;
         cout << "1. Consultar por Nombre" << endl;
         cout << "2. Consultar por Cedula" << endl;
@@ -294,7 +301,6 @@ void maintenancePeople(people** head, people** last) {
     people* cliente = NULL; // Declaración fuera del do-while
 
     do {
-        clearScreen();
         // Mostrar el menú de mantenimiento de personas
         cout << "MANTENIMIENTO PERSONAS" << endl;
         cout << "1. Agregar Cliente" << endl;
@@ -309,7 +315,7 @@ void maintenancePeople(people** head, people** last) {
 
         switch (opcion) {
             case 1:
-                clearScreen();
+                clScr();
                 cout << "\n\t - Ingrese Cedula: ";
                 cin.getline(id, 10);
                 cout << "\n\t - Ingrese Nombre y Apellido: ";
@@ -322,7 +328,7 @@ void maintenancePeople(people** head, people** last) {
                 }
                 break;
             case 2:
-                clearScreen();
+                clScr();
                 cout << "\nMODIFICAR CLIENTE" << endl;
                 showPeople(*head);
                 cout << "\n\t - Ingrese la cedula del cliente a modificar: ";
@@ -330,7 +336,7 @@ void maintenancePeople(people** head, people** last) {
                 cliente = foundPeopleByID(*head, id);
                 if (cliente) {
                     // Mostrar información actual del cliente
-                    clearScreen();
+                    clScr();
                     cout << "\n\tInformacion actual del cliente:\n" << endl;
                     cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->nameAndSecondName << endl;
 
@@ -374,7 +380,7 @@ void maintenancePeople(people** head, people** last) {
 
                         // Mostrar información actualizada del cliente después de cada modificación
                         if (opcionModificar != 0) {
-                            clearScreen();
+                            clScr();
                             cout << "Informacion actualizada del cliente:" << endl;
                             cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
                         }
@@ -384,7 +390,7 @@ void maintenancePeople(people** head, people** last) {
                 }
                 break;
             case 3:
-                clearScreen();
+                clScr();
                 cout << "ELIMINAR CLIENTE" << endl;
                 showPeople(*head);
                 cout << "\n\t - Ingrese la cedula del cliente a eliminar: ";
@@ -392,7 +398,7 @@ void maintenancePeople(people** head, people** last) {
                 cliente = foundPeopleByID(*head, id);
                 if (cliente) {
                     // Mostrar información del cliente a eliminar
-                    clearScreen();
+                    clScr();
                     cout << "Informacion del cliente a eliminar:" << endl;
                     cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
 
@@ -414,7 +420,7 @@ void maintenancePeople(people** head, people** last) {
                 }
                 break;
             case 4:
-                clearScreen();
+                clScr();
                 cout << "CONSULTAR CLIENTE" << endl;
                 int opcionConsulta;
                 do {
@@ -428,7 +434,7 @@ void maintenancePeople(people** head, people** last) {
 
                     switch (opcionConsulta) {
                         case 1: {
-                            clearScreen();
+                            clScr();
                             cout << "Ingrese el nombre y apellido a buscar: ";
                             cin.getline(nameAndSecondName, 40);
                             consultByName(*head, nameAndSecondName);
@@ -436,7 +442,7 @@ void maintenancePeople(people** head, people** last) {
                         }
     
                         case 2:
-                            clearScreen();
+                            clScr();
                             printID(*head);
                             cout << "Ingrese la cedula a consultar: ";
                             cin.getline(id, 10);
@@ -452,7 +458,7 @@ void maintenancePeople(people** head, people** last) {
                 break;
 
             case 5:
-                clearScreen();
+                clScr();
                 showPeople(*head);
                 esperarEntrada();
                 break;
@@ -466,7 +472,7 @@ void maintenancePeople(people** head, people** last) {
     } while (opcion != 0);
 
     // Guardar los cambios realizados en el archivo
-    guardarPersonasEnArchivo("people.txt", *head);
+    //guardarPersonasEnArchivo("people.txt", *head);
 }
 
 
@@ -477,7 +483,7 @@ void printPeople(people* p) {
     printPeople(p->next);
 }
 
-int main() {
+/*int main() {
     clearScreen();
     int opcion;
     people* listaPersonas = NULL;
@@ -507,4 +513,6 @@ int main() {
         }
     } while (opcion != 0);
     return 0;
-}
+}*/
+
+#endif
