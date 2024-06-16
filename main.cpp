@@ -1,29 +1,25 @@
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include <iostream>
-#include <stdlib.h>
 
 #include "libs/branch.h"
 #include "libs/menu.h"
 #include "libs/helper.h"
 using namespace std;
 
-
+/*
 int main() {
-    setlocale(LC_ALL, "es_ES.UTF-8");
+    
 	int op;
-    unordered_map<string, branch*> hashB;
     branch* branchs = NULL;
-    branch* lastB = NULL;
 
     product* products = NULL;
-    product* lastP = NULL;
     // READ PRODUCTS
-    readProducts(&products, &lastP);
+    //readProducts(&products);
     // READ BRANCHS
-    readBranchs(&branchs , &lastB , hashB);
+    //readBranchs(&branchs);
     // READ PRODUCTS INSIDE BRANCHS
-    readProductsOfBranch(branchs , products , hashB);
+    readProductsOfBranch(branchs , products);
 	do
 	{
 		menu();
@@ -35,6 +31,7 @@ int main() {
             op = -1;
         }
         fflush(stdin);
+
 		switch (op)
 		{
 			case 1: // Mantenimiento
@@ -64,13 +61,14 @@ int main() {
                                 switch (op)
                                 {
                                     case 1: // Add Product
-                                        createProduct(&products, &lastP);
+                                        createProduct(&products);
                                         break;
                                     case 2: // MODIFY A PRODUCT
                                         menuModProduct(products);
                                         break;
                                     case 3: // DELETE A PRODUCT
-                                        menuDelProduct(&products , &lastP);
+                                        
+                                        (&products);
                                         break;
                                     case 4: // CONSULT A PRODUCT BY CODE
                                         menuConsultProductByCode(products);
@@ -102,13 +100,13 @@ int main() {
                                 switch (op)
                                 {
                                     case 1: // Add Branch
-                                        createBranch(&branchs , &lastB , hashB);
+                                        createBranch(&branchs);
                                         break;
                                     case 2: // Modify Branch
                                         menuModBranch(branchs);
                                         break;
                                     case 3: // Delete Branch
-                                        menuDeleBranch(&branchs , &lastB);
+                                        menuDeleBranch(&branchs );
                                         break;
                                     case 4: // Consult By Code
                                         menuConsultBranchByCode(branchs);
@@ -129,7 +127,7 @@ int main() {
                             op = -1;
 							break;
 					}
-					/* ---------- FIN MANTENIMIENTO ---------- */
+					// ---------- FIN MANTENIMIENTO ---------- 
 				} while (op != 0);
 				op = -1;
 				break;
@@ -147,4 +145,11 @@ int main() {
 	saveBranchs(branchs);
     saveProductsOfBranch(branchs);
     return EXIT_SUCCESS;
+}
+*/
+
+
+int main() {
+    setlocale(LC_ALL, "es_ES.UTF-8");
+    run();
 }

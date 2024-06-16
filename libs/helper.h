@@ -3,22 +3,185 @@
 
 #include "branch.h"
 #include "product.h"
+//#include "menu.h"
 #include <iostream>
-#include <fstream>
-#include <stdlib.h>
-#include <iomanip>
-#include <conio.h>
-#include <windows.h>
-#include <locale.h>
-#include <string>
-#include <sstream>
-#include <cmath>
 
 
+struct slista {
+    string cont;
+    slista *prox;
+};
+
+
+void invertir(slista **s) {
+    slista *actual = *s;
+    slista *prox = NULL;
+    slista *prev = NULL;
+    while (actual) {
+        prox = actual->prox;
+        actual->prox = prev;
+        prev = actual;
+        actual = prox;
+    }
+    *s = prev;
+
+}
+
+void mostrar(slista *s) {
+    while (s) {
+        cout << s->cont << endl << "----------------" << endl;
+        s = s->prox;
+    }
+}
+
+
+slista *SL(string val, slista *p) {
+    slista *r = new slista;
+    r->cont = val;
+    r->prox = p;
+    return r;
+}
+
+void agregar(slista **s, string cont) {
+    if (*s) {
+        slista *r = SL(cont, *s);
+        *s = r;
+    }
+}
+
+
+slista *split(string input, char charray) {
+    slista *result = SL("", NULL);
+    slista *temp = NULL;
+    if (input.length() > 0) {
+    
+        for (int i = 0; i < input.length(); i++) {
+            if (input[i] != charray) {
+                result->cont += input[i];
+            }
+            else {
+                agregar(&result, "");
+            }
+        }
+        if (result->cont == "") {
+            temp = result;
+            result = result->prox;
+            delete temp;
+        }
+    }
+    invertir(&result);
+    return result;
+}
+
+
+// ------------------------
+// ------------------------
+// ------------------------
+// ------------------------
 
 
 
 /*     FUNCTIONS      */
+const string NUM_VALIDO = "1234567890";
+const int NS = 10; 
+
+void obtenerEntrada(string input, string *res) {
+    cout << input << endl;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
+void obtenerEntrada2(string input, string *res) {
+    cout << input;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
+int entradaValidar(string entrada) {
+    int i = 0;
+    char t;
+    if (entrada[0]) {
+        t = entrada[0];
+    }
+    while ((i < NS) && (t) && (t != NUM_VALIDO[i])) {
+        i++;
+    }
+    if (t == NUM_VALIDO[i]) {
+        return (((int) t) - 48);
+    } else {
+        return (-1);
+    }
+}
+
+long int pow(int num, int e) {
+	long int result = 1;
+	for (int i = 0; i < e; i++) {
+		result *= num; 
+	}
+	return result;
+}
+
+
+long int to_int(string s) {
+	int index = 0;
+	long int result = 0;
+	int sl = s.length();
+	while ((sl > 0) && (index < sl)) {
+		switch (s[index]) {
+			case '0':
+				index++;
+				break;
+			case '1':
+				result += pow(10, sl - index - 1);
+				index++;
+				break;
+			case '2':
+				result += 2 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '3':
+				result += 3 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '4':
+				result += 4 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '5':
+				result += 5 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '6':
+				result += 6 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '7':
+				result += 7 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '8':
+				result += 8 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '9':
+				result += 9 * pow(10, sl - index - 1);
+				index++;
+				break;
+			default:
+				index++;
+				break;
+
+		}
+	}
+	return result;
+}
+
+
+
+int confirm() {
+    string entrada = "";
+    obtenerEntrada2("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ", &entrada);
+    if (entradaValidar(entrada)) return 1;
+    return 0;
+}
 
 int length(string& line) {
     int count = 0;
@@ -68,172 +231,160 @@ void replaceTrash(string& line) {
 
 /*---------------------------------*/
 //        FILE MANAGMENT
-void readBranchs(branch**B , branch**L , unordered_map<std::string, branch*>& tableB){ // Update the function to delete the trash in line
-    ifstream archivo("branchs.txt");
-    if (archivo.fail()) return; 
-    string n, s , c , a , t , code ,line;
-    while (getline(archivo , line))
-    {
-        replaceTrash(line);
-        istringstream ss(line);
-        string dato;
-        for (int i = 1; i < 7; i++)
-        {
-            getline(ss , dato , ',');
-            switch (i)
-            {
-                case 1:
-                    code = dato;
-                case 2:
-                    n = dato;
-                    break;
-                case 3:
-                    c = dato;
-                    break;
-                case 4:
-                    s = dato;
-                    break;
-                case 5:
-                    t=dato;
-                    break;
-                case 6:
-                    a=dato;
-                    break;
-            }
-        }
-        if (!tableB[code])
-        {
-            addBranch(B, L, code, n, c, s, a, t, tableB);
+
+void destroy(slista **n) {
+    slista *temp = NULL;
+    while (*n) {
+        temp = *n;
+        delete temp;
+        *n = (*n)->prox;
+    }
+}
+
+int len(slista *s) {
+    int c = 0;
+    while (s) { c++; s = s->prox; }
+    return c;
+}
+
+slista *next(slista **n) {
+    slista *temp = *n;
+    *n = (*n)->prox;
+    delete temp;
+    return *n;
+}
+
+void stringToProduct(char* s , product **P) {
+    if (s) {
+        slista *attrs = split(s, ',');
+        int sl = len(attrs);
+        if (sl >= 3) {
+            addProduct(P , attrs->cont , attrs->prox->cont , attrs->prox->prox->cont , 0 , 0 , 0);
         }
     }
-    archivo.close();
 }
+
+void stringToBranch(char* s , branch **B) {
+    if (s) {
+        slista *attrs = split(s, ',');
+        int sl = len(attrs);
+        if (sl >= 6) {
+            addBranch(B , attrs->cont , attrs->prox->cont , attrs->prox->prox->cont, attrs->prox->prox->prox->cont, 
+            attrs->prox->prox->prox->prox->cont, attrs->prox->prox->prox->prox->prox->cont);
+        }
+    }
+}
+
+void readProducts(product**P) {
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("products.txt" , "r");
+    if (!archivo) return;
+
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            stringToProduct(i , P);
+            i = NULL;
+        }
+    }
+    delete i;
+    fclose(archivo);
+}
+
+void readBranches(branch**B) {
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("branches.txt" , "r");
+    if (!archivo) return;
+
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            stringToBranch(i , B);
+            i = NULL;
+        }
+    }
+    delete i;
+    fclose(archivo);
+}
+
+
+void readInventory(branch*B , product*P) {
+    char *i = NULL;
+    FILE *archivo;
+    archivo = fopen("inventory.txt" , "r");
+    if (!archivo) return;
+    branch *sB = NULL;
+    product *sP = NULL;
+    slista *branchCode, *productList, *pttr;
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            branchCode = split(i, '|');
+            if (len(branchCode) >= 2) {
+                sB = searchBranchByCode(B , branchCode->cont); 
+                productList = split(branchCode->prox->cont, ';');
+                mostrar(productList);
+                while (productList) {
+                    pttr = split(productList->cont, ',');
+                    if (pttr && len(pttr) >= 4) {
+                        sP = searchProductByCode(P , pttr->cont);
+                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
+                    }
+                    productList = next(&productList);
+                    destroy(&pttr);
+                }
+                i = NULL;
+            }
+        }
+    }
+    // Vaciado de memoria
+    if (i) {delete i;}
+    destroy(&branchCode);
+    fclose(archivo);
+}
+
 
 // Write branchs in .txt
-void saveBranchs(branch*B){ 
-    ofstream archivo("branchs.txt");
-    if (archivo.is_open())
+void saveBranchs(branch*B) { 
+    FILE*archivo = fopen("branches.txt" , "w");
+    while (B)
     {
-        while (B)
-        {
-            archivo << B->code << "," << B->name << "," << B->city << "," << B->state << "," << B->tlf << "," << B->address << "\n";
-            B = B->next;
-        }
+        fprintf(archivo , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
+            B->name.c_str(), B->city.c_str(), B->state.c_str(), B->tlf.c_str(), B->address.c_str());
+        B = B->next;
     }
-    archivo.close();
+    fclose(archivo);
 }
 
-// Take products of .txt
-void readProducts(product** P, product** L) { // Update the function to delete the trash in line
-    ifstream archivo("products.txt");
-    if (archivo.fail()) return;
-    string code, n, d,line;
-    while (getline(archivo, line))
-    {
-        replaceTrash(line);
-        istringstream ss(line);
-        string dato;
 
-        for (int i = 1; i < 4; i++)
-        {
-            getline(ss, dato, ',');
-            switch (i)
-            {
-                case 1:
-                    code = dato;
-                case 2:
-                    n = dato;
-                    break;
-                case 3:
-                    d = dato;
-                    break;
-            }
-        }
-        addProduct(P, L, code, n, d, 0, 0 , 0);
-    }
-    archivo.close();
-}
 // Write products in .txt
 void saveProducts(product* P) {
-    ofstream file("products.txt");
-    if (file.is_open())
+    FILE*archivo = fopen("products.txt" , "w");
+    while (P)
     {
-        while (P)
-        {
-            file << P->code << "," << P->name << "," << P->description << "\n";
-            P = P->next;
-        }
+        fprintf(archivo , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
+        P = P->next;
     }
-    file.close();
-}
-
-// Take the products inside each branch
-void readProductsOfBranch(branch*B , product*P , unordered_map<string, branch*>& tableB){
-    ifstream archivo("inventory.txt");
-    if (archivo.fail()) return;
-    string codeB, codeP , line;
-    int am , minAm;
-    float price , temp;
-    branch*selectedB;
-    product*selectedP;
-    while (getline(archivo , line))
-    {
-        replaceTrash(line);
-        istringstream ss(line);
-        string data;
-        for (int i = 0; i < 5; i++)
-        {
-            getline(ss , data , ',');
-            switch (i)
-            {
-                case 0:
-                    codeB = data;
-                    break;
-                case 1:
-                    codeP = data;
-                    break;
-                case 2:
-                    am = stoi(data);
-                    break;
-                case 3:
-                    minAm = stoi(data);
-                    break;
-                case 4:
-                    price = stof(data);
-                    getline(ss, data, ',');
-                    temp = stof(data) / 100;
-                    price += temp;
-                    break;
-            }
-        }
-        selectedB = tableB[codeB]; //searchBranchByCode(B , codeB);
-        selectedP = searchProductByCode(P , codeP);
-        if (selectedB && selectedP && am >= minAm && price > 0)
-        {
-            addProductToBranch(selectedB , selectedP , am , minAm, price);
-        }
-    }
-    archivo.close();
+    fclose(archivo);
 }
 
 void saveProductsOfBranch(branch*B){
-    ofstream archivo("inventory.txt");
-    if (archivo.fail()) return;
+    FILE* file = fopen("inventory.txt" , "w");
+    product*P;
     while (B)
     {
-        product*P = B->products; 
+        fprintf(file, "%s|" , B->code.c_str());
+        P = B->products;
         while (P)
         {
-            double p = P->price;
-            double temp1;
-            double temp2 = modf(p, &temp1);
-            int temp3 = static_cast<int>(temp2 * 100);
-            archivo << B->code<<","<<P->code<<","<<P->amount<<","<<P->minAmount<<","<<temp1<<","<<temp3<<"\n";
+            fprintf(file , "%s,%d,%d,%.2f;" , P->code.c_str(), P->amount, P->minAmount, P->price);
             P = P->next;
         }
+        fprintf(file , "\n");
         B = B->next;
     }
-    archivo.close();
 }
 
 

@@ -41,7 +41,7 @@ product* searchProductByPrice(product* P, float price) {
     return searchProductByPrice(P->next, price);
 }
 
-void deleteProduct(product** P, product** L, string str) {
+void deleteProduct(product** P, string str) {
     if (!(*P)) return;
     product* ax = *P, * temp;
     if (tolow(ax->code) == tolow(str)) {
@@ -50,24 +50,17 @@ void deleteProduct(product** P, product** L, string str) {
         delete temp;
     }
     else {
-        while (ax->next && tolow(ax->next->code) != tolow(str)) ax = ax->next;
+        while (ax->next && ax->next->code != str) ax = ax->next;
         if (ax->next) {
-            if (ax->next == *L) {
-                temp = ax->next;
-                ax->next = temp->next;
-                delete temp;
-                *L = ax;
-            }
-            else {
-                temp = ax->next;
-                ax->next = temp->next;
-                delete temp;
-            }
+            temp = ax->next;
+            ax->next = temp->next;
+            delete temp;
+            
         }
     }
 }
 
-void addProduct(product** P, product** L, string codeP, string name, string description, float price, int amount, int minAmount) {
+void addProduct(product** P, string codeP, string name, string description, float price, int amount, int minAmount) {
     product* newP = new product;
     newP->name = name;
     newP->description = description;
@@ -75,17 +68,8 @@ void addProduct(product** P, product** L, string codeP, string name, string desc
     newP->code = codeP;
     newP->amount = amount;
     newP->minAmount = minAmount;
-
-    if (!(*P)) {
-        newP->next = *P;
-        *P = newP;
-        *L = newP;
-    }
-    else {
-        newP->next = NULL;
-        (*L)->next = newP;
-        *L = newP;
-    }
+    newP->next = *P;
+    *P = newP;
 }
 
 #endif // PRODUCT_H

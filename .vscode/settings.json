@@ -12,6 +12,11 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "*.tcc": "cpp",
+        "string_view": "cpp",
+        "iosfwd": "cpp",
+        "typeinfo": "cpp",
+        "string": "cpp"
     }
 }
