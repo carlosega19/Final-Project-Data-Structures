@@ -1,4 +1,4 @@
-101,Café,Marca Maria Café C.A.  1 kg
+101,Cafe,Marca Maria Café C.A.  1 kg
 112,Margarina,Marca Leguminosa S.A  500 gr
 137,Azucar Morena,Marca Artica.  1 kg
 254,Acetaminofen,Marca LabNacional.  75 mg

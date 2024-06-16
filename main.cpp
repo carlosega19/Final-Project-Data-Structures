@@ -31,6 +31,7 @@ int main() {
             op = -1;
         }
         fflush(stdin);
+
 		switch (op)
 		{
 			case 1: // Mantenimiento
@@ -66,7 +67,8 @@ int main() {
                                         menuModProduct(products);
                                         break;
                                     case 3: // DELETE A PRODUCT
-                                        menuDelProduct(&products);
+                                        
+                                        (&products);
                                         break;
                                     case 4: // CONSULT A PRODUCT BY CODE
                                         menuConsultProductByCode(products);
