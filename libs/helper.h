@@ -3,6 +3,7 @@
 
 #include "branch.h"
 #include "product.h"
+#include "client.h"
 //#include "menu.h"
 #include <iostream>
 
@@ -399,6 +400,21 @@ void readInventory(branch*B , product*P) {
     if (i) {delete i;}
     destroy(&branchCode);
     fclose(archivo);
+}
+
+void readClients(people**P){
+    FILE*file = fopen("clients.txt" , "r");
+    if (!file) return;
+    slista*newP;
+    char *i = NULL;
+    while (!feof(file))
+    {
+        fscanf(file, "%s" , &i);
+        newP = split(i , ',');
+        //addPerson
+    }
+    
+
 }
 
 
