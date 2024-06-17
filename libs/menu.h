@@ -5,7 +5,6 @@
 #define MENU_H
 
 #include <iostream>
-#include <iomanip>
 #include "branch.h"
 #include "product.h"
 #include "helper.h"
@@ -30,9 +29,10 @@ mensajeInformativo *MI() {
     return m;
 }
 
+
 static mensajeInformativo *Mensajero = MI();
 /*const string NUM_VALIDO = "1234567890";
-const int NS = 10; /* ver si los string son terminados en NULL para eliminar este campo */
+const int NS = 10; ver si los string son terminados en NULL para eliminar este campo */
 
 
 void actualizarMensaje(string m) {
@@ -40,9 +40,7 @@ void actualizarMensaje(string m) {
 }
 
 void printCreators() {
-    string names = "REALIZADO POR:    Andres De Quintal   Y   Carlos Gali�o";
-    cout << setw((lineWidth + names.length()) / 2) << names << endl;
-    cout << line << endl;
+    cout << line << "\nREALIZADO POR: Carlos Galiño, Andrés De Quintal y Manuel Negrón;\n" << line << endl;
 }
 
 /*--------------- BRANCHES AND PRODUCTS MENUS ---------------*/
@@ -58,7 +56,7 @@ void createProduct(product**P){
     } while (invalidCode);
 
     obtenerEntrada2("\n\t- Escribe el NOMBRE del nuevo producto: ", &name);
-    obtenerEntrada2("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &name);
+    obtenerEntrada2("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &description);
 
     if (confirm())
     {
@@ -77,42 +75,36 @@ void printProducts(product*P) {
 }
 
 void showAllProducts(product*P) {
-    cout << header;
-    string subtitle = "LISTA DE PRODUCTOS";
-    cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
-    cout << line << endl;
+    cout << header << endl;
+    cout << "LISTA DE PRODUCTOS:\n" << line << endl;
     printProducts(P);
     cout << "\n\n";
 }
 
-void headerProducts(string line) {
-    
-    cout << line << endl;
-    string subtitle = "LISTA DE PRODUCTOS";
-    cout << setw((length(line) + length(subtitle)) / 2) << subtitle << endl;
-    cout << line << endl;
-    cout << setw(10) << internal << "CODIGO"
-        << setw(25) << internal << "NOMBRE"
-        << setw(35) << internal << "DESCRIPCION"<<endl;
-    cout << line << endl;
+void headerProducts() {
+	cout << line << "\nLISTA DE PRODUCTOS\n" << line << endl; // FIXME
+	printFmt("CODIGO", 10);
+	printFmt("NOMBRE", 30);
+	printFmt("DESCRIPCION", 30);
+	cout << endl;
 }
 
 void printProductsInTable(product* P) {
-    cout << setw(10) << internal << P->code
-        << setw(25) << internal << P->name<<"   " 
-        << setw(35) << internal << P->description << endl;
+	printFmt(P->code, 10);
+	printFmt(P->name, 30);
+	printFmt(P->description, 30);
+	cout << endl;
 }
 
 void tableProducts(product* P) {
     cout << "\n\n";
-    string line = "|-------------------------------------------------------------------------------|";
-    headerProducts(line);
+    headerProducts();
     while (P)
     {
         printProductsInTable(P);
         P = P->next;
     }
-    cout << line << "\n\n\t";
+    cout << line << "\n\n";
 }
 /*--------------------------------------------------------------------------------------------*/
 product* selectProductByCode(product* P) {
@@ -125,9 +117,9 @@ product* selectProductByCode(product* P) {
 
 void optionsModProduct(product*selected) {
     clScr();
-    cout << header;
-    cout << "\nMODIFICAR\n\t1. NOMBRE\n\t2. DESCRIPCION\n\t3. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
-    cout << "\n\n\tPRODUCTO ENCONTRADA: \n";
+    cout << header << endl;
+    cout << "MODIFICAR\n\t1. NOMBRE\n\t2. DESCRIPCION\n\t3. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
+    cout << "\n\n\tPRODUCTO ENCONTRADO: \n";
     cout << "\n\t - " << selected->name << " [" << selected->code << "]";
     cout << "\n\t\t ~ Descripcion: " << selected->description;
     cout << "\n\n\tIngresa la opcion a modificar: ";
@@ -217,7 +209,7 @@ void menuConsultProductByType(product* B) { // CAMBIAR EL "TYPE"
         cout << "\n\n\t\tNINGUNO...\n\n";
         return;
     }
-    headerProducts(line);
+    headerProducts();
     while (selected)
     {
         printProductsInTable(selected);
@@ -264,7 +256,6 @@ void createBranch(branch**B) {
     bool invalidCode = true;
     do
     {
-        cout << "\n\t- Escribe el CODIGO de la nueva branch: ";
         obtenerEntrada2("\n\t- Escribe el CODIGO de la nueva branch: ", &code);
         invalidCode = searchBranchByCode(*B, code);
         if (invalidCode)
@@ -295,32 +286,32 @@ void printBranchs(branch*B) {
 	printBranchs(B->next);
 }
 
-void headerBranchs(const string& line) {
-    cout << line << endl;
-    string subtitle = "LISTA DE SUCURSALES";
-    cout << setw((line.length() + subtitle.length()) / 2) << subtitle << endl;
-    cout << line << endl;
-    cout << setw(9) << "CODIGO"
-        << setw(15) << "NOMBRE"
-        << setw(15) << "CIUDAD"
-        << setw(10) << "ESTADO"
-        << setw(15) << "TELEFONO"
-        << setw(50) << "DIRECCION" << endl;
-    cout << line << endl;
+
+
+
+void headerBranchs() {
+	cout << line << "\nLISTA DE SUCURSALES\n" << endl;
+	printFmt("CODIGO", 10);
+	printFmt("NOMBRE", 30);
+	printFmt("CIUDAD", 20);
+	printFmt("ESTADO", 20);
+	printFmt("TELEFONO", 20);
+	printFmt("DIRECCION", 40); 
+	cout << endl << line << endl; // FIXME
 }
 
 void printBranchsInTable(branch* B) {
-    cout << setw(9) << B->code
-        << setw(15) << B->name
-        << setw(15) << B->city
-        << setw(10) << B->state
-        << setw(15) << B->tlf
-        << "   " << setw(50) << B->address << endl;
+	printFmt(B->code, 10);
+	printFmt(B->name, 30);
+	printFmt(B->city, 20);
+	printFmt(B->state, 20);
+	printFmt(B->tlf, 20);
+	printFmt(B->address, 40); 
+	cout << endl;
 }
 
 void tableBranchs(branch* B) {
-    string line = "|----------------------------------------------------------------------------------------------------------------------|";
-    headerBranchs(line);
+    headerBranchs();
     while (B)
     {
         printBranchsInTable(B);
@@ -354,16 +345,9 @@ void menuConsultBranchByCode(branch*B){
 
 
 void menuConsultByState(branch*B ){
-    cout << header;
-    string userInput;
-    string subtitle = "CONSULTAR SUCURSAL POR ESTADO";
-    string op0 = "0. VOLVER A MENU ANTERIOR.";
-    cout << setw((lineWidth + length(subtitle)) / 2) << subtitle << endl;
-	cout << line << endl;
-    cout << setw((lineWidth + length(op0)) / 2) << op0 << endl;
-    cout << line <<endl;
-    cin.ignore();
-    cout << "\nIngresa el estado: ";
+    cout << header << endl;
+    string userInput = "";
+    cout << "\n\tCONSULTAR SUCURSAL POR ESTADO\n\t0.VOLVER AL MENU ANTERIOR\n" << line << endl;
     obtenerEntrada2("\nIngresa el estado: " , &userInput);
     if (userInput == "0") return;
     cout << "\n\tSUCURSALES ENCONTRADAS: \n";
@@ -372,7 +356,7 @@ void menuConsultByState(branch*B ){
         cout << "\n\n\t\tNINGUNA...\n\n\t";
         return;
     }
-    headerBranchs(line);
+    headerBranchs();
     while (selected)
     {
         printBranchsInTable(selected);
@@ -394,7 +378,7 @@ void menuConsultByCity(branch* B) {
         system("pause");
         return;
     }
-    headerBranchs(line);
+    headerBranchs();
     while (selected)
     {
         printBranchsInTable(selected);
@@ -468,33 +452,30 @@ void printProductssOfBranch(product*P) {
     cout << "\n\t\t ~ Descripcion: " << P->description;
 }
 
-void headerProductsOfBranch(string line) {
-    cout << line << endl;
-    string subtitle = "LISTA DE PRODUCTOS";
-    cout << setw((length(line) + length(subtitle)) / 2) << subtitle << endl;
-    cout << line << endl;
-    cout << setw(10) << internal << "CODIGO"
-        << setw(15) << internal << "NOMBRE"
-        << setw(17) << internal << "EXISTENCIA"
-        << setw(17) << internal << "EXISTENCIA MIN."
-        << setw(13) << internal << "PRECIO" << endl;
-    cout << line << endl;
+void headerProductsOfBranch() {
+	cout << line << "\nLISTA DE PRODUCTOS\n" << line << endl;
+	printFmt("CODIGO", 10);
+	printFmt("NOMBRE", 30);
+	printFmt("EXISTENCIA", 20);
+	printFmt("EXISTENCIA MIN.", 20);
+	printFmt("PRECIO", 20);
+	cout << line << endl;
 }
 
 void printProductsInTableOfBranch(product* P) {
     while (P) {
-        cout << setw(10) << internal << P->code
-            << setw(15) << internal << P->name
-            << setw(15) << internal << P->amount
-            << setw(15) << internal << P->minAmount
-            << setw(15) << fixed << setprecision(2) << P->price << endl;
+	printFmt(P->code, 20);
+	printFmt(P->name, 20);
+	printFmt(P->amount, 20);
+	printFmt(P->minAmount, 20); 
+	printFmt(P->price, 20); 
+	cout << endl;
         P = P->next;
     }
 }
 
 void tableProductsOfBranch(product* P) {
-    string line = "|----------------------------------------------------------------------------|";
-    headerProductsOfBranch(line);
+    headerProductsOfBranch();
     printProductsInTableOfBranch(P);
     cout << line << "\n\n\t";
 }

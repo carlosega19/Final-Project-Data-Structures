@@ -24,6 +24,38 @@ void clScr() {
     }
 }
 
+void printFmt(string h, int size) {
+        size_t length = h.length();
+        string result = "";
+        if (size > length) {
+                result = h;
+                for (int i = 1; i < (size - length); i++) {
+                        result += " ";
+                }
+        } else if (length > size) {
+                for (int i = 1; i < size; i++) {
+                        result += h[i];
+                }
+        }
+        cout << result;
+}
+
+void printFmt(float p, int size) {
+        string h = to_string(p);
+        size_t length = h.length();
+        string result = "";
+        if (size > length) {
+                result = h;
+                for (int i = 1; i < (size - length); i++) {
+                        result += " ";
+                }
+        } else if (length > size) {
+                for (int i = 1; i < size; i++) {
+                        result += h[i];
+                }
+        }
+        cout << result;
+}
 
 
 struct slista {
@@ -211,7 +243,7 @@ int length(string& line) {
     return count;
 }
 
-bool onlySpace(const std::string & str) {
+bool onlySpace(const std::string str) {
     bool result = true;
     for (size_t i = 0; i < sizeof(str); i++) {
         if (!isspace(static_cast<unsigned char>(str[i]))) {
