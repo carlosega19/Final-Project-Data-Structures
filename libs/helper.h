@@ -27,16 +27,18 @@ void clScr() {
 void printFmt(string h, int size) {
         size_t length = h.length();
         string result = "";
-        if (size > length) {
+	
+	if (size > length) {
                 result = h;
                 for (int i = 1; i < (size - length); i++) {
                         result += " ";
                 }
-        } else if (length > size) {
+        } 
+	else if (length > size) {
                 for (int i = 1; i < size; i++) {
                         result += h[i];
                 }
-        }
+        } else { result = h; }
         cout << result;
 }
 
@@ -44,16 +46,18 @@ void printFmt(float p, int size) {
         string h = to_string(p);
         size_t length = h.length();
         string result = "";
-        if (size > length) {
+	
+	if (size > length) {
                 result = h;
                 for (int i = 1; i < (size - length); i++) {
                         result += " ";
                 }
-        } else if (length > size) {
+        } 
+	else if (size < length) {
                 for (int i = 1; i < size; i++) {
                         result += h[i];
                 }
-        }
+        } else { result = h; }
         cout << result;
 }
 
