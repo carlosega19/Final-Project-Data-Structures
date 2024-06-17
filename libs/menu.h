@@ -736,6 +736,7 @@ PASOS PARA IMPLEMENTAR MENUITEM
 
 int controllerMenuModBranch(menuItem **activo, int selec, context *ct) {
     branch* selected = selectBranchByCode(*ct->branches);
+    if (!selected) return 1;
     string input = "";
     switch (selec) {
         case 0:

@@ -64,7 +64,7 @@ BA
 
 
 /*BALANCE FUNCTIONS*/
-void II(bill**B) {
+void LL(bill**B) {
     bill*ax = (*B)->left;
     (*B)->left = ax->right;
     ax->right = *B;
@@ -72,7 +72,7 @@ void II(bill**B) {
     ax->BF = 0;
     (*B)->BF = 0;
 }
-void DD(bill**B) {
+void RR(bill**B) {
     bill*ax = (*B)->right;
     (*B)->right = ax->left;
     ax->left = *B;
@@ -80,7 +80,7 @@ void DD(bill**B) {
     (*B)->BF = 0;
     ax->BF = 0;
 }
-void ID(bill**B) {
+void LR(bill**B) {
     bill*ax = (*B)->left;
     bill*bx = ax->right;
     (*B)->left = bx->right;
@@ -93,7 +93,7 @@ void ID(bill**B) {
     bx->BF = 0;
     (*B)->BF = 0;
 }
-void DI(bill**B) {
+void RL(bill**B) {
     bill*ax = (*B)->right;
     bill*bx = ax->left;
     (*B)->right = bx->left;
@@ -174,8 +174,8 @@ int addBill(bill**B, string num, string cId, string date, float t) {
             if (res) (*B)->BF += -1;
             if ((*B)->BF < -1) {
                 if (compare((*B)->left->code, num)) {
-                    II(B);
-                } else ID(B);
+                    LL(B);
+                } else LR(B);
                 return 0;
             }
         }
@@ -184,8 +184,8 @@ int addBill(bill**B, string num, string cId, string date, float t) {
             if (res) (*B)->BF += 1;
             if ((*B)->BF > 1) {
                 if (compare(num, (*B)->right->code)) {
-                    DD(B);
-                } else DI(B);
+                    RR(B);
+                } else RL(B);
                 return 0;
             }
         }
@@ -197,28 +197,72 @@ int addBill(bill**B, string num, string cId, string date, float t) {
     }
 }
 
+void replaceBills(bill *b1, bill *b2) {
+    swap(b1->code, b2->code);
+    swap(b1->date, b2->date);
+    swap(b1->total, b2->total);
+    swap(b1->detailBill, b2->detailBill);
+    swap(b1->clientId, b2->clientId);
+}
 
-/*int main() {
+bill *mayor(bill**B, bill**t) {
+    if (!(*B)->right) {
+        *t = *B;
+        *B = (*t)->left;
+        return *t;
+    }
+    return mayor(&(*B)->right, t);
+}
+
+int deleteBill(bill**B, string num){
+    if (*B)
+    {
+        if (compare((*B)->code, num)) {
+            int res = deleteBill(&(*B)->left, num);
+            if (res) (*B)->BF += 1;
+            if ((*B)->BF > 1)
+            {
+                if ((*B)->right && (*B)->right->right) RR(B);
+                else RL(B);
+                return 0;
+            }                
+        }
+        else if (compare(num , (*B)->code)) {
+            int res = deleteBill(&(*B)->right, num);
+            if (res) (*B)->BF += -1;
+            if ((*B)->BF < -1) {
+                if ((*B)->left && (*B)->left->left) LL(B);
+                else LR(B);
+                return 0;
+            }
+        }
+        else {
+            bill *t = *B;
+            if (!(*B)->left && !(*B)->right) *B = NULL;
+            else if (!(*B)->right) *B = (*B)->left;
+            else if (!(*B)->left)  *B = (*B)->right;
+            else replaceBills(*B, mayor(&(*B)->left, &t));
+            delete t;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+int main() {
     bill *a = NULL;
     
-    addBill(&a, "10", "", "", 0);
-    addBill(&a, "5", "", "", 0);
-    addBill(&a, "7", "", "", 0);
-    addBill(&a, "15", "", "", 0);
-    addBill(&a, "2", "", "", 0);
-    addBill(&a, "20", "", "", 0);
-    addBill(&a, "14", "", "", 0);
-    addBill(&a, "8", "", "", 0);
-    addBill(&a, "1", "", "", 0);
-    addBill(&a, "9", "", "", 0);
-    addBill(&a, "11", "", "", 0);
-    addBill(&a, "80", "", "", 0);
-    addBill(&a, "12", "", "", 0);
-    addBill(&a, "16", "", "", 0);
-    addBill(&a, "22", "", "", 0);
-
+    addBill(&a,"18","","",0);
+    addBill(&a,"16","","",0);
+    addBill(&a,"20","","",0);
     inorden(a);
+
+    system("pause");
+    deleteBill(&a, "18");
+    inorden(a);
+    system("pause");
     return 0;
-}*/
+}
 
 #endif //BILL_H
