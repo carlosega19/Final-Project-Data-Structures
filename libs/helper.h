@@ -84,6 +84,17 @@ slista *split(string input, char charray) {
 /*     FUNCTIONS      */
 const string NUM_VALIDO = "1234567890";
 const int NS = 10; 
+
+void obtenerEntrada(string input, string *res) {
+    cout << input << endl;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
+void obtenerEntrada2(string input, string *res) {
+    cout << input;
+    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+}
+
 int entradaValidar(string entrada) {
     int i = 0;
     char t;
@@ -100,9 +111,75 @@ int entradaValidar(string entrada) {
     }
 }
 
+long int pow(int num, int e) {
+	long int result = 1;
+	for (int i = 0; i < e; i++) {
+		result *= num; 
+	}
+	return result;
+}
+
+
+long int to_int(string s) {
+	int index = 0;
+	long int result = 0;
+	int sl = s.length();
+	while ((sl > 0) && (index < sl)) {
+		switch (s[index]) {
+			case '0':
+				index++;
+				break;
+			case '1':
+				result += pow(10, sl - index - 1);
+				index++;
+				break;
+			case '2':
+				result += 2 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '3':
+				result += 3 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '4':
+				result += 4 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '5':
+				result += 5 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '6':
+				result += 6 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '7':
+				result += 7 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '8':
+				result += 8 * pow(10, sl - index - 1);
+				index++;
+				break;
+			case '9':
+				result += 9 * pow(10, sl - index - 1);
+				index++;
+				break;
+			default:
+				index++;
+				break;
+
+		}
+	}
+	return result;
+}
+
+
 
 int confirm() {
-    if (entradaValidar("\n\tSeguro que desea modificar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ")) return 1;
+    string entrada = "";
+    obtenerEntrada2("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ", &entrada);
+    if (entradaValidar(entrada)) return 1;
     return 0;
 }
 
