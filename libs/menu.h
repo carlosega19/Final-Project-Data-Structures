@@ -1038,7 +1038,7 @@ menuItem *menuConsultBranchByDesc(menuItem *parent) {
 
 menuItem *menuModBranchs(menuItem *parent) {
     menuItem *m = new menuItem;
-    m->encabezado = line + "\nMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n\t" + line;
+    m->encabezado = line + "\nMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
     m->parent = parent;
     m->comportamiento = controllerConsultBranchByDesc;
     return m;
