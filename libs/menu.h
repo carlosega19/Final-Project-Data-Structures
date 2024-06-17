@@ -596,7 +596,7 @@ void menuInventory(branch*B , product*P) {
         clScr();
         optionsMenuInventory(selected);
         cin >> op;
-        if (!selected && op != '1')
+        if (!selected && (op != '1' && op != '0'))
         {
             cout << "\n\t\t\t-- SUCURSAL NO SELECCIONADA --\n\n\n";
             op = '\0';
@@ -605,6 +605,7 @@ void menuInventory(branch*B , product*P) {
         switch (op)
         {
             case '1':
+                fflush(stdin);
                 selected = selectBranchByCode(B);
                 cout << "\n\n";
                 break;
