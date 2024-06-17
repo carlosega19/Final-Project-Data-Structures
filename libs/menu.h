@@ -596,6 +596,7 @@ void menuInventory(branch*B , product*P) {
         clScr();
         optionsMenuInventory(selected);
         cin >> op;
+        cin.ignore();
         if (!selected && (op != '1' && op != '0'))
         {
             cout << "\n\t\t\t-- SUCURSAL NO SELECCIONADA --\n\n\n";
