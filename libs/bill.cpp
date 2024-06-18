@@ -165,7 +165,7 @@ void inorden(bill*B) {
         inorden(B->right);
     }
 }
-
+// NO FUNCIONA
 int addBill(bill**B, string num, string cId, string date, float t) {
     int res = 0;
     if (*B) {
