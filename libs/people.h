@@ -10,12 +10,12 @@ struct people {
 };
 
 // Función para limpiar la pantalla
-void clearScreen() {
+void clrScr() {
     cout << "\033[2J\033[H";
 }
 
 // Función para validar que el nombre y apellido no contengan números
-bool validateName(const string& name) {
+bool validateName(string name) {
     for (char c : name) {
         if (isdigit(c)) {
             return false;
@@ -25,7 +25,7 @@ bool validateName(const string& name) {
 }
 
 // Función para validar que la cedula tenga solo numeros y tenga entre 7 y 8 dígitos
-bool validateID(const string& cedula) {
+bool validateID(string cedula) {
     if (cedula.length() < 7 || cedula.length() > 8) {
         return false;
     }
@@ -38,164 +38,109 @@ bool validateID(const string& cedula) {
 }
 
 // Función para encontrar una persona por su cedula
-people* foundPeopleByID(people* head, const string& id) {
-    people* current = head;
-    while (current != NULL) {
-        if (current->ID == id) {
-            return current;
-        }
-        current = current->next;
-    }
-    return NULL;
+people* foundPeopleByID(people* P, string id) {
+    if (!P) return NULL;
+    if (P->ID == id) return P;
+    return foundPeopleByID(P->next, id);
 }
 
 // Función para agregar una nueva persona a la lista
-bool addPerson(people** head, people** last, const string& id, const string& nameAndSecondName) {
-    // Validar cédula
-    if (!validateID(id)) {
-        cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
-        return false;
-    }
+void addPerson(people** P, people** L, string id, string nameAndSecondName) {
+    people* newP = new people;
+    newP->ID = id;
+    newP->nameAndSecondName = nameAndSecondName;
+    newP->next = NULL;
 
-    // Validar nombre y apellido
-    if (!validateName(nameAndSecondName)) {
-        cout << "El nombre y el apellido no deben contener numeros." << endl;
-        return false;
-    }
-
-    // Verificar si la cédula ya existe
-    if (foundPeopleByID(*head, id) != NULL) {
-        cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
-        return false;
-    }
-
-    // Crear nuevo cliente
-    people* newPerson = new people;
-    newPerson->ID = id;
-    newPerson->nameAndSecondName = nameAndSecondName;
-    newPerson->next = NULL;
-
-    // Agregar persona a la lista
-    if (!(*head)) {
-        *head = newPerson;
-        *last = newPerson;
+    if (!(*P)) {
+        *P = newP;
+        *L = newP;
     } else {
-        (*last)->next = newPerson;
-        *last = newPerson;
+        (*L)->next = newP;
+        *L = newP;
     }
+}
 
-    return true;
+// Función para convertir una cadena a minúsculas
+string tolow(string cad) {
+    for (int i = 0; i < cad.length(); i++) {
+        if (cad[i] >= 'A' && cad[i] <= 'Z') {
+            cad[i] += 'a' - 'A'; // Convertir caracteres mayúsculas a minúsculas
+        }
+    }
+    return cad;
+}
+
+// Función para comprobar si una subcadena está contenida en una cadena
+int find(string main, string pat) {
+    for (int i = 0; i <= main.length() - pat.length(); i++) {
+        bool found = true;
+        for (int j = 0; j < pat.length(); j++) {
+            if (main[i + j] != pat[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) return 1;
+    }
+    return 0;
 }
 
 // Función para mostrar todas las personas en la lista
-void showPeople(people* head) {
-    if (head == NULL) {
+void showPeople(people* P) {
+    if (!P) {
         cout << "\t - No hay clientes en la lista" << endl;
         return;
     }
 
-    people* current = head;
-    while (current != NULL) {
-        cout << "Cedula: " << current->ID << ", Nombre y Apellido: " << current->nameAndSecondName << endl;
-        current = current->next;
+    while (P != NULL) {
+        cout << "Cedula: " << P->ID << ", Nombre y Apellido: " << P->nameAndSecondName << endl;
+        P = P->next;
     }
-}
-/* Función para cargar personas desde el archivo
-void loadPeopleFromFile(const char* nombreArchivo, people** head, people** last) {
-    FILE* archivo = fopen(nombreArchivo, "r");
-
-    if (!archivo) {
-        cerr << "Error al abrir el archivo " << nombreArchivo << endl;
-        return;
-    }
-
-    char linea[100];
-    bool comenzarLectura = false;
-
-    while (fgets(linea, sizeof(linea), archivo)) {
-        if (strstr(linea, "@@@@@@")) {
-            comenzarLectura = !comenzarLectura;
-            continue;
-        }
-
-        if (comenzarLectura) {
-            string id, nameAndSecondName;
-            id = strtok(linea, ",");
-            nameAndSecondName = strtok(NULL, "\n");
-            addPerson(head, last, id, nameAndSecondName);
-        }
-    }
-
-    fclose(archivo);
-}*/
-
-//Función para guardar personas en un archivo
-void guardarPersonasEnArchivo(const char* nombreArchivo, const people* cabeza) {
-    FILE* archivo = fopen(nombreArchivo, "w");
-
-    if (!archivo) {
-        cerr << "Error al abrir el archivo " << nombreArchivo << endl;
-        return;
-    }
-
-    fprintf(archivo, "@@@@@@\n"); // Inicio del bloque de personas
-
-    const people* temp = cabeza;
-    while (temp != NULL) {
-        fprintf(archivo, "%s, %s\n", temp->ID.c_str(), temp->nameAndSecondName.c_str());
-        temp = temp->next;
-    }
-
-    fprintf(archivo, "@@@@@@\n"); // Fin del bloque de personas
-
-    fclose(archivo);
-    cout << nombreArchivo << endl;
 }
 
 // Función para eliminar una persona de la lista
-void deletePeople(people** head, people** last, people* personaEliminar) {
-    if (!(*head)) {
-        cout << "La lista esta vacia. No se puede eliminar." << endl;
-        return;
-    }
-
-    if (personaEliminar == *head) {
-        *head = (*head)->next;
-        delete personaEliminar;
-        if (!(*head)) {
-            *last = NULL;
+void deletePeople(people** P, people** L, string id) {
+    if (!(*P)) return;
+    people* ax = *P, * temp;
+    if (ax->ID == id) {
+        temp = ax;
+        *P = (*P)->next;
+        delete temp;
+        if (!(*P)) *L = NULL;
+    } else {
+        while (ax->next && ax->next->ID != id) ax = ax->next;
+        if (ax->next) {
+            if (ax->next == *L) {
+                temp = ax->next;
+                ax->next = temp->next;
+                delete temp;
+                *L = ax;
+            } else {
+                temp = ax->next;
+                ax->next = temp->next;
+                delete temp;
+            }
         }
-        return;
-    }
-
-    people* temp = *head;
-    while (temp && temp->next != personaEliminar) {
-        temp = temp->next;
-    }
-
-    if (!temp) {
-        cout << "Persona no encontrada en la lista." << endl;
-        return;
-    }
-
-    temp->next = personaEliminar->next;
-    delete personaEliminar;
-    if (temp->next == NULL) {
-        *last = temp;
     }
 }
 
 // Función para consultar por nombre
-void consultByName(const people* head, const string& nombreConsulta) {
-    const people* temp = head;
+void consultByName(people* P, string name) {
     bool encontrado = false;
 
-    while (temp != NULL) {
-        if (temp->nameAndSecondName.find(nombreConsulta) != string::npos) {
-            cout << "CEDULA: " << temp->ID << ", Nombre / Apellido: " << temp->nameAndSecondName << endl;
+    // Convertir el nombre ingresado a minúsculas
+    string lowerName = tolow(name);
+
+    while (P != NULL) {
+        // Convertir el nombre almacenado a minúsculas para la comparación
+        string lowerNameToCompare = tolow(P->nameAndSecondName);
+
+        // Comparar las cadenas convertidas
+        if (find(lowerNameToCompare, lowerName)) {
+            cout << "CEDULA: " << P->ID << ", Nombre / Apellido: " << P->nameAndSecondName << endl;
             encontrado = true;
         }
-        temp = temp->next;
+        P = P->next;
     }
 
     if (!encontrado) {
@@ -203,63 +148,59 @@ void consultByName(const people* head, const string& nombreConsulta) {
     }
 }
 
-
 // Función para mostrar todas las cédulas disponibles
-void printID(const people* head) {
-    const people* temp = head;
-
-    while (temp != NULL) {
-        cout << "Cedula: " << temp->ID << endl;
-        temp = temp->next;
+void printID(people* P) {
+    while (P != NULL) {
+        cout << "Cedula: " << P->ID << endl;
+        P = P->next;
     }
 }
 
 // Función para consultar por cédula
-void consultByID(const people* head, const string& cedulaConsulta) {
-    const people* temp = head;
-    bool encontrado = false;
-
-    while (temp != NULL) {
-        if (temp->ID == cedulaConsulta) {
-            cout << "Nombre y Apellido: " << temp->nameAndSecondName << ", Cedula: " << temp->ID << endl;
-            encontrado = true;
-            break;         }
-        temp = temp->next;
-    }
-
-    if (!encontrado) {
+void consultByID(people* P, string id) {
+    people* person = foundPeopleByID(P, id);
+    if (person) {
+        cout << "Nombre y Apellido: " << person->nameAndSecondName << ", Cedula: " << person->ID << endl;
+    } else {
         cout << "No se encontro el cliente con la cedula indicada." << endl;
     }
 }
 
 // Función para consultar cliente por nombre / apellido o cédula
-void consultCustomer(const people* head) {
+void consultCustomer(people* P) {
     int opcion;
     string consulta; // Para almacenar el nombre, apellido o cédula a consultar
 
     do {
-        clearScreen();
+        clrScr();
         cout << "\n\tCONSULTAR CLIENTE" << endl;
         cout << "1. Consultar por Nombre" << endl;
         cout << "2. Consultar por Cedula" << endl;
         cout << "0. Volver al Menu Anterior" << endl;
-        cout << "Su opcion (0-3): ";
+        cout << "Su opcion (0-2): ";
         cin >> opcion;
-        cin.ignore(); 
+        cin.ignore();
+
+        if (cin.fail() || opcion < 0 || opcion > 2) {
+            cin.clear();
+            while (cin.get() != '\n'); 
+            cout << "Opción no válida. Intente de nuevo." << endl;
+            continue;
+        }
 
         switch (opcion) {
             case 1:
                 cout << "Ingrese el nombre a buscar: ";
                 getline(cin, consulta);
                 cout << "Resultados para el nombre '" << consulta << "':" << endl;
-                consultByName(head, consulta);
+                consultByName(P, consulta);
                 break;
             case 2:
                 cout << "Cédulas disponibles en el sistema:" << endl;
-                printID(head);
+                printID(P);
                 cout << "Ingrese la cédula a buscar: ";
                 getline(cin, consulta);
-                consultByID(head, consulta);
+                consultByID(P, consulta);
                 break;
             case 0:
                 cout << "Volviendo al menú anterior..." << endl;
@@ -271,20 +212,19 @@ void consultCustomer(const people* head) {
 
         if (opcion != 0) {
             cout << "\nPresione Enter para continuar...";
-            cin.get(); // Esperar a que el usuario presione Enter
+            while (cin.get() != '\n'); // Limpiar buffer de entrada hasta encontrar nueva línea
         }
     } while (opcion != 0);
 }
 
 // Función para modificar los datos de un cliente
-void maintenancePeople(people** head, people** last) {
+void maintenancePeople(people* P, people* L) {
     int opcion;
     string id, nameAndSecondName;
-    people* cliente = NULL; 
+    people* cliente = NULL;
 
     do {
-        clearScreen();
-        // Mostrar el menú de mantenimiento de personas
+        clrScr();
         cout << "MANTENIMIENTO PERSONAS" << endl;
         cout << "1. Agregar Cliente" << endl;
         cout << "2. Modificar Cliente" << endl;
@@ -296,145 +236,138 @@ void maintenancePeople(people** head, people** last) {
         cin >> opcion;
         cin.ignore();
 
+        if (cin.fail() || opcion < 0 || opcion > 5) {
+            cin.clear();
+            while (cin.get() != '\n');
+            cout << "Opción no válida. Intente de nuevo." << endl;
+            continue;
+        }
+
         switch (opcion) {
             case 1:
-                clearScreen();
+                clrScr();
                 cout << "\n\t - Ingrese Cedula: ";
                 getline(cin, id);
+                if (!validateID(id)) {
+                    cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
                 cout << "\n\t - Ingrese Nombre y Apellido: ";
                 getline(cin, nameAndSecondName);
-                if (!addPerson(head, last, id, nameAndSecondName)) {
+                if (!validateName(nameAndSecondName)) {
+                    cout << "El nombre y el apellido no deben contener numeros." << endl;
                     cout << "\nPresione Enter para continuar...";
-                    cin.get();
-                } else {
-                    cout << "\n\t- Cliente agregado exitosamente! -" << endl;
-                    cout << "\nPresione Enter para continuar...";
-                    cin.get();
+                    while (cin.get() != '\n'); 
+                    break;
                 }
-                break;
-            case 2:
-                clearScreen();
-                cout << "\nMODIFICAR CLIENTE" << endl;
-                showPeople(*head);
-                cout << "\n\t - Ingrese la cedula del cliente a modificar: ";
-                getline(cin, id);
-                cliente = foundPeopleByID(*head, id);
-                if (cliente) {
-                    // Mostrar información actual del cliente
-                    clearScreen();
-                    cout << "\n\tInformacion actual del cliente:\n" << endl;
-                    cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->nameAndSecondName << endl;
 
-                    // Submenú para modificar cliente
-                    int opcionModificar;
-                    do {
-                        cout << "\n\t1. Modificar Nombre" << endl;
-                        cout << "\t2. Modificar Cedula" << endl;
-                        cout << "\t0. Volver al Menu Anterior" << endl;
-                        cout << "\nSu opcion (0-3): ";
-                        cin >> opcionModificar;
-                        cin.ignore(); 
-
-                        switch (opcionModificar) {
-                            case 1:
-                                cout << "Ingrese nuevo nombre y apellido: ";
-                                getline(cin, nameAndSecondName);
-                                if (!validateName(nameAndSecondName)) {
-                                    cout << "Nombre no valido. No debe contener numeros." << endl;
-                                } else {
-                                    cliente->nameAndSecondName = nameAndSecondName;
-                                    cout << "Nombre modificado correctamente." << endl;
-                                }
-                                break;
-                            case 2:
-                                cout << "Ingrese nueva cedula: ";
-                                getline(cin, id);
-                                if (id.length() > 8 || !validateID(id)) {
-                                    cout << "Cedula no valida. Debe tener máximo 8 digitos numericos." << endl;
-                                } else {
-                                    cliente->ID = id;
-                                    cout << "Cedula modificada correctamente." << endl;
-                                }
-                                break;
-                            case 0:
-                                break;
-                            default:
-                                cout << "Opcion no valida. Intente de nuevo." << endl;
-                                break;
-                        }
-
-                        // Mostrar información actualizada del cliente después de cada modificación
-                        if (opcionModificar != 0) {
-                            clearScreen();
-                            cout << "Informacion actualizada del cliente:" << endl;
-                            cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
-                        }
-                    } while (opcionModificar != 0);
-                } else {
-                    cout << "Cliente no encontrado." << endl;
-                }
-                break;
-            case 3:
-                clearScreen();
-                cout << "ELIMINAR CLIENTE" << endl;
-                showPeople(*head);
-                cout << "\n\t - Ingrese la cedula del cliente a eliminar: ";
-                getline(cin, id);
-                cliente = foundPeopleByID(*head, id);
-                if (cliente) {
-                    // Mostrar información del cliente a eliminar
-                    clearScreen();
-                    cout << "Informacion del cliente a eliminar:" << endl;
-                    cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
-
-                    // Confirmación de eliminación
-                    char confirmacion;
-                    cout << "\n\t - Desea ELIMINAR al cliente? (1: SI / 2: NO): ";
-                    cin >> confirmacion;
-                    cin.ignore(); 
-
-                    if (confirmacion == '1') {
-                        // Eliminar cliente
-                        deletePeople(head, last, cliente);
-                        cout << "Cliente eliminado exitosamente." << endl;
-                    } else {
-                        cout << "Operacion cancelada. No se ha eliminado al cliente." << endl;
-                    }
-                } else {
-                    cout << "Cliente no encontrado." << endl;
-                }
-                break;
-            case 4:
-                clearScreen();
-                consultCustomer(*head);
-                break;
-            case 5:
-                clearScreen();
-                showPeople(*head);
+                addPerson(&P, &L, id, nameAndSecondName);
+                cout << "\nCliente Agregado Exitosamente." << endl;
                 cout << "\nPresione Enter para continuar...";
-                cin.get();
+                while (cin.get() != '\n'); 
                 break;
+
+            case 2:
+                clrScr();
+                cout << "\n\t - Ingrese Cedula: ";
+                getline(cin, id);
+                if (!validateID(id)) {
+                    cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                cliente = foundPeopleByID(P, id);
+                if (cliente == NULL) {
+                    cout << "\nCliente no encontrado." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                cout << "\n\t - Ingrese Nuevo Nombre y Apellido: ";
+                getline(cin, nameAndSecondName);
+                if (!validateName(nameAndSecondName)) {
+                    cout << "El nombre y el apellido no deben contener numeros." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                cliente->nameAndSecondName = nameAndSecondName;
+                cout << "\nCliente Modificado Exitosamente." << endl;
+                cout << "\nPresione Enter para continuar...";
+                while (cin.get() != '\n'); 
+                break;
+
+            case 3:
+                clrScr();
+                if (!P) {
+                    cout << "\t - No hay clientes disponibles para eliminar." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                cout << "\n\t - Ingrese Cedula del Cliente a Eliminar: ";
+                getline(cin, id);
+                if (!validateID(id)) {
+                    cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                cliente = foundPeopleByID(P, id);
+                if (cliente == NULL) {
+                    cout << "\nCliente no encontrado." << endl;
+                    cout << "\nPresione Enter para continuar...";
+                    while (cin.get() != '\n'); 
+                    break;
+                }
+
+                deletePeople(&P, &L, id);
+                cout << "\nCliente Eliminado Exitosamente." << endl;
+                cout << "\nPresione Enter para continuar...";
+                while (cin.get() != '\n'); 
+                break;
+
+            case 4:
+                consultCustomer(P);
+                break;
+
+            case 5:
+                clrScr();
+                cout << "\n\t - Clientes Registrados:" << endl;
+                showPeople(P);
+                cout << "\nPresione Enter para continuar...";
+                while (cin.get() != '\n'); 
+                break;
+
             case 0:
+                cout << "Volviendo al menú anterior..." << endl;
                 break;
+
             default:
-                cout << "Opcion no valida. Intente de nuevo." << endl;
+                cout << "Opción no válida. Intente de nuevo." << endl;
                 break;
         }
-    } while (opcion != 0);
 
-    // Guardar los cambios realizados en el archivo
-    guardarPersonasEnArchivo("people.txt", *head);
+        if (opcion != 0) {
+            cout << "\nPresione Enter para continuar...";
+            while (cin.get() != '\n'); 
+        }
+    } while (opcion != 0);
 }
 
+// Función principal para ejecutar el programa
 int main() {
-    people* listaPersonas = NULL;
-    people* ultimaPersona = NULL;
-
-    // Cargar personas desde el archivo
-    //loadPeopleFromFile("people.txt", &listaPersonas, &ultimaPersona);
-
-    // Realizar el mantenimiento de personas
-    maintenancePeople(&listaPersonas, &ultimaPersona);
-
+    people* P = NULL;
+    people* L = NULL;
+    maintenancePeople(P, L);
     return 0;
 }
