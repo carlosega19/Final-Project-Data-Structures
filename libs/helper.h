@@ -332,6 +332,16 @@ void stringToBranch(char* s , branch **B) {
     }
 }
 
+void stringToPerson(char *s, people**P) {
+    if (s) {
+        slista *attrs = split(s, ',');
+        int sl = len(attrs);
+        if (sl >= 2) {
+            addPerson(P, attrs->cont, attrs->prox->cont);
+        }
+    }
+}
+
 void readProducts(product**P) {
     char *i = NULL;
     FILE *archivo;
@@ -380,14 +390,15 @@ void readInventory(branch*B , product*P) {
         if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
             branchCode = split(i, '|');
             if (len(branchCode) >= 2) {
-                sB = searchBranchByCode(B , branchCode->cont); 
+                sB = searchBranchByCode(B , branchCode->cont);
+                if (!sB) continue; 
                 productList = split(branchCode->prox->cont, ';');
-                mostrar(productList);
                 while (productList) {
                     pttr = split(productList->cont, ',');
                     if (pttr && len(pttr) >= 4) {
                         sP = searchProductByCode(P , pttr->cont);
-                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stof(pttr->prox->prox->prox->cont));
+                        if (!sP) continue;
+                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stoi(pttr->prox->prox->prox->cont));
                     }
                     productList = next(&productList);
                     destroy(&pttr);
@@ -403,19 +414,23 @@ void readInventory(branch*B , product*P) {
 }
 
 void readClients(people**P){
-    FILE*file = fopen("clients.txt" , "r");
-    if (!file) return;
-    slista*newP;
     char *i = NULL;
-    while (!feof(file))
-    {
-        fscanf(file, "%s" , &i);
-        newP = split(i , ',');
-        //addPerson
-    }
-    
+    FILE *archivo;
+    archivo = fopen("clients.txt" , "r");
+    if (!archivo) return;
 
+    while (!feof(archivo))
+    {
+        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+            // TODO: No valida si se repite
+            stringToPerson(i , P);
+            i = NULL;
+        }
+    }
+    delete i;
+    fclose(archivo);
 }
+
 
 
 // Write branchs in .txt
@@ -457,6 +472,17 @@ void saveProductsOfBranch(branch*B){
         fprintf(file , "\n");
         B = B->next;
     }
+    fclose(file);
+}
+
+void saveClients(people*C) {
+    FILE*archivo = fopen("clients.txt" , "w");
+    while (C)
+    {
+        fprintf(archivo , "%s,%s\n" , C->ID.c_str(), C->name.c_str());
+        C = C->next;
+    }
+    fclose(archivo);
 }
 
 

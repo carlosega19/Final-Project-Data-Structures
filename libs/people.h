@@ -9,7 +9,7 @@ using namespace std;
 
 struct people {
     string ID;
-    string nameAndSecondName;
+    string name;
     people* next;
 };
 
@@ -63,20 +63,20 @@ people* searchPeopleByID(people* P, string id) {
 }
 
 // Función para agregar una nueva persona a la lista
-void addPerson(people** P, string id, string nameAndSecondName) {
+void addPerson(people** P, string id, string name) {
     people* newP = new people;
     newP->ID = id;
-    newP->nameAndSecondName = nameAndSecondName;
+    newP->name = name;
     newP->next = NULL;
-
-    if (!(*P)) {
-        return;
-    } else {
-        people* temp = *P;
-        while (temp->next != NULL) {
-            temp = temp->next;
+    if (*P) {      
+        people *aux = *P;
+        while (aux && aux->next) {
+            if (aux->ID == id) return;
+            aux = aux->next;
         }
-        temp->next = newP;
+        aux->next =  newP;
+    } else {
+        *P = newP;
     }
 }
 
@@ -104,13 +104,13 @@ void showPeople(people* P) {
     }
 
     while (P != NULL) {
-        cout << "Cedula: " << P->ID << ", Nombre y Apellido: " << P->nameAndSecondName << endl;
+        cout << "Cedula: " << P->ID << ", Nombre y Apellido: " << P->name << endl;
         P = P->next;
     }
 }
 
 // Función para eliminar una persona de la lista
-void deletePeople(people** P, string id) {
+void deletePerson(people** P, string id) {
     if (!P) return;
     
     people* ax = *P;
@@ -140,11 +140,11 @@ void consultByName(people* P, string name) {
 
     while (P != NULL) {
         // Convertir el nombre almacenado a minúsculas para la comparación
-        string lowerNameToCompare = tolow(P->nameAndSecondName);
+        string lowerNameToCompare = tolow(P->name);
 
         // Comparar las cadenas convertidas
         if (find(lowerNameToCompare, lowerName)) {
-            cout << "CEDULA: " << P->ID << ", Nombre / Apellido: " << P->nameAndSecondName << endl;
+            cout << "CEDULA: " << P->ID << ", Nombre / Apellido: " << P->name << endl;
             encontrado = true;
         }
         P = P->next;
@@ -164,10 +164,10 @@ void printID(people* P) {
 }
 
 // Función para consultar por cédula
-void consultByID(people* P, string id) {
+void consultPersonByID(people* P, string id) {
     people* person = searchPeopleByID(P, id);
     if (person) {
-        cout << "Nombre y Apellido: " << person->nameAndSecondName << ", Cedula: " << person->ID << endl;
+        cout << "Nombre y Apellido: " << person->name << ", Cedula: " << person->ID << endl;
     } else {
         cout << "No se encontro el cliente con la cedula indicada." << endl;
     }
@@ -200,7 +200,7 @@ void consultCustomer(people* P) {
                 printID(P);
                 cout << "Ingrese la cédula a buscar: ";
                 getline(cin, consulta);
-                consultByID(P, consulta);
+                consultPersonByID(P, consulta);
                 break;
             case 0:
                 cout << "Volviendo al menú anterior..." << endl;
@@ -220,7 +220,7 @@ void consultCustomer(people* P) {
 // Función para modificar los datos de un cliente
 people* maintenancePeople(people* P) {
     int opcion;
-    string id, nameAndSecondName;
+    string id, name;
     people* cliente = NULL;
 
     do {
@@ -249,8 +249,8 @@ people* maintenancePeople(people* P) {
                 }
 
                 cout << "\n\t - Ingrese Nombre y Apellido: ";
-                getline(cin, nameAndSecondName);
-                if (!validateName(nameAndSecondName)) {
+                getline(cin, name);
+                if (!validateName(name)) {
                     cout << "El nombre y el apellido no deben contener numeros." << endl;
                     cout << "\nPresione Enter para continuar...";
                     getchar();
@@ -264,7 +264,7 @@ people* maintenancePeople(people* P) {
                     break;
                 }
 
-                P = addPerson(P, id, nameAndSecondName); 
+                P = addPerson(P, id, name); 
                 cout << "\n\t- Cliente agregado exitosamente! -" << endl;
                 cout << "\nPresione Enter para continuar...";
                 getchar();
@@ -280,7 +280,7 @@ people* maintenancePeople(people* P) {
                 if (cliente) {
                     clrScr();
                     cout << "\n\tInformacion actual del cliente:\n" << endl;
-                    cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->nameAndSecondName << endl;
+                    cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
 
                     int opcionModificar;
                     do {
@@ -294,12 +294,12 @@ people* maintenancePeople(people* P) {
                         switch (opcionModificar) {
                             case 1:
                                 cout << "\n\t - Ingrese el nuevo Nombre y Apellido: ";
-                                getline(cin, nameAndSecondName);
-                                if (!validateName(nameAndSecondName)) {
+                                getline(cin, name);
+                                if (!validateName(name)) {
                                     cout << "El nombre y el apellido no deben contener numeros." << endl;
                                     break;
                                 }
-                                cliente->nameAndSecondName = nameAndSecondName;
+                                cliente->name = name;
                                 cout << "\n\t- Nombre y Apellido modificados exitosamente! -" << endl;
                                 break;
                             case 2:
@@ -339,7 +339,7 @@ people* maintenancePeople(people* P) {
                 // Verificar si el cliente existe antes de intentar eliminarlo
                 cliente = searchPeopleByID(P, id);
                 if (cliente) {
-                    P = deletePeople(P, id);
+                    P = deletePerson(P, id);
                     cout << "\n\t- Cliente eliminado exitosamente! -" << endl;
                 } else {
                     cout << "\n\t- No se encontró el cliente con la cedula indicada." << endl;
