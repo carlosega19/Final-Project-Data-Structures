@@ -52,7 +52,7 @@ bool validateID(string cedula) {
 }
 
 // Función para encontrar una persona por su cédula
-people* foundPeopleByID(people* P, string id) {
+people* searchPeopleByID(people* P, string id) {
     while (P != NULL) {
         if (P->ID == id) {
             return P;
@@ -165,7 +165,7 @@ void printID(people* P) {
 
 // Función para consultar por cédula
 void consultByID(people* P, string id) {
-    people* person = foundPeopleByID(P, id);
+    people* person = searchPeopleByID(P, id);
     if (person) {
         cout << "Nombre y Apellido: " << person->nameAndSecondName << ", Cedula: " << person->ID << endl;
     } else {
@@ -257,7 +257,7 @@ people* maintenancePeople(people* P) {
                     break;
                 }
 
-                if (foundPeopleByID(P, id) != NULL) {
+                if (searchPeopleByID(P, id) != NULL) {
                     cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
                     cout << "\nPresione Enter para continuar...";
                     getchar();
@@ -276,7 +276,7 @@ people* maintenancePeople(people* P) {
                 showPeople(P);
                 cout << "\n\t - Ingrese la cedula del cliente a modificar: ";
                 getline(cin, id);
-                cliente = foundPeopleByID(P, id);
+                cliente = searchPeopleByID(P, id);
                 if (cliente) {
                     clrScr();
                     cout << "\n\tInformacion actual del cliente:\n" << endl;
@@ -309,7 +309,7 @@ people* maintenancePeople(people* P) {
                                     cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
                                     break;
                                 }
-                                if (foundPeopleByID(P, id) != NULL) {
+                                if (searchPeopleByID(P, id) != NULL) {
                                     cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
                                     break;
                                 }
@@ -337,7 +337,7 @@ people* maintenancePeople(people* P) {
                 cout << "\n\t - Ingrese la cedula del cliente a eliminar: ";
                 getline(cin, id);
                 // Verificar si el cliente existe antes de intentar eliminarlo
-                cliente = foundPeopleByID(P, id);
+                cliente = searchPeopleByID(P, id);
                 if (cliente) {
                     P = deletePeople(P, id);
                     cout << "\n\t- Cliente eliminado exitosamente! -" << endl;
