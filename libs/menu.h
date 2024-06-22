@@ -8,7 +8,7 @@
 #include "branch.h"
 #include "product.h"
 #include "helper.h"
-#include "client.h"
+#include "people.h"
 using namespace std;
 
 
