@@ -111,7 +111,7 @@ void tableProducts(product* P) {
 product* selectProductByCode(product* P) {
     string codeSelect = "";
     showAllProducts(P);    
-    obtenerEntrada2("\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
+    obtenerEntrada2("\n\t0. CANCELAR\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;
     return searchProductByCode(P, codeSelect);
 }
@@ -638,6 +638,88 @@ people *selectPersonById(people* P) {
     return searchPeopleByID(P, input);
 }
 
+void printDetailBill(detail*D) {
+    printFmt("CODIGO", 20);
+    cout << "|";
+    printFmt("DESCRIPCION", 30);
+    cout << "|";
+    printFmt("CANT", 10);
+    cout << "|";
+    printFmt("PRECIO", 10);
+    cout << "|";
+    while (D){
+        cout << endl;
+        printFmt(D->code, 20);
+        cout << "|";
+        printFmt(D->name, 30);
+        cout << "|";
+        printFmt(D->amount, 10);
+        cout << "|";
+        printFmt(D->price, 10);
+        cout << "|";
+        D = D->next;
+    }
+}
+
+void printBill(bill*B, people*P) {
+    people*client = searchPeopleByID(P ,B->clientId);
+    cout << "\n" << line << endl;
+    printFmt("Fecha: " + B->date, 20);
+    printFmt("Factura " + B->code, 30);
+    cout << endl;
+    printFmt("Cliente: " + client->name, 30);
+    printFmt("C.I.: " + client->ID, 20);
+    cout << endl << line << endl;
+    printDetailBill(B->detailBill);
+    cout << endl << line << endl;
+    printFmt("TOTAL: " + B->total, 30);
+    cout << endl << line << endl;    
+}
+
+void showAllBills(bill *B, people *P) {
+    while (B)
+    {
+        printBill(B, P);
+        cout << "\n\n";
+        B = B->next;
+    }
+    cout << "<ENTER>\n";
+    getchar();
+}
+
+void createBill(branch *B, people *C) {
+    detail *dt = NULL;
+    string recycle = "";
+    date newD = newDate(0,0,0); 
+    product *prod = NULL;
+    while (true) {
+        clScr();
+        prod = selectProductByCode(B->products);
+        if (prod) {
+            cout << prod->amount << endl;
+            obtenerEntrada2("Ingrese la cantidad a agregar: ", &recycle);
+            int cant = to_int(recycle);
+            if (cant > 0 && cant <= prod->amount) {
+                addDeatail(&dt, prod, cant);
+            }
+            else cout << "\n\t -- CANTIDAD INVALIDA --\n";
+        }
+        else break;
+    }
+    obtenerEntrada2("\n\tIngrese el codigo de factura: ", &recycle);
+    newD = getDate("\n\tIngrese la feha dd/mm/yyyy: ");
+    
+    if (!dt) cout << "\n\t-- NO SE AGREGO NADA --\n\n";
+    bill *newB = newBill(recycle, C->ID, repr(newD));
+    newB->detailBill = dt;
+    printBill(newB, C);
+    if (confirm()) {
+        cout << "\n\t-- FACTURA AGREGADA --\n\n";
+        addBill(&B->bills, newB, dt);
+    }
+    else cout << "\n\t-- CANCELADO --\n\n";
+    getchar();
+}
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -667,6 +749,8 @@ struct context {
     product **products;
     branch **branches;
     people **clients;
+    dipolo **bills;
+
     branch **selectedBranch;
     people **selectedClient;
 };
@@ -756,8 +840,6 @@ PASOS PARA IMPLEMENTAR MENUITEM
 //obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
 
 int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
-    
-
     switch (selec) {
         case 0:
             if (*activo) {
@@ -772,6 +854,18 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
         case 2:
             *ct->selectedClient = selectPersonById(*ct->clients);
             actualizarMensaje("Tienda[ " + formatNULL(*ct->selectedBranch) + " ]\tCliente[ " + formatNULL(*ct->selectedClient) + " ]");
+            return 1;
+        case 3:
+            if (*ct->selectedBranch && *ct->selectedClient) createBill(*ct->selectedBranch, *ct->selectedClient);
+            return 1;
+        case 4:
+            //showBill(*ct->bills);
+            return 1;
+        case 5:
+            //eliminarFactura;
+            return 1;
+        case 6:
+            showAllBills((*ct->selectedBranch)->bills->first, *ct->clients);
             return 1;
         default:
             return 1;
@@ -1031,7 +1125,7 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
         }
     } return 0;
 }
- // 1 productos 2 sucursales 3 personas  0 regresar
+// 1 productos 2 sucursales 3 personas  0 regresar
 
 int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
     menuItem *temp = NULL;
@@ -1309,11 +1403,14 @@ void run() {
     product *products = NULL;
     people *clients = NULL;
     people *lastclient = NULL;
-
-    readProducts(&products);
+    dipolo *bills;
+    
+    readProducts(&products);    
     readBranches(&branches);
     readInventory(branches, products);
     readClients(&clients);
+    
+    
     context*ct = newContext(&products , &branches, &clients, NULL, NULL);
     while (activo) {
         clScr(); // Refrescar la pantalla y borrar el terminal
@@ -1330,7 +1427,7 @@ void run() {
     saveBranchs(branches);
     saveProductsOfBranch(branches);
     saveClients(clients);
-    clScr(); // Refrescar la pantalla y borrar el terminal
+    clScr(); // Refrescar la pantalla y borrar el terminal*/
 }
 
 

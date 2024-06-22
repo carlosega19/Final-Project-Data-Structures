@@ -17,6 +17,8 @@
 
 
 
+
+
 void clScr() {
     if (PLATFORM_NAME == "linux") {
         cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal
@@ -26,40 +28,40 @@ void clScr() {
 }
 
 void printFmt(string h, int size) {
-        size_t length = h.length();
+        int length = h.length();
         string result = "";
 	
 	if (size > length) {
-                result = h;
-                for (int i = 1; i < (size - length); i++) {
-                        result += " ";
-                }
-        } 
-	else if (length > size) {
-                for (int i = 1; i < size; i++) {
-                        result += h[i];
-                }
-        } else { result = h; }
-        cout << result;
+        result = h;
+        for (int i = 0; i < (size - length); i++) {
+                result += " ";
+        }
+    } 
+	else if (size < length) {
+        for (int i = 0; i < size; i++) {
+                result += h[i];
+        }
+    } else { result = h; }
+    cout << result;
 }
 
-void printFmt(float p, int size) {
+void printFmt(int p, int size) {
         string h = to_string(p);
-        size_t length = h.length();
+        int length = h.length();
         string result = "";
 	
 	if (size > length) {
-                result = h;
-                for (int i = 1; i < (size - length); i++) {
-                        result += " ";
-                }
-        } 
+        result = h;
+        for (int i = 0; i < (size - length); i++) {
+                result += " ";
+        }
+    } 
 	else if (size < length) {
-                for (int i = 1; i < size; i++) {
+                for (int i = 0; i < size; i++) {
                         result += h[i];
                 }
-        } else { result = h; }
-        cout << result;
+    } else { result = h; }
+    cout << result;
 }
 
 
@@ -232,6 +234,51 @@ long int to_int(string s) {
 }
 
 
+string to_string(long int *f) {
+	int e = *f;
+	string resultado = "";
+
+	while (e > 0) {
+		switch (e / 10) {
+			case 1:
+				resultado += "1";
+				break;
+			case 2:
+				resultado += "2";
+				break;
+			case 3:
+				resultado += "3";
+				break;
+			case 4:
+				resultado += "4";
+				break;
+			case 5:
+				resultado += "5";
+				break;
+			case 6:
+				resultado += "6";
+				break;
+			case 7:
+				resultado += "7";
+				break;
+			case 8:
+				resultado += "8";
+				break;
+			case 9:
+				resultado += "9";
+				break;
+			case 0:
+				resultado += "0";
+				break;
+			default:
+				break;
+		}
+		e = e / 10;
+	}
+	return resultado;
+}
+
+
 
 int confirm() {
     string entrada = "";
@@ -311,6 +358,49 @@ slista *next(slista **n) {
     return *n;
 }
 
+
+struct date {
+    unsigned int day;
+    unsigned int month;
+    unsigned int year;
+
+};
+
+date newDate(unsigned int day, unsigned int month, unsigned int year) {
+    date r;
+    r.day = day;
+    r.month = month;
+    r.year = year;
+    return r;
+}
+
+date getDate(string prompt) {
+    string input = "";
+    obtenerEntrada2(prompt, &input);
+    slista *fields = split(input, '/');
+    if (len(fields) >= 3) {
+        return newDate(to_int(fields->cont), to_int(fields->prox->cont), to_int(fields->prox->prox->cont));
+    }
+    return newDate(0, 0, 0);
+}
+
+int laterThan(date fst, date scnd) {
+    if (fst.year > scnd.year) return 1;
+    else if (fst.year < scnd.year) return 0;
+
+    if (fst.month > scnd.month) return 1;
+    else if (fst.month < scnd.month) return 0;
+
+    if (fst.day > scnd.day) return 1;
+    return 0;
+
+}
+
+string repr(date d) {
+    return to_string(d.day) + "/" + to_string(d.month) + "/" + to_string(d.year);
+
+}
+
 void stringToProduct(char* s , product **P) {
     if (s) {
         slista *attrs = split(s, ',');
@@ -372,7 +462,7 @@ void readBranches(branch**B) {
             i = NULL;
         }
     }
-    delete i;
+    if (i) delete i;
     fclose(archivo);
 }
 

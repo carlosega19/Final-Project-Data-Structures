@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "product.h"
+#include "bill.h"
 using namespace std;
 
 struct branch {
@@ -12,7 +13,9 @@ struct branch {
     string state;
     string address;
     string tlf;
-    product* products;
+    /*Pointers*/
+    product *products;
+    dipolo *bills;
     branch* next;
 };
 
@@ -50,6 +53,9 @@ void addBranch(branch** B, string codeB, string name, string city, string state,
     newB->tlf = tlf;
     newB->products = NULL;
     newB->next = *B;
+
+    newB->bills = createBillsList();
+
     *B = newB;
 }
 

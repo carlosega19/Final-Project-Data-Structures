@@ -9,13 +9,14 @@ using namespace std;
 
 // ESTRUCTURAS Y NOMBRES PROVISIONALES
 
-struct details
+struct detail
 {
     string code;
+    string name;
     int amount;
-    float price;
+    int price;
     /*POINTER*/
-    details*next;
+    detail*next;
 };
 
 struct bill
@@ -23,20 +24,31 @@ struct bill
     string code;
     string clientId;
     string date;
-    float total;
-    details *detailBill;
+    int total;
+    detail *detailBill;
     
     /* POINTERS */
     bill *next;
     bill *prev;
 };
 
-//  Idea (hacer un dipolo?)
 struct dipolo
 {
     bill*first;
     bill*last;
 };
+
+detail *newDetail(string code, string name, int amount) {
+    detail *r = new detail;
+    r->code = code;
+    r->name = name;
+    r->amount = amount;
+
+    return r;
+}
+
+//  Idea (hacer un dipolo?)
+
 
 // Nombre provisional (no se como ponerle)
 dipolo *createBillsList() {
@@ -47,12 +59,12 @@ dipolo *createBillsList() {
 }
 
 
-bill *newBill(string code, string cId, string date, float t) {
+bill *newBill(string code, string cId, string date) {
     bill *nbill = new bill;
     nbill->code = code;
     nbill->date = date;
     nbill->clientId = cId;
-    nbill->total = t;
+    nbill->total = 0;
     
     nbill->next = NULL;
     nbill->prev = NULL;
@@ -68,12 +80,12 @@ int isEqual(string code1, string code2) {
 }
 
 // Insertar ordenadamente por codigo de factura
-bool addBill(dipolo**P, string code, string cId, string date, float t) {
-    if (!(*P)->first || compare((*P)->first->code, code))
+bool addBill(dipolo**P, bill *newB, detail *prods) {
+    if (!(*P)->first || compare((*P)->first->code, newB->code))
     {
-        if ((*P)->first && (*P)->first->code == code) return false;
-        bill *newB = newBill(code, cId, date, t);
-
+        if ((*P)->first && (*P)->first->code == newB->code) return false;
+        
+        newB->detailBill = prods;
         newB->next = (*P)->first;
         if ((*P)->first) (*P)->first->prev = newB;
         else (*P)->last = newB;
@@ -81,12 +93,12 @@ bool addBill(dipolo**P, string code, string cId, string date, float t) {
     }
     else {
         bill *ax = (*P)->first;
-        while (ax->next && compare(code, ax->next->code)) {            
+        while (ax->next && compare(newB->code, ax->next->code)) {            
             ax = ax->next;
         }
-        if (ax->next && ax->next->code == code) return false;
+        if (ax->next && ax->next->code == newB->code) return false;
         else {
-            bill *newB = newBill(code, cId, date, t);
+            newB->detailBill = prods;
             newB->next = ax->next;
             newB->prev = ax;
             if (ax->next) ax->next->prev = newB;
@@ -115,6 +127,7 @@ void deleteBill(dipolo**P, string code) {
 }
 
 
+
 // Buscar factura por codigo
 bill *searchBillByCode(bill*B, string code) { 
     while (B && !isEqual(B->code, code)){
@@ -123,46 +136,13 @@ bill *searchBillByCode(bill*B, string code) {
     return B;
 }
 
-// Funcion de uso para pruebas
-/*void printBills(bill*B) {
-    while (B)
-    {
-        cout << B->code << endl;
-        B = B->next;
-    }
-}*/
 
-void printBills(bill*B) {
-    while (B)
-    {
-        cout << B->code << endl;
-        B = B->prev;
-    }
+
+void addDeatail(detail**D, product*P, int amount) {
+    detail *newD = newDetail(P->code, P->name, amount);
+    newD->price = amount*(P->price);
+    newD->next = *D;
+    *D = newD;
 }
-
-/*
-int main() {
-    dipolo *bills = createBillsList();
-    
-    addBill(&bills, "10", "", "",0);
-    addBill(&bills, "1", "", "",0);
-    addBill(&bills, "5", "", "",0);
-    addBill(&bills, "2", "", "",0);
-    addBill(&bills, "2", "", "",0);
-    addBill(&bills, "20", "", "",0);
-    printBills(bills->last);
-    
-    cout << "\n\n";
-    system("pause");
-    cout << "\n\n";
-
-    deleteBill(&bills, "20");
-    printBills(bills->last);
-
-
-    cout << "\n\n";
-    system("pause");
-    return 0;
-}*/
 
 #endif //BILL_H
