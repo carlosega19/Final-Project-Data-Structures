@@ -1,3 +1,7 @@
+#ifndef PEOPLE_H
+#define PEOPLE_H
+
+
 #include <iostream>
 #include <string>
 
@@ -9,6 +13,16 @@ struct people {
     people* next;
 };
 
+people *getLast(people *p) {
+    if (p) {
+        while (p && (p->next)) {
+            p = p->next;
+        }
+        return p;
+
+    } return NULL;
+
+}
 // Función para limpiar la pantalla
 void clrScr() {
     cout << "\033[2J\033[H";
@@ -49,33 +63,23 @@ people* foundPeopleByID(people* P, string id) {
 }
 
 // Función para agregar una nueva persona a la lista
-people* addPerson(people* P, string id, string nameAndSecondName) {
+void addPerson(people** P, string id, string nameAndSecondName) {
     people* newP = new people;
     newP->ID = id;
     newP->nameAndSecondName = nameAndSecondName;
     newP->next = NULL;
 
-    if (!P) {
-        return newP;
+    if (!(*P)) {
+        return;
     } else {
-        people* temp = P;
+        people* temp = *P;
         while (temp->next != NULL) {
             temp = temp->next;
         }
         temp->next = newP;
-        return P;
     }
 }
 
-// Función para convertir una cadena a minúsculas
-string tolow(string cad) {
-    for (int i = 0; i < cad.length(); i++) {
-        if (cad[i] >= 'A' && cad[i] <= 'Z') {
-            cad[i] += 'a' - 'A'; 
-        }
-    }
-    return cad;
-}
 
 // Función para buscar un patrón en una cadena
 bool find(string main, string pat) {
@@ -106,27 +110,17 @@ void showPeople(people* P) {
 }
 
 // Función para eliminar una persona de la lista
-people* deletePeople(people* P, string id) {
-    if (!P) return P;
+void deletePeople(people** P, string id) {
+    if (!P) return;
     
-    people* ax = P;
-    people* temp;
-    
-    int confirm;
-    cout << "¿Desea ELIMINAR al cliente permanentemente? (1: SI, 2: NO): ";
-    cin >> confirm;
-    cin.ignore(); 
-
-    if (confirm != 1) {
-        cout << "Operación de eliminación cancelada." << endl;
-        return P;
-    }
+    people* ax = *P;
+    people* temp = NULL;
     
     if (ax->ID == id) {
         temp = ax;
-        P = P->next;
+        *P = (*P)->next;
         delete temp;
-        return P;
+        return;
     } else {
         while (ax->next && ax->next->ID != id) ax = ax->next;
         if (ax->next) {
@@ -135,7 +129,6 @@ people* deletePeople(people* P, string id) {
             delete temp;
         }
     }
-    return P;
 }
 
 // Función para consultar por nombre
@@ -223,7 +216,7 @@ void consultCustomer(people* P) {
         }
     } while (opcion != 0);
 }
-
+/*
 // Función para modificar los datos de un cliente
 people* maintenancePeople(people* P) {
     int opcion;
@@ -393,3 +386,6 @@ int main() {
 
     return 0;
 }
+*/
+
+#endif

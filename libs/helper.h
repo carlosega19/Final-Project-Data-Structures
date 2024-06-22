@@ -3,7 +3,7 @@
 
 #include "branch.h"
 #include "product.h"
-#include "client.h"
+#include "people.h"
 //#include "menu.h"
 #include <iostream>
 
