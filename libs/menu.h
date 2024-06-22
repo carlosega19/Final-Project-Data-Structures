@@ -833,9 +833,18 @@ int controllerMenuModifyPeople(menuItem **activo, int selec, context *ct) {
             break;
         case 0:
             cout << "Volviendo al menu anterior..." << endl;
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
             break;
         default:
             cout << "Opcion no valida. Intente de nuevo." << endl;
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
             break;
     }
     return 1;
@@ -931,12 +940,22 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
         case 0:
             cout << "Volviendo al menu anterior..." << endl;
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
             break;
 
         default:
             cout << "Opcion no valida. Intente de nuevo." << endl;
+            print("Presione ENTER para continuar.");
+            getchar(); // espera nuevo \n para tomar;
             break;
     }
+    
     return 1;
 }
 
