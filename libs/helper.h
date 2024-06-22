@@ -485,5 +485,17 @@ void saveClients(people*C) {
     fclose(archivo);
 }
 
+string formatNULL(branch *b) {
+    if (!b) return " ";
+    else return b->name;
+
+}
+
+string formatNULL(people *b) {
+    if (!b) return " ";
+    else return "C.I." + b->ID + " " + b->name;
+
+}
+
 
 #endif // BRANCH_H

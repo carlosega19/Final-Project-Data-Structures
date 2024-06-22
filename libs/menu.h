@@ -9,6 +9,7 @@
 #include "product.h"
 #include "helper.h"
 #include "people.h"
+#include "bill.h"
 using namespace std;
 
 
@@ -407,6 +408,9 @@ void menuDeleBranch(branch**B){
     }
     getchar();
 }
+/*---------------------------------------------------------------------------*/
+/* PEOPLE */
+
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*          MENU INVENTORY MANAGMENT      */
@@ -627,6 +631,15 @@ void menuInventory(branch*B , product*P) {
     } while (op != '0');
 }
 
+people *selectPersonById(people* P) {
+    showPeople(P);
+    string input;
+    obtenerEntrada2("\nIngrese la cedula: ", &input);
+    return searchPeopleByID(P, input);
+}
+
+
+
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 
@@ -649,17 +662,22 @@ void menuInventory(branch*B , product*P) {
 // ------------------------------------------
 
 
+
 struct context {
     product **products;
     branch **branches;
     people **clients;
+    branch **selectedBranch;
+    people **selectedClient;
 };
 
-context *newContext(product **p, branch **b, people **c) {
+context *newContext(product **p, branch **b, people **c, branch *sb, people *sc) {
     context *result = new context;
     result->products = p;
     result->branches = b;
     result->clients = c;
+    result->selectedBranch = &sb;
+    result->selectedClient = &sc;
     return result;
 }
 
@@ -715,6 +733,7 @@ menuItem *menuModBranchs(menuItem*);
 menuItem *menuConsultBranchByDesc(menuItem*);
 menuItem *menuPeople(menuItem*);
 menuItem *menuModifyPeople(menuItem*);
+menuItem *menuBilling(menuItem*);
 
 /* PRODUCTOS */
 
@@ -736,9 +755,32 @@ PASOS PARA IMPLEMENTAR MENUITEM
 
 //obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
 
+int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
+    
+
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
+        case 1:
+            *ct->selectedBranch = selectBranchByCode(*ct->branches);
+            actualizarMensaje("Tienda[ " + formatNULL(*ct->selectedBranch) + " ]\tCliente[ " + formatNULL(*ct->selectedClient) + " ]");
+            return 1;
+        case 2:
+            *ct->selectedClient = selectPersonById(*ct->clients);
+            actualizarMensaje("Tienda[ " + formatNULL(*ct->selectedBranch) + " ]\tCliente[ " + formatNULL(*ct->selectedClient) + " ]");
+            return 1;
+        default:
+            return 1;
+    }
+}
+
 
 int controllerMenuModBranch(menuItem **activo, int selec, context *ct) {
-    branch* selected = selectBranchByCode(*ct->branches);
+    branch *selected = selectBranchByCode(*ct->branches);
     if (!selected) return 1;
     string input = "";
     switch (selec) {
@@ -871,7 +913,7 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             break;
 
         case 1:
-            clrScr();
+            clScr();
             cout << "\nAGREGAR CLIENTE\n";
             obtenerEntrada2("Ingrese su cedula: ", &id);
             if (!validateID(id)) {
@@ -902,11 +944,11 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             break;
 
         case 2:
-            clrScr();
+            clScr();
             cout << "\nMODIFICAR CLIENTE" << endl;
             showPeople(*(ct->clients));
             obtenerEntrada2("\n\t - Ingrese la cedula del cliente a modificar: ", &id);
-            consultPersonByID(*(ct->clients), id);
+            selectPersonById(*(ct->clients));
             /*if (cliente) {
                 clrScr();
                 cout << "\n\tInformacion actual del cliente:\n" << endl;
@@ -920,7 +962,7 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             getchar();
             break;
         case 3:
-            clrScr();
+            clScr();
             cout << "\nELIMINAR CLIENTE" << endl;
             showPeople(*(ct->clients));
             obtenerEntrada2("\n\t - Ingrese la cedula del cliente a eliminar: ", &id);
@@ -939,11 +981,11 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             getchar();
             break;
         case 4:
-            consultCustomer(*(ct->clients));
+            //consultCustomer(*(ct->clients));
             break;
 
         case 5:
-            clrScr();
+            clScr();
             cout << "\n\tLISTA DE CLIENTES" << endl;
             showPeople(*(ct->clients));
             cout << "\nPresione Enter para continuar...";
@@ -978,6 +1020,10 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
                 return 1;
             case 1:
                 *activo = menuMantenimiento(*activo);
+                return 1;
+            case 2:
+                actualizarMensaje("Tienda[   ]\tCliente[   ]");
+                *activo = menuBilling(*activo);
                 return 1;
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
@@ -1225,8 +1271,34 @@ menuItem *menuModifyPeople(menuItem *parent) {
     return m;
 }
 
+menuItem *menuBilling(menuItem *parent) {
+    menuItem *m = new menuItem;
+    m->encabezado = line + "\n\t1. SELECCIONAR TIENDA\n\t2. SELECCIONAR CLIENTE\n\t3. AGREGAR PRODUCTOS\n\t4. MOSTRAR FACTURA\n\t5. ELIMINAR FACTURA\n\t6. MOSTRAR RESUMEN FACTURAS\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
+    m->parent = parent;
+    m->comportamiento = controllerMenuBilling;
+    return m;
+}
 
 
+/*
+void optionsMenuBilling(branch*sb, people *sc){
+    cout << 
+    cout << "\n\n\t\tSucursal seleccionada: ";
+    if (sb) cout << selected->name << " [" << selected->code << "]\n\n";
+
+}*/
+/*
+void menuBilling(branch *branches, people *peopleList, bill *bills) {
+    branch *bs = NULL;
+    people *cs = NULL;
+    do
+    {
+        // Mostrar todo
+
+
+        //leer casos
+    } while ();
+}*/
 
 void run() {
     int activo = 1;
@@ -1237,11 +1309,12 @@ void run() {
     product *products = NULL;
     people *clients = NULL;
     people *lastclient = NULL;
+
     readProducts(&products);
     readBranches(&branches);
     readInventory(branches, products);
     readClients(&clients);
-    context*ct = newContext(&products , &branches, &clients);
+    context*ct = newContext(&products , &branches, &clients, NULL, NULL);
     while (activo) {
         clScr(); // Refrescar la pantalla y borrar el terminal
         print(Mensajero->data);
