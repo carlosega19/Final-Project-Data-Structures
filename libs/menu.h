@@ -713,6 +713,8 @@ menuItem *controlSucursales(menuItem*);
 /* SUCURSALES */
 menuItem *menuModBranchs(menuItem*);     
 menuItem *menuConsultBranchByDesc(menuItem*);
+menuItem *menuPeople(menuItem*);
+
 /* PRODUCTOS */
 
 
@@ -797,6 +799,179 @@ int controllerConsultBranchByDesc(menuItem **activo, int selec, context*ct) {
     getchar(); // espera nuevo \n para tomar;
     return 1;
 }
+// 12345
+int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
+    int opcion;
+    char id[10], nameAndSecondName[40];
+    people* cliente = NULL; // Declaración fuera del do-while
+
+    do {
+        // Mostrar el menú de mantenimiento de personas
+
+        cin.ignore(); // Para limpiar el buffer de entrada
+
+        switch (opcion) {
+            case 1:
+                clScr();
+                cout << "\n\t - Ingrese Cedula: ";
+                cin.getline(id, 10);
+                cout << "\n\t - Ingrese Nombre y Apellido: ";
+                cin.getline(nameAndSecondName, 40);
+                if (!addPerson(head, last, id, nameAndSecondName)) {
+                    esperarEntrada();
+                } else {
+                    cout << "\n\t- Cliente agregado exitosamente! -" << endl;
+                    esperarEntrada();
+                }
+                break;
+            case 2:
+                clScr();
+                cout << "\nMODIFICAR CLIENTE" << endl;
+                showPeople(*head);
+                cout << "\n\t - Ingrese la cedula del cliente a modificar: ";
+                cin.getline(id, 10);
+                cliente = foundPeopleByID(*head, id);
+                if (cliente) {
+                    // Mostrar información actual del cliente
+                    clScr();
+                    cout << "\n\tInformacion actual del cliente:\n" << endl;
+                    cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->nameAndSecondName << endl;
+
+                    // Submenú para modificar cliente
+                    int opcionModificar;
+                    do {
+                        cout << "\n\t1. Modificar Nombre" << endl;
+                        cout << "\t2. Modificar Cedula" << endl;
+                        cout << "\t0. Volver al Menu Anterior" << endl;
+                        cout << "\nSu opcion (0-3): ";
+                        cin >> opcionModificar;
+                        cin.ignore(); // Limpiar el buffer de entrada
+
+                        switch (opcionModificar) {
+                            case 1:
+                                cout << "Ingrese nuevo nombre y apellido: ";
+                                cin.getline(nameAndSecondName, 40);
+                                if (!validateName(nameAndSecondName)) {
+                                    cout << "Nombre no valido. No debe contener numeros." << endl;
+                                } else {
+                                    strcpy(cliente->nameAndSecondName, nameAndSecondName);
+                                    cout << "Nombre modificado correctamente." << endl;
+                                }
+                                break;
+                            case 2:
+                                cout << "Ingrese nueva cedula: ";
+                                cin.getline(id, 10);
+                                if (strlen(id) > 8 || !validateID(id)) {
+                                    cout << "Cedula no valida. Debe tener máximo 8 digitos numericos." << endl;
+                                } else {
+                                    strcpy(cliente->ID, id);
+                                    cout << "Cedula modificada correctamente." << endl;
+                                }
+                                break;
+                            case 0:
+                                break;
+                            default:
+                                cout << "Opcion no valida. Intente de nuevo." << endl;
+                                break;
+                        }
+
+                        // Mostrar información actualizada del cliente después de cada modificación
+                        if (opcionModificar != 0) {
+                            clScr();
+                            cout << "Informacion actualizada del cliente:" << endl;
+                            cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
+                        }
+                    } while (opcionModificar != 0);
+                } else {
+                    cout << "Cliente no encontrado." << endl;
+                }
+                break;
+            case 3:
+                clScr();
+                cout << "ELIMINAR CLIENTE" << endl;
+                showPeople(*head);
+                cout << "\n\t - Ingrese la cedula del cliente a eliminar: ";
+                cin.getline(id, 10);
+                cliente = foundPeopleByID(*head, id);
+                if (cliente) {
+                    // Mostrar información del cliente a eliminar
+                    clScr();
+                    cout << "Informacion del cliente a eliminar:" << endl;
+                    cout << "CEDULA: " << cliente->ID << ", NOMBRE / APELLIDO: " << cliente->nameAndSecondName << endl;
+
+                    // Confirmación de eliminación
+                    char confirmacion;
+                    cout << "\n\t - Desea ELIMINAR al cliente? (1: SI / 2: NO): ";
+                    cin >> confirmacion;
+                    cin.ignore(); // Limpiar el buffer de entrada
+
+                    if (confirmacion == '1') {
+                        // Eliminar cliente
+                        deletePeople(head, last, cliente);
+                        cout << "Cliente eliminado exitosamente." << endl;
+                    } else {
+                        cout << "Operacion cancelada. No se ha eliminado al cliente." << endl;
+                    }
+                } else {
+                    cout << "Cliente no encontrado." << endl;
+                }
+                break;
+            case 4:
+                clScr();
+                cout << "CONSULTAR CLIENTE" << endl;
+                int opcionConsulta;
+                do {
+                    cout << "\n\t - CONSULTAR POR:\n" << endl;
+                    cout << "1. Nombre/Apellido" << endl;
+                    cout << "2. Cedula" << endl;
+                    cout << "0. Volver al Menu Anterior" << endl;
+                    cout << "Su opcion (0-3): ";
+                    cin >> opcionConsulta;
+                    cin.ignore(); // Limpiar el buffer de entrada
+
+                    switch (opcionConsulta) {
+                        case 1: {
+                            clScr();
+                            cout << "Ingrese el nombre y apellido a buscar: ";
+                            cin.getline(nameAndSecondName, 40);
+                            consultByName(*head, nameAndSecondName);
+                            break;
+                        }
+    
+                        case 2:
+                            clScr();
+                            printID(*head);
+                            cout << "Ingrese la cedula a consultar: ";
+                            cin.getline(id, 10);
+                            consultByID(*head, id);
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            cout << "Opcion no valida. Intente de nuevo." << endl;
+                            break;
+                    }
+                } while (opcionConsulta != 0);
+                break;
+
+            case 5:
+                clScr();
+                showPeople(*head);
+                esperarEntrada();
+                break;
+            case 0:
+                cout << "Volviendo al menu anterior..." << endl;
+                break;
+            default:
+                cout << "Opcion no valida. Intente de nuevo." << endl;
+                break;
+        }
+    } while (opcion != 0);
+
+    // Guardar los cambios realizados en el archivo
+    //guardarPersonasEnArchivo("people.txt", *head);
+}
+
 
 int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
     menuItem *temp = NULL;
@@ -844,7 +1019,7 @@ int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
             case 3:
             {
                 people *p = getLast(*ct->clients);
-                maintenancePeople(ct->clients, &p);
+                *activo = menuPeople(*activo);
                 return 1;
             }
             default:
@@ -1046,6 +1221,13 @@ menuItem *menuModBranchs(menuItem *parent) {
     return m;
 }
 
+menuItem menuPeople(menuItem *parent) {
+    menuItem *m =  new menuItem;
+    m->encabezado = line + "\n\tMANTENIMIENTO PERSONAS\n\t\t1. AGREGAR CLIENTE\n\t1. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line;
+    m->parent = parent;
+    m->comportamiento = controllerMenuPeople;
+    return m;
+}
 
 
 
