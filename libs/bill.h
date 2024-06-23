@@ -126,8 +126,6 @@ void deleteBill(dipolo**P, string code) {
     }
 }
 
-
-
 // Buscar factura por codigo
 bill *searchBillByCode(bill*B, string code) { 
     while (B && !isEqual(B->code, code)){
@@ -136,13 +134,23 @@ bill *searchBillByCode(bill*B, string code) {
     return B;
 }
 
-
-
 void addDeatail(detail**D, product*P, int amount) {
     detail *newD = newDetail(P->code, P->name, amount);
     newD->price = amount*(P->price);
     newD->next = *D;
     *D = newD;
+}
+
+int totalPrice(detail*B) {
+    return B ? B->price + totalPrice(B->next) : 0;
+    /*int total = 0;
+    while (B)
+    {
+        cout << B->price;
+        total += B->price;
+        B = B->next;
+    }
+    return total;*/
 }
 
 #endif //BILL_H

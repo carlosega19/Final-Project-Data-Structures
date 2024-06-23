@@ -672,7 +672,8 @@ void printBill(bill*B, people*P) {
     cout << endl << line << endl;
     printDetailBill(B->detailBill);
     cout << endl << line << endl;
-    printFmt("TOTAL: " + B->total, 30);
+    cout << "\tTOTAL:   " << B->total;
+    //printFmt("TOTAL: " + B->total, 30);
     cout << endl << line << endl;    
 }
 
@@ -696,7 +697,7 @@ void createBill(branch *B, people *C) {
         clScr();
         prod = selectProductByCode(B->products);
         if (prod) {
-            cout << prod->amount << endl;
+            //cout << prod->amount << endl;
             obtenerEntrada2("Ingrese la cantidad a agregar: ", &recycle);
             int cant = to_int(recycle);
             if (cant > 0 && cant <= prod->amount) {
@@ -710,8 +711,11 @@ void createBill(branch *B, people *C) {
     newD = getDate("\n\tIngrese la feha dd/mm/yyyy: ");
     
     if (!dt) cout << "\n\t-- NO SE AGREGO NADA --\n\n";
+    
     bill *newB = newBill(recycle, C->ID, repr(newD));
     newB->detailBill = dt;
+    newB->total = totalPrice(newB->total);
+
     printBill(newB, C);
     if (confirm()) {
         cout << "\n\t-- FACTURA AGREGADA --\n\n";
