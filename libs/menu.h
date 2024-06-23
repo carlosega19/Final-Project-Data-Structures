@@ -661,14 +661,13 @@ void printDetailBill(detail*D) {
     }
 }
 
-void printBill(bill*B, people*P) {
-    people*client = searchPeopleByID(P ,B->clientId);
+void printBill(bill*B) {
     cout << "\n" << line << endl;
     printFmt("Fecha: " + B->date, 20);
     printFmt("Factura " + B->code, 30);
     cout << endl;
-    printFmt("Cliente: " + client->name, 30);
-    printFmt("C.I.: " + client->ID, 20);
+    //printFmt("Cliente: " + client->name, 30);
+    printFmt("C.I.: " + B->clientId, 20);
     cout << endl << line << endl;
     printDetailBill(B->detailBill);
     cout << endl << line << endl;
@@ -677,14 +676,33 @@ void printBill(bill*B, people*P) {
     cout << endl << line << endl;    
 }
 
-void showAllBills(bill *B, people *P) {
+void showAllBills(bill *B) {
     while (B)
     {
-        printBill(B, P);
+        printBill(B);
         cout << "\n\n";
         B = B->next;
     }
-    cout << "<ENTER>\n";
+    
+}
+/*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
+void billsResume(branch*B, people*C) {
+    bill *ax = B->bills->first;
+    cout << "--------------------------------------\tRESUMEN DE FACTURAS: \n--------------------------------------\n";
+    printFmt("\tFactura ", 20);
+    printFmt("Fehca ", 20);
+    printFmt("Monto \n", 20);
+    while (ax)
+    {
+        if (ax->clientId == C->ID) {
+            printFmt(ax->code, 10);
+            printFmt(ax->date, 20);
+            printFmt(ax->total, 10);
+            cout << "\n";
+        } 
+        ax = ax->next;
+    }
+    cout << "\n\t\t<ENTER>\n";
     getchar();
 }
 
@@ -714,9 +732,9 @@ void createBill(branch *B, people *C) {
     
     bill *newB = newBill(recycle, C->ID, repr(newD));
     newB->detailBill = dt;
-    newB->total = totalPrice(newB->total);
+    newB->total = totalPrice(newB->detailBill);
 
-    printBill(newB, C);
+    printBill(newB);
     if (confirm()) {
         cout << "\n\t-- FACTURA AGREGADA --\n\n";
         addBill(&B->bills, newB, dt);
@@ -725,6 +743,27 @@ void createBill(branch *B, people *C) {
     getchar();
 }
 
+bill *selectBillByCode(branch*B, people*C) {
+    billsResume(B,C);
+    string input = "";
+    obtenerEntrada2("\n\tIngrese el codigo de la factura: ", &input);
+    return searchBillByCode(B->bills->first, input);
+    cout << "\n\t\t<ENTER>\n";
+    getchar();
+}
+
+
+// TODO: PULIR ESTA FUNCION
+void menuDeleteBill(branch *B, people*C) {
+    bill *selected = selectBillByCode(B, C);
+    if (selected)
+    {
+        printBill(selected);
+        cout << "\n\n";
+        if (confirm()) deleteBill(&B->bills, selected->code);
+    }
+    else cout << "\n\t-- FACTURA NO ENCONTRADA --\n";
+}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -863,17 +902,21 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
             if (*ct->selectedBranch && *ct->selectedClient) createBill(*ct->selectedBranch, *ct->selectedClient);
             return 1;
         case 4:
-            //showBill(*ct->bills);
+            printBill(selectBillByCode(*ct->selectedBranch, *ct->selectedClient));
             return 1;
         case 5:
             //eliminarFactura;
+            menuDeleteBill(*ct->selectedBranch, *ct->selectedClient);
             return 1;
         case 6:
-            showAllBills((*ct->selectedBranch)->bills->first, *ct->clients);
+            //showAllBills((*ct->selectedBranch)->bills->first, *ct->clients);
+            billsResume(*ct->selectedBranch, *ct->selectedClient);
             return 1;
         default:
             return 1;
     }
+    cout << "\n\t\t<ENTER>\n";
+    getchar();
 }
 
 

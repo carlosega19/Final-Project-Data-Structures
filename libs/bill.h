@@ -143,14 +143,6 @@ void addDeatail(detail**D, product*P, int amount) {
 
 int totalPrice(detail*B) {
     return B ? B->price + totalPrice(B->next) : 0;
-    /*int total = 0;
-    while (B)
-    {
-        cout << B->price;
-        total += B->price;
-        B = B->next;
-    }
-    return total;*/
 }
 
 #endif //BILL_H

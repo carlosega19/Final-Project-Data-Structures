@@ -113,7 +113,7 @@ void generateReports(branch* branchList, people* peopleList, string personID) {
         while (currentBill) {
             if (currentBill->clientId == personID) {
                 cout << "                                   " << currentBill->code << "    " << currentBill->date
-                     << "    " << currentBill->total << "    " << currentBranch->name << "\n";
+                        << "    " << currentBill->total << "    " << currentBranch->name << "\n";
             }
             currentBill = currentBill->next;
         }
@@ -182,7 +182,7 @@ void showProductSummary(branch* branchList, people* peopleList, string personID)
         detail* current = productDetails;
         while (current) {
             cout << left << setw(15) << current->code << setw(20) << current->name
-                 << setw(10) << current->amount << setw(10) << current->price << endl;
+                    << setw(10) << current->amount << setw(10) << current->price << endl;
             detail* temp = current;
             current = current->next;
             delete temp; 
