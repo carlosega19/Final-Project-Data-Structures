@@ -597,7 +597,7 @@ void menuInventory(branch*B , product*P) {
     char op = '\0';
     do
     {
-        //clScr();
+        clScr();
         optionsMenuInventory(selected);
         cin >> op;
 	cin.ignore();
