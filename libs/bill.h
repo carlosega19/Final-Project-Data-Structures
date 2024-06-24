@@ -79,6 +79,11 @@ int isEqual(string code1, string code2) {
     return stoi(code1) == stoi(code2);
 }
 
+int totalPrice(detail*B) {
+    return B ? B->price + totalPrice(B->next) : 0;
+}
+
+
 // Insertar ordenadamente por codigo de factura
 bool addBill(dipolo**P, bill *newB, detail *prods) {
     if (!(*P)->first || compare((*P)->first->code, newB->code))
@@ -86,7 +91,9 @@ bool addBill(dipolo**P, bill *newB, detail *prods) {
         if ((*P)->first && (*P)->first->code == newB->code) return false;
         
         newB->detailBill = prods;
+        newB->total = totalPrice(prods);
         newB->next = (*P)->first;
+        
         if ((*P)->first) (*P)->first->prev = newB;
         else (*P)->last = newB;
         (*P)->first = newB;
@@ -99,6 +106,8 @@ bool addBill(dipolo**P, bill *newB, detail *prods) {
         if (ax->next && ax->next->code == newB->code) return false;
         else {
             newB->detailBill = prods;
+            newB->total = totalPrice(prods);
+            system("pause");
             newB->next = ax->next;
             newB->prev = ax;
             if (ax->next) ax->next->prev = newB;
@@ -141,8 +150,5 @@ void addDeatail(detail**D, product*P, int amount) {
     *D = newD;
 }
 
-int totalPrice(detail*B) {
-    return B ? B->price + totalPrice(B->next) : 0;
-}
 
 #endif //BILL_H

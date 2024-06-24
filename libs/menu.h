@@ -662,6 +662,7 @@ void printDetailBill(detail*D) {
 }
 
 void printBill(bill*B) {
+    if (!B) return;
     cout << "\n" << line << endl;
     printFmt("Fecha: " + B->date, 20);
     printFmt("Factura " + B->code, 30);
@@ -688,10 +689,11 @@ void showAllBills(bill *B) {
 /*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
 void billsResume(branch*B, people*C) {
     bill *ax = B->bills->first;
-    cout << "--------------------------------------\tRESUMEN DE FACTURAS: \n--------------------------------------\n";
-    printFmt("\tFactura ", 20);
-    printFmt("Fehca ", 20);
-    printFmt("Monto \n", 20);
+    cout << "\n--------------------------------------\tRESUMEN DE FACTURAS: \n--------------------------------------\n";
+    printFmt("Factura ", 15);
+    printFmt("Fehca ", 15);
+    printFmt("Monto ", 15);
+    cout << "\n--------------------------------------\n";
     while (ax)
     {
         if (ax->clientId == C->ID) {
@@ -702,8 +704,7 @@ void billsResume(branch*B, people*C) {
         } 
         ax = ax->next;
     }
-    cout << "\n\t\t<ENTER>\n";
-    getchar();
+    cout << "\n--------------------------------------\n";
 }
 
 void createBill(branch *B, people *C) {
@@ -726,20 +727,23 @@ void createBill(branch *B, people *C) {
         else break;
     }
     obtenerEntrada2("\n\tIngrese el codigo de factura: ", &recycle);
-    newD = getDate("\n\tIngrese la feha dd/mm/yyyy: ");
+    newD = getDate("\n\tIngrese la fecha dd/mm/yyyy: ");
     
-    if (!dt) cout << "\n\t-- NO SE AGREGO NADA --\n\n";
-    
+    if (!dt) {
+        cout << "\n\t-- NO SE AGREGO NADA --\n\n";
+        getchar();
+        return;
+    }
     bill *newB = newBill(recycle, C->ID, repr(newD));
     newB->detailBill = dt;
-    newB->total = totalPrice(newB->detailBill);
+    newB->total = totalPrice(dt);
 
     printBill(newB);
     if (confirm()) {
-        cout << "\n\t-- FACTURA AGREGADA --\n\n";
         addBill(&B->bills, newB, dt);
+        cout << "\n\t-- FACTURA AGREGADA --\n\n";
     }
-    else cout << "\n\t-- CANCELADO --\n\n";
+    else cout << "\n\t-- FINALIZADO --\n\n";
     getchar();
 }
 
@@ -748,8 +752,6 @@ bill *selectBillByCode(branch*B, people*C) {
     string input = "";
     obtenerEntrada2("\n\tIngrese el codigo de la factura: ", &input);
     return searchBillByCode(B->bills->first, input);
-    cout << "\n\t\t<ENTER>\n";
-    getchar();
 }
 
 
@@ -903,20 +905,20 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
             return 1;
         case 4:
             printBill(selectBillByCode(*ct->selectedBranch, *ct->selectedClient));
+            cout << "\n\t\t<ENTER>\n";
+            getchar();
             return 1;
         case 5:
-            //eliminarFactura;
             menuDeleteBill(*ct->selectedBranch, *ct->selectedClient);
             return 1;
         case 6:
-            //showAllBills((*ct->selectedBranch)->bills->first, *ct->clients);
-            billsResume(*ct->selectedBranch, *ct->selectedClient);
+            showAllBills((*ct->selectedBranch)->bills->first);
+            cout << "\n\t\t<ENTER>\n";
+            getchar();
             return 1;
         default:
             return 1;
     }
-    cout << "\n\t\t<ENTER>\n";
-    getchar();
 }
 
 
@@ -1456,6 +1458,7 @@ void run() {
     readBranches(&branches);
     readInventory(branches, products);
     readClients(&clients);
+    readBills(&branches, &clients);
     
     
     context*ct = newContext(&products , &branches, &clients, NULL, NULL);
@@ -1474,7 +1477,8 @@ void run() {
     saveBranchs(branches);
     saveProductsOfBranch(branches);
     saveClients(clients);
-    clScr(); // Refrescar la pantalla y borrar el terminal*/
+    saveBills(branches);
+    clScr(); // Refrescar la pantalla y borrar el terminal
 }
 
 

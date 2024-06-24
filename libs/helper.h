@@ -88,7 +88,7 @@ void invertir(slista **s) {
 
 void mostrar(slista *s) {
     while (s) {
-        cout << s->cont << endl << "----------------" << endl;
+        cout << s->cont <<" --> "; //endl << "----------------" << endl;
         s = s->prox;
     }
 }
@@ -434,62 +434,65 @@ void stringToPerson(char *s, people**P) {
 
 void readProducts(product**P) {
     char *i = NULL;
-    FILE *archivo;
-    archivo = fopen("products.txt" , "r");
-    if (!archivo) return;
+    FILE *file;
+    file = fopen("products.txt" , "r");
+    if (!file) return;
 
-    while (!feof(archivo))
+    while (!feof(file))
     {
-        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
             stringToProduct(i , P);
             i = NULL;
         }
     }
     delete i;
-    fclose(archivo);
+    fclose(file);
 }
 
 void readBranches(branch**B) {
     char *i = NULL;
-    FILE *archivo;
-    archivo = fopen("branches.txt" , "r");
-    if (!archivo) return;
+    FILE *file;
+    file = fopen("branches.txt" , "r");
+    if (!file) return;
 
-    while (!feof(archivo))
+    while (!feof(file))
     {
-        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
             stringToBranch(i , B);
             i = NULL;
         }
     }
     if (i) delete i;
-    fclose(archivo);
+    fclose(file);
 }
 
 
 void readInventory(branch*B , product*P) {
     char *i = NULL;
-    FILE *archivo;
-    archivo = fopen("inventory.txt" , "r");
-    if (!archivo) return;
+    FILE *file;
+    file = fopen("inventory.txt" , "r");
+    if (!file) return;
     branch *sB = NULL;
     product *sP = NULL;
     slista *branchCode, *productList, *pttr;
-    while (!feof(archivo))
+    while (!feof(file))
     {
-        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
             branchCode = split(i, '|');
             if (len(branchCode) >= 2) {
+
                 sB = searchBranchByCode(B , branchCode->cont);
                 if (!sB) continue; 
                 productList = split(branchCode->prox->cont, ';');
                 while (productList) {
+
                     pttr = split(productList->cont, ',');
                     if (pttr && len(pttr) >= 4) {
                         sP = searchProductByCode(P , pttr->cont);
                         if (!sP) continue;
                         addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stoi(pttr->prox->prox->prox->cont));
                     }
+
                     productList = next(&productList);
                     destroy(&pttr);
                 }
@@ -500,51 +503,104 @@ void readInventory(branch*B , product*P) {
     // Vaciado de memoria
     if (i) {delete i;}
     destroy(&branchCode);
-    fclose(archivo);
+    fclose(file);
 }
 
 void readClients(people**P){
     char *i = NULL;
-    FILE *archivo;
-    archivo = fopen("clients.txt" , "r");
-    if (!archivo) return;
+    FILE *file;
+    file = fopen("clients.txt" , "r");
+    if (!file) return;
 
-    while (!feof(archivo))
+    while (!feof(file))
     {
-        if (fscanf(archivo, "%m[^\n]%*c", &i) == 1) {
+        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
             // TODO: No valida si se repite
             stringToPerson(i , P);
             i = NULL;
         }
     }
     delete i;
-    fclose(archivo);
+    fclose(file);
+}
+
+void readBills(branch**B, people**C) {
+    char *i = NULL;
+    FILE *file;
+    file = fopen("bills.txt" , "r");
+    if (!file) return;
+
+    bill *newB = NULL;
+    detail *newDt = NULL;
+
+    slista *fullBill, *codes,*productsList, *pttr;
+    product *sP;
+    people *sC = NULL;
+    branch *sB = NULL;
+
+    while (!feof(file))
+    {
+        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
+            newDt = NULL;
+
+            fullBill = split(i, '|');
+            codes = split(fullBill->cont, ',');
+            sB = searchBranchByCode(*B, codes->cont);
+            sC = searchPeopleByID(*C, codes->prox->prox->cont);
+            
+            productsList = split(fullBill->prox->cont, ';');
+
+            
+            if (!sB || !sC || len(productsList) < 1) continue;
+            
+            newB = newBill(codes->prox->cont, sC->ID, codes->prox->prox->prox->cont);
+            
+            while (productsList) {
+                pttr = split(productsList->cont, ',');
+
+                sP = searchProductByCode(sB->products, pttr->cont);
+                if (!sP) continue;
+                
+                addDeatail(&newDt, sP, stoi(pttr->prox->cont));
+                
+                productsList = next(&productsList);
+                destroy(&pttr);
+            }
+
+            newB->total = totalPrice(newDt);
+            addBill(&(sB)->bills, newB, newDt);
+
+            i = NULL;
+        }
+    }
+    delete i;
+    fclose(file);
 }
 
 
 
 // Write branchs in .txt
 void saveBranchs(branch*B) { 
-    FILE*archivo = fopen("branches.txt" , "w");
+    FILE*file = fopen("branches.txt" , "w");
     while (B)
     {
-        fprintf(archivo , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
+        fprintf(file , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
             B->name.c_str(), B->city.c_str(), B->state.c_str(), B->tlf.c_str(), B->address.c_str());
         B = B->next;
     }
-    fclose(archivo);
+    fclose(file);
 }
 
 
 // Write products in .txt
 void saveProducts(product* P) {
-    FILE*archivo = fopen("products.txt" , "w");
+    FILE*file = fopen("products.txt" , "w");
     while (P)
     {
-        fprintf(archivo , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
+        fprintf(file , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
         P = P->next;
     }
-    fclose(archivo);
+    fclose(file);
 }
 
 void saveProductsOfBranch(branch*B){
@@ -566,13 +622,37 @@ void saveProductsOfBranch(branch*B){
 }
 
 void saveClients(people*C) {
-    FILE*archivo = fopen("clients.txt" , "w");
+    FILE*file = fopen("clients.txt" , "w");
     while (C)
     {
-        fprintf(archivo , "%s,%s\n" , C->ID.c_str(), C->name.c_str());
+        fprintf(file , "%s,%s\n" , C->ID.c_str(), C->name.c_str());
         C = C->next;
     }
-    fclose(archivo);
+    fclose(file);
+}
+
+// TODO: CAMBIAR LA ESTRUCTURA DEL TXT
+void saveBills(branch*B) {
+    FILE*file = fopen("bills.txt" , "w");
+    bill *bx;
+    detail *dx;
+    while (B) {
+        bx = B->bills->first;
+        
+        while (bx) {
+            dx = bx->detailBill;
+            fprintf(file , "%s,%s,%s,%s|", B->code.c_str(), bx->code.c_str(), bx->clientId.c_str(), bx->date.c_str());
+            
+            while (dx) {
+                fprintf(file, "%s,%d;", dx->code.c_str(), dx->amount);
+                dx = dx->next;
+            }
+            fprintf(file, "\n");
+            bx = bx->next;
+        }
+        B = B->next;
+    }
+    fclose(file);
 }
 
 string formatNULL(branch *b) {
