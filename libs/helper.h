@@ -533,7 +533,7 @@ void readBills(branch**B, people**C) {
     bill *newB = NULL;
     detail *newDt = NULL;
 
-    slista *fullBill, *codes,*productsList, *pttr;
+    slista *billsList, *bill, *codes,*productsList, *pttr;
     product *sP;
     people *sC = NULL;
     branch *sB = NULL;
@@ -541,35 +541,40 @@ void readBills(branch**B, people**C) {
     while (!feof(file))
     {
         if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
-            newDt = NULL;
-
-            fullBill = split(i, '|');
-            codes = split(fullBill->cont, ',');
-            sB = searchBranchByCode(*B, codes->cont);
-            sC = searchPeopleByID(*C, codes->prox->prox->cont);
             
-            productsList = split(fullBill->prox->cont, ';');
-
+            billsList = split(i, '-');
             
-            if (!sB || !sC || len(productsList) < 1) continue;
+            sB = searchBranchByCode(*B, billsList->cont);
+            if (!sB) continue;
             
-            newB = newBill(codes->prox->cont, sC->ID, codes->prox->prox->prox->cont);
-            
-            while (productsList) {
-                pttr = split(productsList->cont, ',');
-
-                sP = searchProductByCode(sB->products, pttr->cont);
-                if (!sP) continue;
+            billsList = next(&billsList);
+            while (billsList)
+            {
+                newDt = NULL;
                 
-                addDeatail(&newDt, sP, stoi(pttr->prox->cont));
-                
-                productsList = next(&productsList);
-                destroy(&pttr);
+                bill = split(billsList->cont, '|');
+                codes = split(bill->cont, ',');
+                sC = searchPeopleByID(*C, codes->prox->cont);
+                if (!sC) continue;
+                newB = newBill(codes->cont, sC->ID, codes->prox->prox->cont);
+                productsList = split(bill->prox->cont, ';');
+                while (productsList)
+                {
+                    pttr = split(productsList->cont, ',');
+                    if (!pttr) break;
+                    sP = searchProductByCode(sB->products, pttr->cont);
+                    if (!sP) continue;
+                    addDeatail(&newDt, sP, stoi(pttr->prox->cont));
+
+                    productsList = next(&productsList);
+                    destroy(&pttr);
+                }
+                if (!newDt) continue;
+                newB->total = totalPrice(newDt);
+                addBill(&(sB)->bills, newB, newDt);
+
+                billsList = next(&billsList);
             }
-
-            newB->total = totalPrice(newDt);
-            addBill(&(sB)->bills, newB, newDt);
-
             i = NULL;
         }
     }
@@ -638,18 +643,21 @@ void saveBills(branch*B) {
     detail *dx;
     while (B) {
         bx = B->bills->first;
-        
+        //if (!bx) continue;
+        fprintf(file, "%s-", B->code.c_str());
         while (bx) {
             dx = bx->detailBill;
-            fprintf(file , "%s,%s,%s,%s|", B->code.c_str(), bx->code.c_str(), bx->clientId.c_str(), bx->date.c_str());
+            if (!dx) break;
+            fprintf(file, "%s,%s,%s|", bx->code.c_str(), bx->clientId.c_str(), bx->date.c_str());
             
             while (dx) {
                 fprintf(file, "%s,%d;", dx->code.c_str(), dx->amount);
                 dx = dx->next;
             }
-            fprintf(file, "\n");
+            fprintf(file, "-");    
             bx = bx->next;
         }
+        fprintf(file, "\n");
         B = B->next;
     }
     fclose(file);
