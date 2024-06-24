@@ -1384,7 +1384,7 @@ menuItem *menuPrincipal() {
 
 menuItem *menuConsultBranchByDesc(menuItem *parent) {
     menuItem *m = new menuItem;
-    m->encabezado = line + "\nCONSULTAR branch POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
+    m->encabezado = line + "\nCONSULTAR SUCURSAL POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-2): ";
     m->parent = parent;
     m->comportamiento = controllerConsultBranchByDesc;
     return m;
@@ -1392,7 +1392,7 @@ menuItem *menuConsultBranchByDesc(menuItem *parent) {
 
 menuItem *menuModBranchs(menuItem *parent) {
     menuItem *m = new menuItem;
-    m->encabezado = line + "\nMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
+    m->encabezado = line + "\nMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-6): ";
     m->parent = parent;
     m->comportamiento = controllerConsultBranchByDesc;
     return m;
@@ -1400,7 +1400,7 @@ menuItem *menuModBranchs(menuItem *parent) {
 
 menuItem *menuPeople(menuItem *parent) {
     menuItem *m =  new menuItem;
-    m->encabezado = line + "\nMANTENIMIENTO PERSONAS\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line;
+    m->encabezado = line + "\nMANTENIMIENTO PERSONAS\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line + "\nSu opcion (0-5): ";
     m->parent = parent;
     m->comportamiento = controllerMenuPeople;
     return m;
@@ -1416,7 +1416,7 @@ menuItem *menuModifyPeople(menuItem *parent) {
 
 menuItem *menuBilling(menuItem *parent) {
     menuItem *m = new menuItem;
-    m->encabezado = line + "\n\t1. SELECCIONAR TIENDA\n\t2. SELECCIONAR CLIENTE\n\t3. AGREGAR PRODUCTOS\n\t4. MOSTRAR FACTURA\n\t5. ELIMINAR FACTURA\n\t6. MOSTRAR RESUMEN FACTURAS\n\t0. VOLVER A MENU ANTERIOR.\n" + line;
+    m->encabezado = line + "---------------------------------------------------------------------------\n\t\t2. FACTURACION\n---------------------------------------------------------------------------\n\t1. SELECCIONAR TIENDA\n\t2. SELECCIONAR CLIENTE\n\t3. AGREGAR PRODUCTOS\n\t4. MOSTRAR FACTURA\n\t5. ELIMINAR FACTURA\n\t6. MOSTRAR RESUMEN FACTURAS\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-6): ";
     m->parent = parent;
     m->comportamiento = controllerMenuBilling;
     return m;
