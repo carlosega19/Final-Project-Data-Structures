@@ -5,6 +5,12 @@
 #ifndef BILL_H
 #define BILL_H
 #include <iostream>
+
+// NO VA
+#include "product.h"
+#include "branch.h"
+#include "people.h"
+
 using namespace std;
 
 // ESTRUCTURAS Y NOMBRES PROVISIONALES
@@ -84,7 +90,7 @@ int totalPrice(detail*B) {
 }
 
 
-// Insertar ordenadamente por codigo de factura
+// Insertar ordenadamente por codigo de factura CUIDADO
 bool addBill(dipolo**P, bill *newB, detail *prods) {
     if (!(*P)->first || compare((*P)->first->code, newB->code))
     {
@@ -107,7 +113,6 @@ bool addBill(dipolo**P, bill *newB, detail *prods) {
         else {
             newB->detailBill = prods;
             newB->total = totalPrice(prods);
-            system("pause");
             newB->next = ax->next;
             newB->prev = ax;
             if (ax->next) ax->next->prev = newB;

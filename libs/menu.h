@@ -10,6 +10,9 @@
 #include "helper.h"
 #include "people.h"
 #include "bill.h"
+#include "reports.h"
+
+
 using namespace std;
 
 
@@ -863,6 +866,7 @@ menuItem *menuConsultBranchByDesc(menuItem*);
 menuItem *menuPeople(menuItem*);
 menuItem *menuModifyPeople(menuItem*);
 menuItem *menuBilling(menuItem*);
+menuItem *menuReports(menuItem*);
 
 /* PRODUCTOS */
 
@@ -1168,6 +1172,8 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
                 actualizarMensaje("Tienda[   ]\tCliente[   ]");
                 *activo = menuBilling(*activo);
                 return 1;
+            case 3:
+                *activo = menuReports(*activo);
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
@@ -1271,7 +1277,7 @@ int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
 int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     string entrada = "";
     branch *s = NULL;
-    int conf;
+    int conf = 0;
     product *p = NULL;
     switch (selec) {
         case 0:
@@ -1335,6 +1341,132 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     return 1;
 }
 
+
+void helperClientInfo(context *ct) {
+    /*
+    pedir ci del cliente -> buscar cliente;
+    mostrar opciones de info
+    llamar funciones 
+    */
+    string info = "";
+    people *client = NULL;
+    int selec = 0;
+    obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
+    client = searchPeopleByID(*(ct->clients), info);
+
+    if (client) {
+        do {
+            obtenerEntrada2(line + "\nOPCIONES DISPONIBLES PARA OPERAR\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
+            selec = entradaValidar(info);
+            switch (selec) {
+                case 0:
+                    return;
+                    break;
+                case 1:
+                // opcion 1
+                    billsClientResume(*(ct->branches), client);
+                    system("pause");
+                    return;
+                    break;
+                case 2:
+                //opcion 2
+                    productClientResume(*(ct->branches), client);
+                    system("pause");
+                    return;
+                    break;
+                default:
+                    cout << "La Opcion es invalida.\n";
+                    cout << "<ENTER>";
+                    system("pause");
+                    break;
+            }
+        } while (1);
+    } else { cout << "La C.I. proporcionada es invalida... \n"; cout << "<ENTER>\n"; system("pause"); return; }
+}
+
+/*
+pedir codigo sucursal y buscar
+mostrar opciones 
+interpretar opciones
+
+3.2.1
+Mostrar el total de unidades vendidas de cada producto, el ingreso total en cada uno y
+el inventario en existencia. Los totales de unidades vendidas, su cantidad y el promedio total al final del
+listado. Ordenado por descripción de producto.
+
+3.2.2
+Mostrar el total de unidades en existencia de cada producto y el inventario mínimo.
+Debe ordenarse por cantidad en existencia de menor a mayor.
+
+3.2.3
+Dado un mes y una cédula de cliente. Mostrar el resumen de sus facturas indicando el
+total ingresado y la cantidad de productos comprados. 
+*/
+void helperBranchInfo(context *ct) {
+    string info = "";
+    branch *branch = NULL;
+    int selec = 0;
+    obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+    branch = searchBranchByCode(*(ct->branches), info);
+
+    if (branch) {
+        do {
+            obtenerEntrada2(line + "\nOPCIONES DISPONIBLES PARA OPERAR\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
+            selec = entradaValidar(info);
+            switch (selec) {
+                case 0:
+                    return;
+                    break;
+                case 1:
+                // opcion 1
+                    return;
+                    break;
+                case 2:
+                //opcion 2
+                    return;
+                    break;
+                case 3:
+                    return;
+                    break;
+                default:
+                    cout << "La Opcion es invalida.\n";
+                    cout << "<ENTER>\n";
+                    system("pause");
+                    break;
+            }
+        } while (1);
+    } else { cout << "El codigo proporcionado es invalido... \n"; cout << "<ENTER>\n"; system("pause"); return; }
+}
+void helperMarketing(context *ct) {;}
+
+int controllerMenuReports(menuItem **activo, int selec, context*ct) {
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
+            break;
+        case 1: // cliente por c.i.
+            helperClientInfo(ct);
+            return 1;
+            break;
+        case 2:
+            helperBranchInfo(ct);
+            return 1;
+            break;
+        case 3:
+            helperMarketing(ct);
+            return 1;
+            break;
+        default:
+            return 1;
+            break;
+
+    }
+
+}
 
 
 
@@ -1422,6 +1554,13 @@ menuItem *menuBilling(menuItem *parent) {
     return m;
 }
 
+menuItem *menuReports(menuItem *parent) {
+    menuItem *m =  new menuItem;
+    m->encabezado = line + "\nREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n" + line;
+    m->parent = parent;
+    m->comportamiento = controllerMenuReports;
+    return m;
+}
 
 /*
 void optionsMenuBilling(branch*sb, people *sc){

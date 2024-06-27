@@ -2,195 +2,171 @@
 #define REPORTS_H
 
 #include <iostream>
-#include <cstring> 
-using namespace std;
 
-// Estructura para detalle de productos en una factura
-struct detail {
-    string code;
-    string name;
-    int amount;
-    int price;
-    detail* next;
-};
+#include "branch.h"
+#include "product.h"
+#include "people.h"
 
-// Estructura para factura
-struct bill {
-    string code;
-    string clientId;
-    string date;
-    int total;
-    detail* detailBill;
-    bill* next;
-    bill* prev;
-};
+// provisional
 
-struct dipolo
+// Se accede asi (a la referencia del nodo): (*(*N)->dir)
+struct ABBbill
 {
-    bill*first;
-    bill*last;
-};
+    bill *dir;
 
-// Estructura para sucursal
-struct branch {
-    string code;
-    string name;
-    string city;
-    string state;
-    string address;
-    string tlf;
-    branch* next;
-    // Lista de facturas para esta sucursal
-    dipolo* bills; // bills es un puntero a dipolo
+    /* POINTERS */
+    ABBbill *left;
+    ABBbill *right;
 };
 
 
-// Estructura para personas
-struct people {
-    string ID;
-    string name;
-    people* next;
+
+
+
+// struct abbGenerico {
+//     void *data;
+//     abbGenerico *left;
+//     abbGenerico *right;
+// };
+// // data = *context;
+// void interpretar(abbGenerico *a) {
+//     mostrar( (context*)(a->data) );
+
+// }
+// //data = int*
+// void interpretar(abbGenerico *a) {
+//     mostrar( (int*) (a->data) );
+// }
+
+
+
+ABBbill *newRep(bill *dir) {
+    ABBbill *n = new ABBbill;
+    n->dir = dir;
+    n->left = NULL;
+    n->right = NULL;
+    return n;
+}
+
+void insertAbbBill(ABBbill**N, bill *dir) {
+    if (*N) {
+        if (compare( ((*N)->dir)->code, (dir)->code)) insertAbbBill(&(*N)->left, dir);
+        else if (compare( (dir)->code, ((*N)->dir)->code)) insertAbbBill(&(*N)->right, dir);
+        else return;
+    }else *N = newRep(dir);
+}
+
+void inorderBill(ABBbill**N) {
+    if (*N)
+    {
+        inorderBill(&(*N)->left);
+        if ((*N)->dir) {
+            cout << (*N)->dir->code << "   |   "; 
+        }
+        inorderBill(&(*N)->right);
+        
+        ABBbill *t = *N;
+        *N = NULL;
+        delete t;
+    }
+}
+
+
+void billsClientResume(branch *branches, people *client) {
+    bill *ax;
+    ABBbill *resume = NULL;
+
+    while (branches) {
+        ax = branches->bills->first;
+        while (ax) {
+            if (ax->clientId == client->ID) insertAbbBill(&resume, ax);
+            ax = ax->next;
+        }
+        branches = branches->next;
+    }
+    if (resume) inorderBill(&resume);
+}
+
+/*
+ENUNCIADOS DE REPORTES
+
+3.1.Dada la cedula de un cliente:
+    3.1.1 Mostrar el resumen de todas sus facturas ordenado por número de factura (o fecha)
+    indicando los totales en cada una. Por ejemplo:
+
+*/
+
+
+
+// ABB PRODUCTOS ------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+
+struct ABBprod
+{
+    detail *dir;
+
+    //  POINTERS
+    ABBprod *left;
+    ABBprod *right;
 };
 
-// Función para buscar una persona por su ID
-people* searchPeopleByID(people* P, string id) {
-    while (P != NULL) {
-        if (P->ID == id) {
-            return P;
+
+ABBprod *newProd(detail *dir) {
+    ABBprod *n = new ABBprod;
+    n->dir = dir;
+    n->left = NULL;
+    n->right = NULL;
+    return n;
+}
+
+void insertAbbProd(ABBprod**N, detail *dir) {
+    if (*N) {
+        if (compare( ((*N)->dir)->code, (dir)->code)) insertAbbProd(&(*N)->left, dir);
+        else if (compare( (dir)->code, ((*N)->dir)->code)) insertAbbProd(&(*N)->right, dir);
+        else {
+            (*N)->dir->amount += dir->amount;
         }
-        P = P->next;
-    }
-    return NULL;
+    }else *N = newProd(dir);
 }
 
-// Función para buscar una factura por su código en una lista de facturas
-bill* searchBillByCode(bill* B, string code) {
-    while (B != NULL) {
-        if (B->code == code) {
-            return B;
+void inorderProd(ABBprod**N) {
+    if (*N)
+    {
+        inorderProd(&(*N)->left);
+        cout << (*N)->dir->name << "    |    ";
+        inorderProd(&(*N)->right);
+
+        ABBprod *t = *N;
+        *N = NULL;
+        delete t;
+    }
+}
+
+void productClientResume(branch *branches, people *client) {
+    bill *ax;
+    detail *dt;
+    ABBprod *resume = NULL;
+
+    while (branches)
+    {
+        ax = branches->bills->first;
+        while (ax) {
+            dt = ax->detailBill;
+            
+            while (dt) {
+                if (ax->clientId == client->ID) insertAbbProd(&resume, dt);
+                dt = dt->next;
+            }    
+            ax = ax->next;
         }
-        B = B->next;
+        branches = branches->next;
     }
-    return NULL;
+    if (resume) inorderProd(&resume);
 }
 
-// Función para imprimir una línea de guiones
-void printDashesLine(int length) {
-    for (int i = 0; i < length; ++i) {
-        cout << "-";
-    }
-    cout << endl;
-}
-
-// Función para imprimir una línea de asteriscos
-void printAsterisksLine(int length) {
-    for (int i = 0; i < length; ++i) {
-        cout << "*";
-    }
-    cout << endl;
-}
-
-//3.1.1 Mostrar Resumenes de facturas 
-void generateReports(branch* branchList, people* peopleList, string personID) {
-    people* client = searchPeopleByID(peopleList, personID);
-    if (!client) {
-        cout << "Cliente no encontrado.\n";
-        return;
-    }
-
-    printDashesLine(97);
-    cout << "SISTEMA DE INVENTARIO Y FACTURACION\n";
-    printDashesLine(97);
-    cout << "3.1.1 Resumen de facturas\n";
-    cout << "CLIENTE [ CI: " << client->ID << " " << client->name << " ]\n";
-    cout << "                                FACTURA      FECHA       MONTO         SUCURSAL\n";
-    printAsterisksLine(97);
-
-    branch* currentBranch = branchList;
-    while (currentBranch) {
-        dipolo* currentDipolo = currentBranch->bills;
-        bill* currentBill = currentDipolo->first;
-        while (currentBill) {
-            if (currentBill->clientId == personID) {
-                cout << "                                   " << currentBill->code << "    " << currentBill->date
-                        << "    " << currentBill->total << "    " << currentBranch->name << "\n";
-            }
-            currentBill = currentBill->next;
-        }
-        currentBranch = currentBranch->next;
-    }
-
-    printAsterisksLine(97);
-    cout << "Pulse <0> para volver al menú anterior\n";
-    printDashesLine(97);
-    pause();
-}
-
-//3.1.2 Mostrar Productos Adquiridos por un cliente
-void showProductSummary(branch* branchList, people* peopleList, string personID) {
-    people* client = searchPeopleByID(peopleList, personID);
-    if (!client) {
-        cout << "Cliente no encontrado.\n";
-        return;
-    }
-
-    detail* productDetails = NULL;
-    bool found = false;
-
-    // Recorre la lista de sucursales
-    branch* currentBranch = branchList;
-    while (currentBranch) {
-        dipolo* currentDipolo = currentBranch->bills;
-        bill* currentBill = currentDipolo->first;
-        while (currentBill) {
-            if (currentBill->clientId == personID) {
-                found = true;
-
-                // Recorre los detalles de la factura actual
-                detail* currentDetail = currentBill->detailBill;
-                while (currentDetail) {
-                    // Agrega el detalle del producto al inicio de la lista
-                    detail* newDetail = new detail;
-                    newDetail->code = currentDetail->code;
-                    newDetail->name = currentDetail->name;
-                    newDetail->amount = currentDetail->amount;
-                    newDetail->price = currentDetail->price;
-                    newDetail->next = productDetails;
-                    productDetails = newDetail;
-
-                    currentDetail = currentDetail->next;
-                }
-            }
-            currentBill = currentBill->next;
-        }
-        currentBranch = currentBranch->next;
-    }
-
-    if (!found) {
-        cout << "No se encontraron facturas para este cliente.\n";
-    } else {
-        printDashesLine(97);
-        cout << "SISTEMA DE INVENTARIO Y FACTURACION\n";
-        printDashesLine(97);
-        cout << "3.1.2 Resumen de productos adquiridos\n";
-        cout << "CLIENTE [ CI: " << client->ID << " " << client->name << " ]\n";
-        printAsterisksLine(97);
-        cout << left << setw(15) << "CÓDIGO" << setw(20) << "DESCRIPCION" << setw(10) << "CANT" << setw(10) << "PRECIO\n";
-        printAsterisksLine(97);
-
-        // Imprimir los detalles de los productos adquiridos
-        detail* current = productDetails;
-        while (current) {
-            cout << left << setw(15) << current->code << setw(20) << current->name
-                    << setw(10) << current->amount << setw(10) << current->price << endl;
-            detail* temp = current;
-            current = current->next;
-            delete temp; 
-        }
-        printDashesLine(97);
-    }
-
-    pause();
-}
-
-#endif // BRANCH_H
+#endif //REPORTS_H
