@@ -51,13 +51,15 @@ bool validateID(string cedula) {
 
 // Función para encontrar una persona por su cédula
 people* searchPeopleByID(people* P, string id) {
+    /*if (id == "\0");
     while (P != NULL) {
         if (P->ID == id) {
             return P;
         }
         P = P->next;
     }
-    return NULL;
+    return NULL;*/
+    while (P && P->ID != id) { P = P->next; } return P;
 }
 
 // Función para agregar una nueva persona a la lista

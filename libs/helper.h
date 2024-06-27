@@ -6,6 +6,7 @@
 #include "people.h"
 //#include "menu.h"
 #include <iostream>
+#include <string.h>
 
 
 #if defined(__linux__)
@@ -433,70 +434,61 @@ void stringToPerson(char *s, people**P) {
 }
 
 void readProducts(product**P) {
-    char *i = NULL;
+    char *i = (char* ) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("products.txt" , "r");
     if (!file) return;
 
-    while (!feof(file))
-    {
-        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
-            stringToProduct(i , P);
-            i = NULL;
-        }
+    while (fgets(i, 1024, file)) {
+        i[strcspn(i, "\n")] = '\0';
+        stringToProduct(i,P);
     }
-    delete i;
+    if (i) delete i;
     fclose(file);
 }
 
 void readBranches(branch**B) {
-    char *i = NULL;
+    char *i = (char* ) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("branches.txt" , "r");
     if (!file) return;
 
-    while (!feof(file))
-    {
-        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
-            stringToBranch(i , B);
-            i = NULL;
-        }
+    while (fgets(i, 1024, file)) {
+        i[strcspn(i, "\n")] = '\0';
+        stringToBranch(i,B);
     }
+    
     if (i) delete i;
     fclose(file);
 }
 
 
 void readInventory(branch*B , product*P) {
-    char *i = NULL;
+    char *i = (char* ) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("inventory.txt" , "r");
     if (!file) return;
     branch *sB = NULL;
     product *sP = NULL;
     slista *branchCode, *productList, *pttr;
-    while (!feof(file))
-    {
-        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
-            branchCode = split(i, '|');
-            if (len(branchCode) >= 2) {
+    
+    while (fgets(i, 1024, file)) {
+        branchCode = split(i, '|');
+        if (len(branchCode) >= 2) {
+            sB = searchBranchByCode(B , branchCode->cont);
+            if (!sB) continue; 
+            productList = split(branchCode->prox->cont, ';');
+            while (productList) {
 
-                sB = searchBranchByCode(B , branchCode->cont);
-                if (!sB) continue; 
-                productList = split(branchCode->prox->cont, ';');
-                while (productList) {
-
-                    pttr = split(productList->cont, ',');
-                    if (pttr && len(pttr) >= 4) {
-                        sP = searchProductByCode(P , pttr->cont);
-                        if (!sP) continue;
-                        addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stoi(pttr->prox->prox->prox->cont));
-                    }
-
-                    productList = next(&productList);
-                    destroy(&pttr);
+                pttr = split(productList->cont, ',');
+                if (pttr && len(pttr) >= 4) {
+                    sP = searchProductByCode(P , pttr->cont);
+                    if (!sP) continue;
+                    addProductToBranch(sB, sP, stoi(pttr->prox->cont), stoi(pttr->prox->prox->cont), stoi(pttr->prox->prox->prox->cont));
                 }
-                i = NULL;
+
+                productList = next(&productList);
+                destroy(&pttr);
             }
         }
     }
@@ -507,25 +499,21 @@ void readInventory(branch*B , product*P) {
 }
 
 void readClients(people**P){
-    char *i = NULL;
+    char *i = (char* ) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("clients.txt" , "r");
     if (!file) return;
 
-    while (!feof(file))
-    {
-        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
-            // TODO: No valida si se repite
-            stringToPerson(i , P);
-            i = NULL;
-        }
+    while (fgets(i, 1024, file)) {
+        i[strcspn(i, "\n")] = '\0';
+        stringToPerson(i , P);
     }
-    delete i;
+    if (i) delete i;
     fclose(file);
 }
 
-void readBills(branch**B, people**C) {
-    char *i = NULL;
+void readBills(branch**B, people**C) {  
+    char *i = (char* ) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("bills.txt" , "r");
     if (!file) return;
@@ -538,47 +526,50 @@ void readBills(branch**B, people**C) {
     people *sC = NULL;
     branch *sB = NULL;
 
-    while (!feof(file))
-    {
-        if (fscanf(file, "%m[^\n]%*c", &i) == 1) {
+    while (fgets(i, 1024, file)) {
+        billsList = split(i, '-');
+        if (!(billsList->prox)) continue;
+
+        sB = searchBranchByCode(*B, billsList->cont);
+        if (!sB) continue;
+
+        billsList = next(&billsList);
+        while (billsList) {
+            newDt = NULL;
+
+
+            ////////////
+            bill = split(billsList->cont, '|');
             
-            billsList = split(i, '-');
-            
-            sB = searchBranchByCode(*B, billsList->cont);
-            if (!sB) continue;
-            
-            billsList = next(&billsList);
-            while (billsList)
-            {
-                newDt = NULL;
-                
-                bill = split(billsList->cont, '|');
-                codes = split(bill->cont, ',');
+            codes = split(bill->cont, ',');
+            cout << "c";
+            if (codes && codes->prox) {
                 sC = searchPeopleByID(*C, codes->prox->cont);
-                if (!sC) continue;
-                newB = newBill(codes->cont, sC->ID, codes->prox->prox->cont);
-                productsList = split(bill->prox->cont, ';');
-                while (productsList)
-                {
-                    pttr = split(productsList->cont, ',');
-                    if (!pttr) break;
-                    sP = searchProductByCode(sB->products, pttr->cont);
-                    if (!sP) continue;
-                    addDeatail(&newDt, sP, stoi(pttr->prox->cont));
+            } else { break; }
+            cout << "d";
+            if (!sC) break;
+            newB = newBill(codes->cont, sC->ID, codes->prox->prox->cont);
+            productsList = split(bill->prox->cont, ';');
+            //////////////
+            //cout d
+            while (productsList) {
+                pttr = split(productsList->cont, ',');
+                if (!pttr) break;
+                sP = searchProductByCode(sB->products, pttr->cont);
+                if (!sP) break;
+                addDeatail(&newDt, sP, stoi(pttr->prox->cont));
 
-                    productsList = next(&productsList);
-                    destroy(&pttr);
-                }
-                if (!newDt) continue;
-                newB->total = totalPrice(newDt);
-                addBill(&(sB)->bills, newB, newDt);
-
-                billsList = next(&billsList);
+                productsList = next(&productsList);
+                destroy(&pttr);
             }
-            i = NULL;
+            if (!newDt) continue;
+            newB->total = totalPrice(newDt);
+            addBill(&(sB)->bills, newB, newDt);
+
+            billsList = next(&billsList);
         }
     }
-    delete i;
+    if (i) delete i;
     fclose(file);
 }
 

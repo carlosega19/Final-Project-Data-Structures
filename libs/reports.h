@@ -9,83 +9,121 @@
 
 // provisional
 
-// Se accede asi (a la referencia del nodo): (*(*N)->dir)
-struct ABBbill
-{
-    bill *dir;
+// Se accede asi (a la referencia del nodo): (*(*N)->data)
 
-    /* POINTERS */
-    ABBbill *left;
-    ABBbill *right;
+// abb generico
+enum TYPE {
+    T_BILL = 1,
+    T_DETAIL = 2,
+    T_UNDEFINED = 0
 };
 
 
+struct ABBgen {
+    void *data;
+    enum TYPE T;
+    ABBgen *left;
+    ABBgen *right;
+};
 
+ABBgen *NG(bill *b) {
+    ABBgen *r = new ABBgen;
+    r->data = b;
+    r->T = T_BILL;
+    r->left = NULL;
+    r->right = NULL;
 
-
-// struct abbGenerico {
-//     void *data;
-//     abbGenerico *left;
-//     abbGenerico *right;
-// };
-// // data = *context;
-// void interpretar(abbGenerico *a) {
-//     mostrar( (context*)(a->data) );
-
-// }
-// //data = int*
-// void interpretar(abbGenerico *a) {
-//     mostrar( (int*) (a->data) );
-// }
-
-
-
-ABBbill *newRep(bill *dir) {
-    ABBbill *n = new ABBbill;
-    n->dir = dir;
-    n->left = NULL;
-    n->right = NULL;
-    return n;
+    return r;
 }
 
-void insertAbbBill(ABBbill**N, bill *dir) {
+ABBgen *NG(detail *b) {
+    ABBgen *r = new ABBgen;
+    r->data = b;
+    r->T = T_DETAIL;
+    r->left = NULL;
+    r->right = NULL;
+
+    return r;
+}
+
+int compareGen(ABBgen *a, ABBgen *b) {
+    if (a->T == b->T) {
+        switch (a->T) {
+            case T_BILL:
+                return compare(((bill*) a->data)->code,  ((bill*) b->data)->code);
+                break;
+            case T_DETAIL:
+                return compare(((detail*) a->data)->code,  ((detail*) b->data)->code);
+                break;
+            case T_UNDEFINED:
+                return 0;
+                break;
+        }
+    }
+    return 0;
+}
+
+string reprCode(ABBgen *t) {
+    if (t) {
+        switch (t->T) {
+            case T_BILL:
+                return ((bill*) t->data)->code;
+                break;
+            case T_DETAIL:
+                return ((detail*) t->data)->code;
+                break;
+            default:
+                return "<Undefined type object>";
+                break;
+        }
+    }
+    return "\0";
+}
+
+void insertABBgen(ABBgen**N, bill *data) {
+    ABBgen *temp = NG(data);
     if (*N) {
-        if (compare( ((*N)->dir)->code, (dir)->code)) insertAbbBill(&(*N)->left, dir);
-        else if (compare( (dir)->code, ((*N)->dir)->code)) insertAbbBill(&(*N)->right, dir);
+        if (compareGen(*N, temp)) {
+            insertABBgen(&(*N)->left, data);
+        }
+        else if (compareGen(temp, *N )) {
+            insertABBgen(&(*N)->right, data);
+        }
         else return;
-    }else *N = newRep(dir);
+    } else *N = temp;
 }
 
-void inorderBill(ABBbill**N) {
+void insertABBgen(ABBgen**N, detail *data) {
+    ABBgen *temp = NG(data);
+    if (*N) {
+        if (compareGen(*N, temp)) {
+            insertABBgen(&(*N)->left, data);
+        }
+        else if (compareGen(temp, *N )) {
+            insertABBgen(&(*N)->right, data);
+        }
+        else return;
+    } else *N = temp;
+}
+
+void inorderGen(ABBgen**N) {
     if (*N)
     {
-        inorderBill(&(*N)->left);
-        if ((*N)->dir) {
-            cout << (*N)->dir->code << "   |   "; 
+        inorderGen(&(*N)->left);
+        if ((*N)->data) {
+            printFmt(reprCode((*N)), 10);
+            cout << "\t|\n"; 
         }
-        inorderBill(&(*N)->right);
+        inorderGen(&(*N)->right);
         
-        ABBbill *t = *N;
+        ABBgen *t = *N;
         *N = NULL;
         delete t;
     }
 }
 
 
-void billsClientResume(branch *branches, people *client) {
-    bill *ax;
-    ABBbill *resume = NULL;
 
-    while (branches) {
-        ax = branches->bills->first;
-        while (ax) {
-            if (ax->clientId == client->ID) insertAbbBill(&resume, ax);
-            ax = ax->next;
-        }
-        branches = branches->next;
-    }
-    if (resume) inorderBill(&resume);
-}
 
 /*
 ENUNCIADOS DE REPORTES
@@ -106,51 +144,11 @@ ENUNCIADOS DE REPORTES
 // --------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------
 
-struct ABBprod
-{
-    detail *dir;
-
-    //  POINTERS
-    ABBprod *left;
-    ABBprod *right;
-};
-
-
-ABBprod *newProd(detail *dir) {
-    ABBprod *n = new ABBprod;
-    n->dir = dir;
-    n->left = NULL;
-    n->right = NULL;
-    return n;
-}
-
-void insertAbbProd(ABBprod**N, detail *dir) {
-    if (*N) {
-        if (compare( ((*N)->dir)->code, (dir)->code)) insertAbbProd(&(*N)->left, dir);
-        else if (compare( (dir)->code, ((*N)->dir)->code)) insertAbbProd(&(*N)->right, dir);
-        else {
-            (*N)->dir->amount += dir->amount;
-        }
-    }else *N = newProd(dir);
-}
-
-void inorderProd(ABBprod**N) {
-    if (*N)
-    {
-        inorderProd(&(*N)->left);
-        cout << (*N)->dir->name << "    |    ";
-        inorderProd(&(*N)->right);
-
-        ABBprod *t = *N;
-        *N = NULL;
-        delete t;
-    }
-}
 
 void productClientResume(branch *branches, people *client) {
     bill *ax;
     detail *dt;
-    ABBprod *resume = NULL;
+    ABBgen *resume = NULL;
 
     while (branches)
     {
@@ -159,7 +157,7 @@ void productClientResume(branch *branches, people *client) {
             dt = ax->detailBill;
             
             while (dt) {
-                if (ax->clientId == client->ID) insertAbbProd(&resume, dt);
+                if (ax->clientId == client->ID) insertABBgen(&resume, dt);
                 dt = dt->next;
             }    
             ax = ax->next;
