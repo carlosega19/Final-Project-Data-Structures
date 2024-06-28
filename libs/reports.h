@@ -42,7 +42,6 @@ ABBgen *NG(detail *b) {
     r->T = T_DETAIL;
     r->left = NULL;
     r->right = NULL;
-
     return r;
 }
 
@@ -105,7 +104,7 @@ void insertABBgen(ABBgen**N, detail *data) {
         else return;
     } else *N = temp;
 }
-
+/*
 void inorderGen(ABBgen**N) {
     if (*N)
     {
@@ -120,30 +119,22 @@ void inorderGen(ABBgen**N) {
         *N = NULL;
         delete t;
     }
+}*/
+
+void billsClientResume(branch *branches, people *client) {
+    bill *ax;
+    ABBgen *resume = NULL;
+
+    while (branches) {
+        ax = branches->bills->first;
+        while (ax) {
+            if (ax->clientId == client->ID) insertABBgen(&resume, ax);
+            ax = ax->next;
+        }
+        branches = branches->next;
+    }
+    if (resume) inorderGen(&resume);
 }
-
-
-
-
-/*
-ENUNCIADOS DE REPORTES
-
-3.1.Dada la cedula de un cliente:
-    3.1.1 Mostrar el resumen de todas sus facturas ordenado por número de factura (o fecha)
-    indicando los totales en cada una. Por ejemplo:
-
-*/
-
-
-
-// ABB PRODUCTOS ------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-
 
 void productClientResume(branch *branches, people *client) {
     bill *ax;
@@ -164,7 +155,7 @@ void productClientResume(branch *branches, people *client) {
         }
         branches = branches->next;
     }
-    if (resume) inorderProd(&resume);
+    if (resume) inorderGen(&resume);
 }
 
 #endif //REPORTS_H
