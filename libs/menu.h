@@ -693,9 +693,9 @@ void showAllBills(bill *B) {
 /*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
 void billsResume(branch*B, people*C) {
     bill *ax = B->bills->first;
-    cout << "\n--------------------------------------\tRESUMEN DE FACTURAS: \n--------------------------------------\n";
+    cout << "\n--------------------------------------\n\tRESUMEN DE FACTURAS \n--------------------------------------\n";
     printFmt("Factura ", 15);
-    printFmt("Fehca ", 15);
+    printFmt("Fecha ", 15);
     printFmt("Monto ", 15);
     cout << "\n--------------------------------------\n";
     while (ax)
@@ -1364,13 +1364,11 @@ void helperClientInfo(context *ct) {
                     return;
                     break;
                 case 1:
-                // opcion 1
                     billsClientResume(*(ct->branches), client);
                     system("pause");
                     return;
                     break;
                 case 2:
-                //opcion 2
                     productClientResume(*(ct->branches), client);
                     system("pause");
                     return;
