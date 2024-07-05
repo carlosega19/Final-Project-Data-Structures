@@ -16,5 +16,5 @@ TODO
     - Mejorar impresion de TODOS los menus
     - Terminar el proyecto
 
-    !!!! PROBARLO EN LAS MAQUINAS DE LA UCAB !!!!
+    !!!!!!!!!!!! PROBARLO EN LAS MAQUINAS DE LA UCAB !!!!!!!!!!!!!!
 */

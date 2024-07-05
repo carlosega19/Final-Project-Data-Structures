@@ -63,8 +63,7 @@ void createProduct(product**P){
     obtenerEntrada2("\n\t- Escribe el NOMBRE del nuevo producto: ", &name);
     obtenerEntrada2("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &description);
 
-    if (confirm())
-    {
+    if (confirm()) {
         if ((isValid(code) && isValid(name) && isValid(description))) {
             cout << "\n\n\t\t-- product AGREGADO --\n\n";
             addProduct(P, code, name, description, 0, 0, 0);
@@ -467,7 +466,7 @@ void headerProductsOfBranch() {
 	printFmt("EXISTENCIA", 20);
 	printFmt("EXISTENCIA MIN.", 20);
 	printFmt("PRECIO", 20);
-	cout << line << endl;
+	cout << endl << line << endl;
 }
 
 void printProductsInTableOfBranch(product* P) {
@@ -1375,7 +1374,6 @@ void helperClientInfo(context *ct) {
                     break;
                 default:
                     cout << "La Opcion es invalida.\n";
-                    cout << "<ENTER>";
                     system("pause");
                     break;
             }
@@ -1403,12 +1401,12 @@ total ingresado y la cantidad de productos comprados.
 */
 void helperBranchInfo(context *ct) {
     string info = "";
-    branch *branch = NULL;
+    branch *selected = NULL;
     int selec = 0;
     obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
-    branch = searchBranchByCode(*(ct->branches), info);
+    selected = searchBranchByCode(*(ct->branches), info);
 
-    if (branch) {
+    if (selected) {
         do {
             obtenerEntrada2(line + "\nOPCIONES DISPONIBLES PARA OPERAR\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
             selec = entradaValidar(info);
@@ -1417,11 +1415,13 @@ void helperBranchInfo(context *ct) {
                     return;
                     break;
                 case 1:
-                // opcion 1
+                    branchUnitsResume(selected);
+                    system("pause");
                     return;
                     break;
                 case 2:
-                //opcion 2
+                    branchInventoryResume(selected);
+                    system("pause");
                     return;
                     break;
                 case 3:
@@ -1555,7 +1555,7 @@ menuItem *menuBilling(menuItem *parent) {
 
 menuItem *menuReports(menuItem *parent) {
     menuItem *m =  new menuItem;
-    m->encabezado = line + "\nREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n" + line;
+    m->encabezado = line + "\nREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerMenuReports;
     return m;
@@ -1589,8 +1589,6 @@ void run() {
     branch *branches = NULL; 
     product *products = NULL;
     people *clients = NULL;
-    people *lastclient = NULL;
-    dipolo *bills;
     
     readProducts(&products);    
     readBranches(&branches);

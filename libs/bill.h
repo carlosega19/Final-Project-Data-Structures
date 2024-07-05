@@ -49,7 +49,6 @@ detail *newDetail(string code, string name, int amount) {
     r->code = code;
     r->name = name;
     r->amount = amount;
-
     return r;
 }
 
