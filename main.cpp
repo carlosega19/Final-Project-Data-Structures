@@ -6,8 +6,7 @@
 using namespace std;
 
 int main() {
-    //setlocale(LC_ALL, "es_ES.UTF-8");
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "es_ES.UTF-8")
     run();
 }
 

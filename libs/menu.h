@@ -680,14 +680,16 @@ void printBill(bill*B) {
     cout << endl << line << endl;    
 }
 
-void showAllBills(bill *B) {
+// Print all bills of a client
+void showAllBills(bill *B, people *client) {
     while (B)
     {
-        printBill(B);
-        cout << "\n\n";
+        if (B->clientId == client->ID) {
+            printBill(B);
+            cout << "\n\n";
+        }
         B = B->next;
     }
-    
 }
 /*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
 void billsResume(branch*B, people*C) {
@@ -890,7 +892,7 @@ PASOS PARA IMPLEMENTAR MENUITEM
 
 int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
     switch (selec) {
-        case 0:
+        case 0: 
             if (*activo) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
@@ -916,7 +918,7 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
             menuDeleteBill(*ct->selectedBranch, *ct->selectedClient);
             return 1;
         case 6:
-            showAllBills((*ct->selectedBranch)->bills->first);
+            showAllBills((*ct->selectedBranch)->bills->first, (*ct->selectedClient));
             cout << "\n\t\t<ENTER>\n";
             getchar();
             return 1;
@@ -1561,25 +1563,6 @@ menuItem *menuReports(menuItem *parent) {
     return m;
 }
 
-/*
-void optionsMenuBilling(branch*sb, people *sc){
-    cout << 
-    cout << "\n\n\t\tSucursal seleccionada: ";
-    if (sb) cout << selected->name << " [" << selected->code << "]\n\n";
-
-}*/
-/*
-void menuBilling(branch *branches, people *peopleList, bill *bills) {
-    branch *bs = NULL;
-    people *cs = NULL;
-    do
-    {
-        // Mostrar todo
-
-
-        //leer casos
-    } while ();
-}*/
 
 void run() {
     int activo = 1;
