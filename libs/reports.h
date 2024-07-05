@@ -17,6 +17,7 @@ enum TYPE {
     T_BILL = 1,
     T_DETAIL = 2,
     T_PRODUCT = 3,
+    T_BRANCH = 4,
     T_UNDEFINED = 0
 };
 
@@ -32,6 +33,16 @@ struct ABBgen {
     ABBgen *left;
     ABBgen *right;
 };
+
+ABBgen *NG(branch *b) {
+    ABBgen *r = new ABBgen;
+    r->data = b;
+    r->T = T_BRANCH;
+    r->left = NULL;
+    r->right = NULL;
+
+    return r;
+}
 
 ABBgen *NG(bill *b, string ax = "") {
     ABBgen *r = new ABBgen;
@@ -127,6 +138,7 @@ void insertABBgen(ABBgen**N, bill *data, string ax = "") {
     } else *N = temp;
 }
 
+// DETAIL AVBB
 void insertABBgen(ABBgen**N, detail *data) {
     if (*N) {
         if (compare( ((detail*)(*N)->data)->code, data->code)) {
@@ -142,12 +154,26 @@ void insertABBgen(ABBgen**N, detail *data) {
     } else *N = NG(data, data->price, data->amount);
 }
 
+// PRODUCTS ABB
 void insertABBgen(ABBgen**N, product *data) {
     if (*N) {
         if (((product*)(*N)->data)->amount > data->amount) {
             insertABBgen(&(*N)->left, data);
         }
         else if (((product*)(*N)->data)->amount < data->amount) {
+            insertABBgen(&(*N)->right, data);
+        }
+        else return;
+    } else *N = NG(data);
+}
+
+// BRANCHS ABB
+void insertABBgen(ABBgen**N, branch *data) {
+    if (*N) {
+        if (compare(((branch*)(*N)->data)->code, data->code)) {
+            insertABBgen(&(*N)->left, data);
+        }
+        else if (compare(data->code, ((branch*)(*N)->data)->code)) {
             insertABBgen(&(*N)->right, data);
         }
         else return;
@@ -279,7 +305,7 @@ void branchUnitsResume(branch *selected) {
         cout << "\tCANTIDAD VENDIDA: " << totalSelled << "\n";
         cout << "\tCOSTO TOTAL: " << totalBills << "Bs.\n";
         cout << "\tPROMEDIO DE GASTO POR COMPRA: " << totalBills/i << "Bs.\n";
-        cout << "\n----------------------------------------------------------------------------\n\n";
+        cout << "\n----------------------------------------------------------------------------\n\n\n";
     }
 }
 
@@ -299,9 +325,59 @@ void branchInventoryResume(branch *selected) {
         printFmt("MIN. EXISTENCIA ", 15);
         cout << "\n----------------------------------------------------------------------------\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n\n";
+        cout << "\n----------------------------------------------------------------------------\n\n\n";
 
     }
+}
+
+void branchMonthlyResume(branch *selected, string month) {
+    ABBgen *resume = NULL;
+
+    bill *ax = selected->bills->first;
+    detail *bx;
+    int earned = 0;
+    int totalProducts = 0;
+    while (ax) {
+        if (getMonth(ax->date) == month) {
+            bx = ax->detailBill;
+            while (bx) {
+                insertABBgen(&resume, bx);
+                earned += bx->price;
+                totalProducts += bx->amount;
+                bx = bx->next;
+            }
+        }
+        ax = ax->next;
+    }
+
+    if (resume) {
+        cout << "\n\t3.2.1 Resumen Inventario de [ " << selected->name << " ]\n";
+        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        printFmt("CODIGO ", 15);
+        printFmt("NOMBRE ", 25);
+        printFmt("TOTAL VENDIDO ", 15);
+        printFmt("MIN. EXISTENCIA ", 15);
+        cout << "\n----------------------------------------------------------------------------\n";
+        inorderGen(&resume);
+        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\tTotal ingresado: " << earned;
+        cout << "\n\tProductos vendidos: " << totalProducts;
+        cout << "\n----------------------------------------------------------------------------\n\n\n";
+    }
+}
+
+// MERCADERO 3.1
+void statsMarketingByCode(branch *branchs, string month) {
+    if (month == "") return;
+    while (branchs) {
+        branchMonthlyResume(branchs, month);
+        branchs = branchs->next;
+    }
+}
+
+// MERCADERO 3.2
+void statsMarketingByBranch() {
+    return;
 }
 
 #endif //REPORTS_H

@@ -6,12 +6,13 @@
 using namespace std;
 
 int main() {
-    setlocale(LC_ALL, "es_ES.UTF-8")
+    setlocale(LC_ALL, "es_ES.UTF-8");
     run();
 }
 
 /*
 TODO
+
     - Modificar los menus de reportes
     - Mejorar impresion de TODOS los menus
     - Terminar el proyecto

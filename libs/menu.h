@@ -869,7 +869,7 @@ menuItem *menuPeople(menuItem*);
 menuItem *menuModifyPeople(menuItem*);
 menuItem *menuBilling(menuItem*);
 menuItem *menuReports(menuItem*);
-
+menuItem *helperMarketing(menuItem*);
 /* PRODUCTOS */
 
 
@@ -1278,9 +1278,6 @@ int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
 
 int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     string entrada = "";
-    branch *s = NULL;
-    int conf = 0;
-    product *p = NULL;
     switch (selec) {
         case 0:
             if (*activo) {
@@ -1427,6 +1424,9 @@ void helperBranchInfo(context *ct) {
                     return;
                     break;
                 case 3:
+                    obtenerEntrada2("Escribe el MES deseado: ", &info);
+                    branchMonthlyResume(selected, info);
+                    system("pause");
                     return;
                     break;
                 default:
@@ -1438,7 +1438,37 @@ void helperBranchInfo(context *ct) {
         } while (1);
     } else { cout << "El codigo proporcionado es invalido... \n"; cout << "<ENTER>\n"; system("pause"); return; }
 }
-void helperMarketing(context *ct) {;}
+
+
+
+int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
+    string input = "";;
+    switch (selec) {
+        case 0:
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
+                return 1;
+            }
+            break;
+        case 1:
+            obtenerEntrada2("Escribe el MES deseado: ", &input);
+            statsMarketingByCode((*ct->branches), input);
+            system("pause");
+            // total ventas ordenado por codigo de producto
+            break;
+        case 2:
+            // total ventas ordenado por codigo de tienda
+            break;
+        case 3:
+            // total ventas ordenado por codigo de tienda
+            break;
+    
+    default:
+        break;
+    }
+}
 
 int controllerMenuReports(menuItem **activo, int selec, context*ct) {
     switch (selec) {
@@ -1458,7 +1488,7 @@ int controllerMenuReports(menuItem **activo, int selec, context*ct) {
             return 1;
             break;
         case 3:
-            helperMarketing(ct);
+            *activo  = helperMarketing(*activo);
             return 1;
             break;
         default:
@@ -1561,6 +1591,15 @@ menuItem *menuReports(menuItem *parent) {
     m->parent = parent;
     m->comportamiento = controllerMenuReports;
     return m;
+}
+
+menuItem *helperMarketing(menuItem *parent) {
+    menuItem *m =  new menuItem;
+    m->encabezado = line + "\nREPORTES\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t0. VOLVER AL MENU\n" + line;
+    m->parent = parent;
+    m->comportamiento = controllerHelperMarketing;
+    return m;
+    
 }
 
 

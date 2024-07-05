@@ -385,6 +385,14 @@ date getDate(string prompt) {
     return newDate(0, 0, 0);
 }
 
+string getMonth(string input) {
+    slista *date = split(input, '/');
+    if (len(date) == 3) {
+        return date->prox->cont;
+    }
+    return "";
+}
+
 int laterThan(date fst, date scnd) {
     if (fst.year > scnd.year) return 1;
     else if (fst.year < scnd.year) return 0;
