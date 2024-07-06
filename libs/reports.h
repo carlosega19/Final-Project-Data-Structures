@@ -317,7 +317,7 @@ void branchInventoryResume(branch *selected) {
         ax = ax->next;
     }
     if (resume) {
-        cout << "\n\t3.2.1 Resumen Inventario de [ " << selected->name << " ]\n";
+        cout << "\n\t\tResumen Inventario de [ " << selected->name << " ]\n";
         cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
         printFmt("CODIGO ", 15);
         printFmt("NOMBRE ", 25);
@@ -351,7 +351,7 @@ void branchMonthlyResume(branch *selected, string month) {
     }
 
     if (resume) {
-        cout << "\n\t3.2.1 Resumen Inventario de [ " << selected->name << " ]\n";
+        cout << "\n\t\tResumen Inventario de [ " << selected->name << " ("<<selected->code<<") ]\n";
         cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
         printFmt("CODIGO ", 15);
         printFmt("NOMBRE ", 25);
@@ -366,18 +366,68 @@ void branchMonthlyResume(branch *selected, string month) {
     }
 }
 
+
+
 // MERCADERO 3.1
 void statsMarketingByCode(branch *branchs, string month) {
-    if (month == "") return;
+    ABBgen *resume = NULL;
+
+    bill *ax = NULL;
+    detail *bx = NULL;
+    int earned = 0;
+    int totalProducts = 0;
+
     while (branchs) {
-        branchMonthlyResume(branchs, month);
+        ax = branchs->bills->first;
+        while (ax) {
+            if (getMonth(ax->date) == month) {
+                bx = ax->detailBill;
+                while (bx) {
+                    insertABBgen(&resume, bx);
+                    earned += bx->price;
+                    totalProducts += bx->amount;
+                    bx = bx->next;
+                }
+            }
+            ax = ax->next;
+        }
         branchs = branchs->next;
+    }
+
+    if (resume) {
+        cout << "\n\tRESUMEN VENTAS GLOBALES ";
+        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        printFmt("CODIGO ", 15);
+        printFmt("NOMBRE ", 25);
+        printFmt("TOTAL VENDIDO ", 15);
+        printFmt("GANANCIA ", 15);
+        cout << "\n----------------------------------------------------------------------------\n";
+        inorderGen(&resume);
+        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\tTotal ingresado: " << earned;
+        cout << "\n\tProductos vendidos: " << totalProducts;
+        cout << "\n----------------------------------------------------------------------------\n\n\n";
     }
 }
 
 // MERCADERO 3.2
-void statsMarketingByBranch() {
-    return;
+void resumeByBranch(ABBgen *resume, string month) {
+    if (resume) {
+        resumeByBranch(resume->left, month);
+        branchMonthlyResume( ((branch*)resume->data), month);
+        resumeByBranch(resume->right, month);
+    }
 }
+
+void statsMarketingByBranch(branch *branchs, string month) {
+    ABBgen *resume = NULL;
+    while (branchs) {
+        insertABBgen(&resume, branchs);
+        branchs = branchs->next;
+    }
+    resumeByBranch(resume, month);
+}
+
+
 
 #endif //REPORTS_H
