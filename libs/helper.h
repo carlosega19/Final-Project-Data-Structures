@@ -19,7 +19,6 @@
 
 
 
-
 void clScr() {
     if (PLATFORM_NAME == "linux") {
         cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal

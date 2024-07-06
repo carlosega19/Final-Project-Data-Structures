@@ -18,6 +18,7 @@ enum TYPE {
     T_DETAIL = 2,
     T_PRODUCT = 3,
     T_BRANCH = 4,
+    T_CLIENT = 5,
     T_UNDEFINED = 0
 };
 
@@ -33,6 +34,13 @@ struct ABBgen {
     ABBgen *left;
     ABBgen *right;
 };
+/*
+struct arr
+{
+
+
+};*/
+
 
 ABBgen *NG(branch *b) {
     ABBgen *r = new ABBgen;
@@ -48,6 +56,19 @@ ABBgen *NG(bill *b, string ax = "") {
     ABBgen *r = new ABBgen;
     r->data = b;
     r->axS = ax;
+    r->T = T_BILL;
+    r->left = NULL;
+    r->right = NULL;
+
+    return r;
+}
+
+ABBgen *NG(people *b, int am, int pr) {
+    ABBgen *r = new ABBgen;
+    r->data = b;
+    r->axAm = am;
+    r->axPr = pr;
+
     r->T = T_BILL;
     r->left = NULL;
     r->right = NULL;
@@ -76,6 +97,15 @@ ABBgen *NG(product *b) {
     r->right = NULL;
     return r;
 }
+
+
+
+
+
+
+
+
+
 
 int compareGen(ABBgen *a, ABBgen *b) {
     if (a->T == b->T) {
@@ -410,6 +440,9 @@ void statsMarketingByCode(branch *branchs, string month) {
     }
 }
 
+
+
+
 // MERCADERO 3.2
 void resumeByBranch(ABBgen *resume, string month) {
     if (resume) {
@@ -428,6 +461,47 @@ void statsMarketingByBranch(branch *branchs, string month) {
     resumeByBranch(resume, month);
 }
 
+//MERCADEO 3.3
+/*
+    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
+    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
+    a menor). Al final el total de producto comprados en todas las tiendas.
+*/
+/*
+void statsMarketingByClientBill(branch *selected) {
+    selected = searchBranchByCode(selected, "101");
+    bill *ax = selected->bills->first;
+    detail *bx;
+    ABBgen *resume = NULL;
+    
+    //ABBgen **ar;
+
+    int pos = 0;
+    
+    while (ax) {
+        bx = ax->detailBill;
+        while (bx) {
+            pos++;
+            insertABBgen(&resume, bx);
+            bx = bx->next;
+        }
+        ax = ax->next;
+    }
+    /*
+    while (ax) {
+        if (ax->clientId != client->ID) {
+            bx = ax->detailBill;
+
+            while (bx) {
+                if (bx->code == prod) {
+                    insertABBgen(&resume, bx);
+                }
+                bx = bx->next;
+            }
+        }
+        ax = ax->next;
+    }
+}*/
 
 
 #endif //REPORTS_H
