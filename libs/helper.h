@@ -546,31 +546,36 @@ void readBills(branch**B, people**C) {
             newDt = NULL;
 
 
-            ////////////
+            
             bill = split(billsList->cont, '|');
             
             codes = split(bill->cont, ',');
-            cout << "c";
+
             if (codes && codes->prox) {
                 sC = searchPeopleByID(*C, codes->prox->cont);
             } else { break; }
-            cout << "d";
             if (!sC) break;
             newB = newBill(codes->cont, sC->ID, codes->prox->prox->cont);
             productsList = split(bill->prox->cont, ';');
-            //////////////
-            //cout d
+            
+
             while (productsList) {
                 pttr = split(productsList->cont, ',');
+                
+                
                 if (!pttr) break;
                 sP = searchProductByCode(sB->products, pttr->cont);
+                
                 if (!sP) break;
+
+                
                 addDeatail(&newDt, sP, stoi(pttr->prox->cont));
 
                 productsList = next(&productsList);
                 destroy(&pttr);
             }
-            if (!newDt) continue;
+            if (!newDt) break;
+            
             newB->total = totalPrice(newDt);
             addBill(&(sB)->bills, newB, newDt);
 
