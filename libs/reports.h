@@ -461,7 +461,6 @@ void statsMarketingByBranch(branch *branchs, string month) {
     resumeByBranch(resume, month);
 }
 
-<<<<<<< HEAD
 //MERCADEO 3.3
 /*
     Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
@@ -503,8 +502,6 @@ void statsMarketingByClientBill(branch *selected) {
         ax = ax->next;
     }
 }*/
-=======
->>>>>>> parent of 27ff6d9 (Revert "Merge branch 'main' of https://github.com/carlosega19/Final-Project-Data-Structures")
 
 
 #endif //REPORTS_H
