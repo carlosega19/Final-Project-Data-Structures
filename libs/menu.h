@@ -1465,7 +1465,7 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
             // total ventas ordenado por codigo de tienda
             break;
         case 3:
-            statsMarketingByClientBill((*ct->branches));
+            //statsMarketingByClientBill((*ct->branches));
             system("pause");
             // total ventas ordenado por codigo de tienda
             break;
