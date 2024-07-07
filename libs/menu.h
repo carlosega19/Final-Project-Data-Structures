@@ -1465,13 +1465,13 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
             // total ventas ordenado por codigo de tienda
             break;
         case 3:
-            //statsMarketingByClientBill((*ct->branches));
+            obtenerEntrada2("Escribe el MES deseado: ", &input);
+            statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
             // total ventas ordenado por codigo de tienda
             break;
-    
-    default:
-        break;
+        default:
+            break;
     }
 }
 

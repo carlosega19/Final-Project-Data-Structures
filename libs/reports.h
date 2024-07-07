@@ -34,14 +34,9 @@ struct ABBgen {
     ABBgen *left;
     ABBgen *right;
 };
-/*
-struct arr
-{
 
 
-};*/
-
-
+//  ABB BRANCH
 ABBgen *NG(branch *b) {
     ABBgen *r = new ABBgen;
     r->data = b;
@@ -52,6 +47,7 @@ ABBgen *NG(branch *b) {
     return r;
 }
 
+// ABB BILL
 ABBgen *NG(bill *b, string ax = "") {
     ABBgen *r = new ABBgen;
     r->data = b;
@@ -63,19 +59,21 @@ ABBgen *NG(bill *b, string ax = "") {
     return r;
 }
 
+//  ABB CLIENT
 ABBgen *NG(people *b, int am, int pr) {
     ABBgen *r = new ABBgen;
     r->data = b;
     r->axAm = am;
     r->axPr = pr;
 
-    r->T = T_BILL;
+    r->T = T_CLIENT;
     r->left = NULL;
     r->right = NULL;
 
     return r;
 }
 
+// ABB DETAIL
 ABBgen *NG(detail *b, int pr, int am) {
     ABBgen *r = new ABBgen;
     r->data = b;
@@ -87,6 +85,7 @@ ABBgen *NG(detail *b, int pr, int am) {
     return r;
 }
 
+// ABB PRODUCT
 ABBgen *NG(product *b) {
     ABBgen *r = new ABBgen;
     r->data = b;
@@ -100,9 +99,60 @@ ABBgen *NG(product *b) {
 
 
 
+// MERCADEO 3.3
+/*
+    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
+    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
+    a menor). Al final el total de producto comprados en todas las tiendas.
+
+    multilista
+    abb y volver a insertar en abb;
+*/
 
 
+struct clientContainer {
+    string branchName;
+    people *clients;
+    int totalQty;
+    int totalPrice; 
+    clientContainer *next;
+};
 
+struct branchContainer {
+    branch *selBranch;
+    clientContainer *cont;
+    branchContainer *next;
+};
+
+
+void insert(branchContainer *b, branchContainer *h) {
+    if (h) {
+        h->next = b;
+        b = h;
+    }
+
+}
+
+void insert(clientContainer *b, clientContainer *h) {
+    if (h) {
+        h->next = b;
+        b = h;
+    }
+}
+
+
+/*
+RESUMEN DE CAFE:
+
+---------------------------------------
+FARMA:
+    30906652 Carlos      20       5042
+------------------------------------
+.
+.
+.
+
+*/
 
 
 
@@ -148,6 +198,12 @@ void tableData(ABBgen *t) {
                 printFmt(to_string(t->axAm), 15);
                 printFmt(to_string(t->axPr), 15);
                 break;
+            case T_CLIENT:
+                printFmt(((people*) t->data)->ID, 15);
+                printFmt(((people*) t->data)->name, 25);
+                printFmt(to_string(t->axAm), 15);
+                printFmt(to_string(t->axPr), 15);
+                break;
             default:
                 cout << "<Undefined type object>";
                 break;
@@ -184,7 +240,7 @@ void insertABBgen(ABBgen**N, detail *data) {
     } else *N = NG(data, data->price, data->amount);
 }
 
-// PRODUCTS ABB
+// INSERT ABB PRODUCTS 
 void insertABBgen(ABBgen**N, product *data) {
     if (*N) {
         if (((product*)(*N)->data)->amount > data->amount) {
@@ -197,7 +253,7 @@ void insertABBgen(ABBgen**N, product *data) {
     } else *N = NG(data);
 }
 
-// BRANCHS ABB
+// INSERT ABB BRANCHS
 void insertABBgen(ABBgen**N, branch *data) {
     if (*N) {
         if (compare(((branch*)(*N)->data)->code, data->code)) {
@@ -210,15 +266,29 @@ void insertABBgen(ABBgen**N, branch *data) {
     } else *N = NG(data);
 }
 
+// INSERT ABB CLIENTS
+void insertABBgen(ABBgen**N, people *data, int am, int pr) {
+    if (*N) {
+        if ( compare( ((people*)(*N)->data)->ID, data->ID ) ) {
+            insertABBgen(&(*N)->left, data, am, pr);
+        }
+        else if ( compare(data->ID, ((people*)(*N)->data)->ID) ) {
+            insertABBgen(&(*N)->left, data, am, pr);
+        } else {
+            (*N)->axAm += am;
+            (*N)->axPr += pr;
+        }
+    }else *N = NG(data, am, pr);
+}
+
+
 void inorderGen(ABBgen**N) {
     if (*N)
     {
         inorderGen(&(*N)->left);
         if ((*N)->data) {
             tableData(*N);
-            cout << "\n";
-            //printFmt(reprData((*N)), 100);
-            //cout << "\t\n"; 
+            cout << "\n"; 
         }
         inorderGen(&(*N)->right);
         
@@ -227,6 +297,52 @@ void inorderGen(ABBgen**N) {
         delete t;
     }
 }
+
+void showArr(ABBgen*arr, int len) {
+    for (int i = 0; i < len; i++) {
+        tableData(arr);
+        cout << "\n";
+    }
+}
+
+int lenAbb(ABBgen*N) {
+    if (N) {
+        return lenAbb(N->left) + lenAbb(N->right) + 1;
+    }
+    return 0;
+}
+
+void abbToARrr(ABBgen *N, ABBgen *arr, int *i) {
+    if (N) {
+        abbToARrr(N->left, arr, i);
+        arr[*i] = N;
+        (*i)++;
+        abbToARrr(N->right, arr, i);
+    }
+}
+
+ABBgen *convertToArr(ABBgen*N, int *size) {
+    *size = lenAbb(N);
+    ABBgen *arr = (ABBgen*)calloc(size, sizeof(ABBgen*));
+    int pos = 0;
+    abbToARrr(N, arr, &pos);
+    return arr;
+}
+
+void sortAnddShow(ABBgen*N) {
+    int size = 0;
+    ABBgen *arr= convertToArr(N, size);
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
 
 void billsClientResume(branch *branches, people *client) {
     bill *ax = NULL;
@@ -287,25 +403,12 @@ void productClientResume(branch *branches, people *client) {
 }
 
 void branchUnitsResume(branch *selected) {
-    /*Mostrar el 
-        total de unidades vendidas de cada producto, x
-        el ingreso total en cada uno y x
-        el inventario en existencia.  x
-        
-        Los totales de unidades vendidas, x
-        su cantidad y el promedio total al final del
-        listado. 
-
-        Ordenado por descripción de producto.*/
-    
     ABBgen *resume = NULL;
     bill *ax = selected->bills->first;
     int totalSelled = 0;
     float cost = 0;
     float totalBills = 0; 
     float i = 0;
-    // Imprimir encabezado
-    //cout << selected->name  << "resumen"
     while (ax) {
         detail *bx = ax->detailBill;
         cost = 0;
@@ -364,7 +467,7 @@ void branchMonthlyResume(branch *selected, string month) {
     ABBgen *resume = NULL;
 
     bill *ax = selected->bills->first;
-    detail *bx;
+    detail *bx = NULL;
     int earned = 0;
     int totalProducts = 0;
     while (ax) {
@@ -461,47 +564,49 @@ void statsMarketingByBranch(branch *branchs, string month) {
     resumeByBranch(resume, month);
 }
 
-//MERCADEO 3.3
-/*
-    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
-    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
-    a menor). Al final el total de producto comprados en todas las tiendas.
-*/
-/*
-void statsMarketingByClientBill(branch *selected) {
-    selected = searchBranchByCode(selected, "101");
-    bill *ax = selected->bills->first;
-    detail *bx;
+
+
+
+// MERCADEO 3.4
+void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,string month) {
+    bill *ax = NULL;
+    detail *bx = NULL;
+    people *cl = clients;
     ABBgen *resume = NULL;
     
-    //ABBgen **ar;
-
-    int pos = 0;
     
-    while (ax) {
-        bx = ax->detailBill;
-        while (bx) {
-            pos++;
-            insertABBgen(&resume, bx);
-            bx = bx->next;
-        }
-        ax = ax->next;
-    }
-    /*
-    while (ax) {
-        if (ax->clientId != client->ID) {
-            bx = ax->detailBill;
-
-            while (bx) {
-                if (bx->code == prod) {
-                    insertABBgen(&resume, bx);
+    while (branchs) {
+        ax = branchs->bills->first;
+        while (ax) {
+            if (getMonth(ax->date) == month) {
+                bx = ax->detailBill;
+                cl = searchPeopleByID(cl, ax->clientId);
+                if (cl) {
+                    while (bx) {
+                        if (bx->code == prod->code) insertABBgen(&resume, cl, bx->amount, bx->price);
+                        bx = bx->next;
+                    }
                 }
-                bx = bx->next;
             }
+            ax = ax->next;
         }
-        ax = ax->next;
+        branchs = branchs->next;
     }
-}*/
+    if (resume) {
+        cout << "\n\tRESUMEN VENTAS DE [ " << prod->name << " ] por cliente";
+        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN\n----------------------------------------------------------------------------\n";
+        printFmt("C.I. ", 15);
+        printFmt("NOMBRE ", 25);
+        printFmt("COMPRADOS ", 15);
+        printFmt("GANANCIA ", 15);
+        cout << "\n----------------------------------------------------------------------------\n";
+        inorderGen(&resume);
+        cout << "\n----------------------------------------------------------------------------\n";
+        //cout << "\tTotal ingresado: " << earned;
+        //cout << "\n\tProductos vendidos: " << totalProducts;
+        //cout << "\n----------------------------------------------------------------------------\n\n\n";
+    }
+}
 
 
 #endif //REPORTS_H
