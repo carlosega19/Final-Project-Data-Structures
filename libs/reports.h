@@ -110,39 +110,40 @@ ABBgen *NG(product *b) {
 */
 
 
-struct clientContainer {
-    string branchName;
-    people *clients;
-    int totalQty;
-    int totalPrice; 
-    clientContainer *next;
-};
 
 struct branchContainer {
     branch *selBranch;
-    clientContainer *cont;
+    int totalSelled;
+    int earned;
+    
+    /*POINTERS*/
     branchContainer *next;
-
     ABBgen *clients;
 };
 
+branchContainer *constructor(branch *b, branchContainer *bc, ABBgen *c, int t, int e) {
+    branchContainer *result = new branchContainer;
+    result->selBranch = b;
+    result->totalSelled = t;
+    result->earned = e;
 
-void insert(branchContainer *b, branchContainer *h) {
-    if (h) {
-        h->next = b;
-        b = h;
-    }
-
+    result->next = bc;
+    result->clients = c;
+    
+    return result;
 }
 
-void insert(clientContainer *b, clientContainer *h) {
-    if (h) {
-        h->next = b;
-        b = h;
-    }
+// insertar por cabeza
+void insertContainer(branchContainer **b, branchContainer *h) {
+    h->next = *b;
+    *b = h;
 }
 
 
+
+
+
+//ordenar por cantidad comprada
 /*
 RESUMEN DE CAFE:
 
@@ -300,18 +301,46 @@ void inorderGen(ABBgen**N) {
     }
 }
 
-void showArr(ABBgen*arr, int len) {
+// log(n)
+// MAX                                   V
+// [ 4 ] [ 2 ] [ 1 ] [ 8 ] [ 5 ] [ 3 ] [ 7 ]  lon(7)
+
+void sortByAm(ABBgen **arr, int size) {
+    int end = size-1;
+    int l = 0;
+    int r = 0;
+
+    for (int i = 0; i < size; i++) {
+
+        for (int j = (end/2); j > -1; j--) {
+            l = (2*j)+1;
+            r = (2*j)+2;
+
+            if ( l <= end && arr[j] < arr[l]) {
+                swap(arr[j], arr[l]);
+            }
+            if ( r <= end && arr[j] < arr[r]) {
+                swap(arr[j], arr[r]);
+            }
+        }
+        swap(arr[0], arr[end]);
+        end--;
+    }
+}
+
+void showArr(ABBgen**arr, int len) {
     for (int i = 0; i < len; i++) {
-        tableData(arr);
+        tableData(arr[i]);
         cout << "\n";
     }
 }
+
 
 int lenAbb(ABBgen*N) {
     if (N) {
         return lenAbb(N->left) + lenAbb(N->right) + 1;
     }
-    return 0;
+    else return 0;
 }
 
 void abbToARrr(ABBgen *N, ABBgen **arr, int *i) {
@@ -323,24 +352,66 @@ void abbToARrr(ABBgen *N, ABBgen **arr, int *i) {
     }
 }
 
-ABBgen *convertToArr(ABBgen*N, int *size) {
+ABBgen **convertToArr(ABBgen*N, int *size) {
     *size = lenAbb(N);
-    ABBgen *arr = (ABBgen*)calloc(*size, sizeof(ABBgen*));
+
+    ABBgen **arr = (ABBgen**)calloc(*size, sizeof(ABBgen*));
     int pos = 0;
-    abbToARrr(N, &arr, &pos);
+    abbToARrr(N, arr, &pos);
     return arr;
 }
 
-void sortAnddShow(ABBgen*N) {
+void sortAnddShow(ABBgen*N, product*prod) {
     int size = 0;
-    ABBgen *arr = convertToArr(N, &size);
-    showArr(arr, size);
+    ABBgen **arr = convertToArr(N, &size);
     
-    system("pause");
-    delete arr;
+    sortByAm(arr, size);
+    
+    cout << "\tRESUMEN VENTAS DE [ " << prod->name << " ] por cliente";
+    cout << "\n----------------------------------------------------------------------------\n";
+    printFmt("C.I. ", 15);
+    printFmt("NOMBRE ", 25);
+    printFmt("COMPRADOS ", 15);
+    printFmt("GANANCIA ", 15);
+    cout << "\n----------------------------------------------------------------------------\n";
+    showArr(arr, size);
+    cout << "\n----------------------------------------------------------------------------\n";
+    
+    delete[] arr;
 }
 
+// MERCADEO 3.3
+/*
+    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
+    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
+    a menor). Al final el total de producto comprados en todas las tiendas.
 
+    multilista
+    abb y volver a insertar en abb;
+*/
+
+void showContainers(branchContainer **b, product *prod) {
+    branchContainer *t;
+    while (*b) {
+        t = *b;
+        cout << "\n----------------------------------------------------------------------------\n";
+
+
+        printFmt("SUCURSAL", 15);
+        printFmt("TOTAL VENDIDO", 15);
+        printFmt("TOTAL INGRESOS", 15);
+        cout << "\n----------------------------------------------------------------------------\n";
+        printFmt((*b)->selBranch->name, 15);
+        printFmt((*b)->totalSelled, 15);
+        printFmt((*b)->earned, 15);
+        
+        cout << "\n----------------------------------------------------------------------------\n";
+        sortAnddShow((*b)->clients, prod);
+        cout << "\n\n";
+        *b = (*b)->next;
+        delete t;
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -422,7 +493,6 @@ void branchUnitsResume(branch *selected) {
             insertABBgen(&resume, bx);
             totalSelled += bx->amount;
             cost += bx->price;
-            cout << cost << "," << bx->amount << "," << bx->price << endl; 
             bx = bx->next;
         }
         i++;
@@ -571,25 +641,123 @@ void statsMarketingByBranch(branch *branchs, string month) {
 }
 
 
+/*
 
+struct branchContainer {
+    branch *selBranch;
+    int totalSelled;
+    int earned;
+    
+    branchContainer *next;
+    ABBgen *clients;
 
-// MERCADEO 3.4
-void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,string month) {
+    /*
+    branchContainer temp = *a;
+    a->selBranch = b->selBranch;
+    a->totalSelled = b->totalSelled;
+    a->earned = b->earned;
+    a->clients = b->clients;
+    *b = temp;
+};*/
+
+void softSwap(branchContainer *a, branchContainer *b) {
+    swap(a->selBranch, b->selBranch);
+    swap(a->totalSelled, b->totalSelled);
+    swap(a->earned, b->earned);
+    swap(a->clients, b->clients);
+}
+
+// mayor a menor
+void sortContainer(branchContainer **bc) {
+    bool sorted = false;
+    branchContainer *ax = *bc, *last = NULL;
+    
+    while (ax && sorted == false) {
+        sorted = true;
+
+        while (ax && ax->next != last) {
+            if (ax->totalSelled < ax->next->totalSelled) {
+                softSwap(ax, ax->next);
+                sorted = false;
+                
+            }
+            ax = ax->next;
+        }
+        last = ax;
+        ax = *bc;
+    }
+}
+//        V                  V
+// A2 -> C5 -> B1 -> D7 -> NULL
+
+void statsMarketingByQty(branch *branchs, people *clients, product *prod, string month) {
     bill *ax = NULL;
     detail *bx = NULL;
-    people *cl = clients;
+    people *cl = NULL;
     ABBgen *resume = NULL;
+    branchContainer *container = NULL;
     
+    int totalPerBranch = 0; // total de ventas por branch
+    int totalEarned = 0;
+
+    while (branchs) {
+        ax = branchs->bills->first;
+        while (ax) {
+            if (getMonth(ax->date) == month) {
+                bx = ax->detailBill;
+                cl = searchPeopleByID(clients, ax->clientId);
+                if (cl) {
+                    while (bx) {
+                        if (bx->code == prod->code) {
+                            insertABBgen(&resume, cl, bx->amount, bx->price);
+                            totalPerBranch += bx->amount;
+                            totalEarned += bx->price;
+                        }
+                        bx = bx->next;
+                    }
+                }
+            }
+            ax = ax->next;
+        }
+        
+        if (resume) {
+            insertContainer(&container, constructor(branchs, NULL, resume, totalPerBranch, totalEarned));
+        }
+        resume = NULL;
+        totalPerBranch = 0;
+        totalEarned = 0;
+
+        branchs = branchs->next;
+    }
+
+    
+    sortContainer(&container);
+    showContainers(&container, prod);
+
+}
+// B-> ARBOL
+// MERCADEO 3.4
+void statsMarketingByClientBill(branch *branchs, people *clients, product *prod, string month) {
+    bill *ax = NULL;
+    detail *bx = NULL;
+    people *cl = NULL;
+    ABBgen *resume = NULL;
+    int earned = 0;
+    int totalProducts = 0;
     
     while (branchs) {
         ax = branchs->bills->first;
         while (ax) {
             if (getMonth(ax->date) == month) {
                 bx = ax->detailBill;
-                cl = searchPeopleByID(cl, ax->clientId);
+                cl = searchPeopleByID(clients, ax->clientId);
                 if (cl) {
                     while (bx) {
-                        if (bx->code == prod->code) insertABBgen(&resume, cl, bx->amount, bx->price);
+                        if (bx->code == prod->code) {
+                            insertABBgen(&resume, cl, bx->amount, bx->price);
+                            earned += bx->price;
+                            totalProducts += bx->amount;
+                        }
                         bx = bx->next;
                     }
                 }
@@ -598,22 +766,13 @@ void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,
         }
         branchs = branchs->next;
     }
-    sortAnddShow(resume);
-    /*
+    
     if (resume) {
-        cout << "\n\tRESUMEN VENTAS DE [ " << prod->name << " ] por cliente";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN\n----------------------------------------------------------------------------\n";
-        printFmt("C.I. ", 15);
-        printFmt("NOMBRE ", 25);
-        printFmt("COMPRADOS ", 15);
-        printFmt("GANANCIA ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
-        inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n";
-        //cout << "\tTotal ingresado: " << earned;
-        //cout << "\n\tProductos vendidos: " << totalProducts;
-        //cout << "\n----------------------------------------------------------------------------\n\n\n";
-    }*/
+        sortAnddShow(resume, prod);
+        cout << "\tTotal ingresado: " << earned;
+        cout << "\n\tProductos vendidos: " << totalProducts;
+        cout << "\n----------------------------------------------------------------------------\n\n\n";
+    }
 }
 
 

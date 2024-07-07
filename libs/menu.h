@@ -1466,6 +1466,12 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
             break;
         case 3:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
+            statsMarketingByQty((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
+            system("pause");
+            // 
+            break;
+        case 4:
+            obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
             // total ventas ordenado por codigo de tienda
@@ -1600,7 +1606,7 @@ menuItem *menuReports(menuItem *parent) {
 
 menuItem *helperMarketing(menuItem *parent) {
     menuItem *m =  new menuItem;
-    m->encabezado = line + "\nREPORTES\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t0. VOLVER AL MENU\n" + line;
+    m->encabezado = line + "\nREPORTES\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t3. VER ESTADISTICAS DE PRODUCTO POR SUCURSAL\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerHelperMarketing;
     return m;
