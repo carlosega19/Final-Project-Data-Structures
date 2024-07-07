@@ -122,6 +122,8 @@ struct branchContainer {
     branch *selBranch;
     clientContainer *cont;
     branchContainer *next;
+
+    ABBgen *clients;
 };
 
 
@@ -312,7 +314,7 @@ int lenAbb(ABBgen*N) {
     return 0;
 }
 
-void abbToARrr(ABBgen *N, ABBgen *arr, int *i) {
+void abbToARrr(ABBgen *N, ABBgen **arr, int *i) {
     if (N) {
         abbToARrr(N->left, arr, i);
         arr[*i] = N;
@@ -323,15 +325,19 @@ void abbToARrr(ABBgen *N, ABBgen *arr, int *i) {
 
 ABBgen *convertToArr(ABBgen*N, int *size) {
     *size = lenAbb(N);
-    ABBgen *arr = (ABBgen*)calloc(size, sizeof(ABBgen*));
+    ABBgen *arr = (ABBgen*)calloc(*size, sizeof(ABBgen*));
     int pos = 0;
-    abbToARrr(N, arr, &pos);
+    abbToARrr(N, &arr, &pos);
     return arr;
 }
 
 void sortAnddShow(ABBgen*N) {
     int size = 0;
-    ABBgen *arr= convertToArr(N, size);
+    ABBgen *arr = convertToArr(N, &size);
+    showArr(arr, size);
+    
+    system("pause");
+    delete arr;
 }
 
 
@@ -592,6 +598,8 @@ void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,
         }
         branchs = branchs->next;
     }
+    sortAnddShow(resume);
+    /*
     if (resume) {
         cout << "\n\tRESUMEN VENTAS DE [ " << prod->name << " ] por cliente";
         cout << "\n----------------------------------------------------------------------------\n\tRESUMEN\n----------------------------------------------------------------------------\n";
@@ -605,7 +613,7 @@ void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,
         //cout << "\tTotal ingresado: " << earned;
         //cout << "\n\tProductos vendidos: " << totalProducts;
         //cout << "\n----------------------------------------------------------------------------\n\n\n";
-    }
+    }*/
 }
 
 
