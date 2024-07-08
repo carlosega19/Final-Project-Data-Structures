@@ -28,8 +28,8 @@ void clScr() {
 }
 
 void printFmt(string h, int size) {
-        int length = h.length();
-        string result = "";
+    int length = h.length();
+    string result = "";
 	
 	if (size > length) {
         result = h;
@@ -46,9 +46,9 @@ void printFmt(string h, int size) {
 }
 
 void printFmt(int p, int size) {
-        string h = to_string(p);
-        int length = h.length();
-        string result = "";
+    string h = to_string(p);
+    int length = h.length();
+    string result = "";
 	
 	if (size > length) {
         result = h;
@@ -84,13 +84,6 @@ void invertir(slista **s) {
     }
     *s = prev;
 
-}
-
-void mostrar(slista *s) {
-    while (s) {
-        cout << s->cont <<" --> "; //endl << "----------------" << endl;
-        s = s->prox;
-    }
 }
 
 
@@ -340,8 +333,8 @@ void destroy(slista **n) {
     slista *temp = NULL;
     while (*n) {
         temp = *n;
-        delete temp;
         *n = (*n)->prox;
+        delete temp;
     }
 }
 
@@ -363,7 +356,6 @@ struct date {
     unsigned int day;
     unsigned int month;
     unsigned int year;
-
 };
 
 date newDate(unsigned int day, unsigned int month, unsigned int year) {
@@ -401,12 +393,10 @@ int laterThan(date fst, date scnd) {
 
     if (fst.day > scnd.day) return 1;
     return 0;
-
 }
 
 string repr(date d) {
     return to_string(d.day) + "/" + to_string(d.month) + "/" + to_string(d.year);
-
 }
 
 void stringToProduct(char* s , product **P) {
@@ -669,13 +659,11 @@ void saveBills(branch*B) {
 string formatNULL(branch *b) {
     if (!b) return " ";
     else return b->name;
-
 }
 
 string formatNULL(people *b) {
     if (!b) return " ";
     else return "C.I." + b->ID + " " + b->name;
-
 }
 
 

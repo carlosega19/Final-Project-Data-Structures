@@ -380,16 +380,6 @@ void sortAnddShow(ABBgen*N, product*prod) {
     delete[] arr;
 }
 
-// MERCADEO 3.3
-/*
-    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
-    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
-    a menor). Al final el total de producto comprados en todas las tiendas.
-
-    multilista
-    abb y volver a insertar en abb;
-*/
-
 void showContainers(branchContainer **b, product *prod) {
     branchContainer *t;
     while (*b) {
@@ -467,7 +457,7 @@ void productClientResume(branch *branches, people *client) {
     }
     if (resume) {
         
-        cout << "\n\t3.1 Resumen de facturas\n\n\tCliente: [ "<<client->name<<"]\n";
+        cout << "\n\t3.2 Resumen de productos adquiridos\n\n\tCliente: [ "<<client->name<<"]\n";
         cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
         printFmt("CODIGO ", 15);
         printFmt("DESCRIPCION ", 25);

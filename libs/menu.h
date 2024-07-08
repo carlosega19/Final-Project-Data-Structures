@@ -1,4 +1,3 @@
-
 /*
     In this file are all the functions to interact with the user.
 */
@@ -34,11 +33,7 @@ mensajeInformativo *MI() {
     return m;
 }
 
-
 static mensajeInformativo *Mensajero = MI();
-/*const string NUM_VALIDO = "1234567890";
-const int NS = 10; ver si los string son terminados en NULL para eliminar este campo */
-
 
 void actualizarMensaje(string m) {
     Mensajero->data = m;
@@ -71,7 +66,7 @@ void createProduct(product**P){
         else cout << "\n\nLOS DATOS SON INVALIDOS\n";
     } 
 }
-/*  Functions to see products*/
+
 void printProducts(product*P) {
     if (!P) return;
     cout << "\n\t - " << P->name << " [" << P->code << "]";
@@ -801,17 +796,17 @@ struct context {
     people **clients;
     dipolo **bills;
 
-    branch **selectedBranch;
-    people **selectedClient;
+    branch *selectedBranch;
+    people *selectedClient;
 };
 
-context *newContext(product **p, branch **b, people **c, branch *sb, people *sc) {
+context *newContext(product **p, branch **b, people **c) {
     context *result = new context;
     result->products = p;
     result->branches = b;
     result->clients = c;
-    result->selectedBranch = &sb;
-    result->selectedClient = &sc;
+    result->selectedBranch = NULL;
+    result->selectedClient = NULL;
     return result;
 }
 
@@ -899,32 +894,34 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
                 return 1;
             }
         case 1:
-            *ct->selectedBranch = selectBranchByCode(*ct->branches);
-            actualizarMensaje("Tienda[ " + formatNULL(*ct->selectedBranch) + " ]\tCliente[ " + formatNULL(*ct->selectedClient) + " ]");
+            ct->selectedBranch = selectBranchByCode(*ct->branches);
+            actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
+            system("pause");
             return 1;
         case 2:
-            *ct->selectedClient = selectPersonById(*ct->clients);
-            actualizarMensaje("Tienda[ " + formatNULL(*ct->selectedBranch) + " ]\tCliente[ " + formatNULL(*ct->selectedClient) + " ]");
+            ct->selectedClient = selectPersonById(*ct->clients);
+            actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
+            system("pause");
             return 1;
         case 3:
-            if (*ct->selectedBranch && *ct->selectedClient) createBill(*ct->selectedBranch, *ct->selectedClient);
+            if (ct->selectedBranch && ct->selectedClient) createBill(ct->selectedBranch, ct->selectedClient);
+            system("pause");
             return 1;
         case 4:
-            printBill(selectBillByCode(*ct->selectedBranch, *ct->selectedClient));
-            cout << "\n\t\t<ENTER>\n";
-            getchar();
+            printBill(selectBillByCode(ct->selectedBranch, ct->selectedClient));
+            system("pause");
             return 1;
         case 5:
-            menuDeleteBill(*ct->selectedBranch, *ct->selectedClient);
+            menuDeleteBill(ct->selectedBranch, ct->selectedClient);
+            system("pause");
             return 1;
         case 6:
-            showAllBills((*ct->selectedBranch)->bills->first, (*ct->selectedClient));
-            cout << "\n\t\t<ENTER>\n";
-            getchar();
+            showAllBills((ct->selectedBranch)->bills->first, (ct->selectedClient));
+            system("pause");
             return 1;
         default:
             return 1;
-    }
+    } 
 }
 
 
@@ -1022,7 +1019,7 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
     string id = "";
 
     if (cliente == NULL) {
-        cliente = *(ct->selectedClient);
+        cliente = (ct->selectedClient);
     }
 
     cout << "\n\t- Informacion actual del cliente:\n" << endl;
@@ -1136,7 +1133,7 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             obtenerEntrada2("\n\t - Ingrese la cedula del cliente a modificar: ", &id);
             client = searchPeopleByID(*(ct->clients), id); // Declarar y asignar client
             if (client) {
-                ct->selectedClient = &client; // Save the client to the context for modification
+                ct->selectedClient = client; // Save the client to the context for modification
                 clScr();
                 cout << "\n\t- Informacion actual del cliente:\n" << endl;
                 cout << "Cedula: " << client->ID << ", Nombre y Apellido: " << client->name << endl;
@@ -1210,12 +1207,9 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
     if (*activo) {
         switch (selec) {
             case 0:
-                //cache = *ct->branches;
                 if (!(*activo)->parent) {
-                    //guardarLocal(cache, "Data.txt");
-                    //cache = NULL;
                     return 0;
-                } // refactorizar antes de merge
+                }
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
@@ -1234,7 +1228,6 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
         }
     } return 0;
 }
-// 1 productos 2 sucursales 3 personas  0 regresar
 
 int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
     menuItem *temp = NULL;
@@ -1278,45 +1271,38 @@ int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
             if (*activo) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
-                // guardarLocal(*principal, "Data.txt");
                 return 1;
             }
             break;
         case 1:
             actualizarMensaje("");
             createProduct(ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 2: // modificar
             actualizarMensaje("");
             menuModProduct(*ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 3: // eliminar
             actualizarMensaje("");
             menuDelProduct(ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 4: // consultar por codigo
             actualizarMensaje("");
             menuConsultProductByCode(*ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 5:
             actualizarMensaje("");
             menuConsultProductByDesc(*ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 6:
             actualizarMensaje("");
             tableProducts(*ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         default:
             actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
@@ -1342,47 +1328,39 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
         case 1: // agregar
             actualizarMensaje("");
             createBranch(ct->branches);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 2: // modificar
             actualizarMensaje("");
             *activo = menuModBranchs(*activo);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 3: // eliminar
             actualizarMensaje("");
             obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
             menuDeleBranch(ct->branches);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 4: // consultar por codigo
             actualizarMensaje("");
             obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
             menuConsultBranchByCode(*ct->branches);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 5: // Consult by description
             actualizarMensaje("");
-            //menuConsultBranchByDesc(*ct->branches);
             *activo = menuConsultBranchByDesc(*activo); // listo
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 6:
             actualizarMensaje("");
             tableBranchs(*ct->branches);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         case 7:
             actualizarMensaje("");
             menuInventory(*ct->branches , *ct->products);
-            print("Presione ENTER para continuar.");
-            getchar(); // espera nuevo \n para tomar;
+            system("pause"); 
             break;
         default:
             actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
@@ -1394,42 +1372,46 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
 
 
 void helperClientInfo(context *ct) {
-    /*
-    pedir ci del cliente -> buscar cliente;
-    mostrar opciones de info
-    llamar funciones 
-    */
     string info = "";
     people *client = NULL;
     int selec = 0;
-    obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
-    client = searchPeopleByID(*(ct->clients), info);
-
-    if (client) {
-        do {
-            obtenerEntrada2(line + "\nOPCIONES DISPONIBLES PARA OPERAR\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
-            selec = entradaValidar(info);
-            switch (selec) {
-                case 0:
-                    return;
-                    break;
-                case 1:
-                    billsClientResume(*(ct->branches), client);
-                    system("pause");
-                    return;
-                    break;
-                case 2:
-                    productClientResume(*(ct->branches), client);
-                    system("pause");
-                    return;
-                    break;
-                default:
-                    cout << "La Opcion es invalida.\n";
+    
+    do {
+        clScr();
+        obtenerEntrada2(line + "\nESTADISTICAS DE CLIENTE\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
+        selec = entradaValidar(info);
+        switch (selec) {
+            case 0:
+                return;
+                break;
+            case 1:
+                obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
+                client = searchPeopleByID(*(ct->clients), info);
+                if (!client) {
+                    cout << "\n\t-- Cliente no encontrado --\n\n";
                     system("pause");
                     break;
-            }
-        } while (1);
-    } else { cout << "La C.I. proporcionada es invalida... \n"; cout << "<ENTER>\n"; system("pause"); return; }
+                }
+                billsClientResume(*(ct->branches), client);
+                system("pause");
+                break;
+            case 2:
+                obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
+                client = searchPeopleByID(*(ct->clients), info);
+                if (!client) {
+                    cout << "\n\t-- Cliente no encontrado --\n\n";
+                    system("pause");
+                    break;
+                }
+                productClientResume(*(ct->branches), client);
+                system("pause");
+                break;
+            default:
+                cout << "La Opcion es invalida.\n";
+                system("pause");
+                break;
+        }
+    } while (1);
 }
 
 /*
@@ -1454,41 +1436,57 @@ void helperBranchInfo(context *ct) {
     string info = "";
     branch *selected = NULL;
     int selec = 0;
-    obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
-    selected = searchBranchByCode(*(ct->branches), info);
+    
 
-    if (selected) {
-        do {
-            obtenerEntrada2(line + "\nOPCIONES DISPONIBLES PARA OPERAR\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
-            selec = entradaValidar(info);
-            switch (selec) {
-                case 0:
-                    return;
-                    break;
-                case 1:
-                    branchUnitsResume(selected);
-                    system("pause");
-                    return;
-                    break;
-                case 2:
-                    branchInventoryResume(selected);
-                    system("pause");
-                    return;
-                    break;
-                case 3:
-                    obtenerEntrada2("Escribe el MES deseado: ", &info);
-                    branchMonthlyResume(selected, info);
-                    system("pause");
-                    return;
-                    break;
-                default:
-                    cout << "La Opcion es invalida.\n";
-                    cout << "<ENTER>\n";
+    do {
+        clScr();
+        obtenerEntrada2(line + "\nESTADISTICAS DE SUCURSAL\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
+        selec = entradaValidar(info);
+        switch (selec) {
+            case 0:
+                return;
+                break;
+            case 1:
+                obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+                selected = searchBranchByCode(*(ct->branches), info);
+                if (!selected) {
+                    cout << "\n\t-- Sucursal no encontrada --\n\n";
                     system("pause");
                     break;
-            }
-        } while (1);
-    } else { cout << "El codigo proporcionado es invalido... \n"; cout << "<ENTER>\n"; system("pause"); return; }
+                }
+                branchUnitsResume(selected);
+                system("pause");
+                break;
+            case 2:
+                obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+                selected = searchBranchByCode(*(ct->branches), info);
+                if (!selected) {
+                    cout << "\n\t-- Sucursal no encontrada --\n\n";
+                    system("pause");
+                    break;
+                }
+                branchInventoryResume(selected);
+                system("pause");
+                break;
+            case 3:
+                obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+                selected = searchBranchByCode(*(ct->branches), info);
+                if (!selected) {
+                    cout << "\n\t-- Sucursal no encontrada --\n\n";
+                    system("pause");
+                    break;
+                }
+                obtenerEntrada2("Escribe el MES deseado: ", &info);
+                branchMonthlyResume(selected, info);
+                system("pause");
+                break;
+            default:
+                cout << "La Opcion es invalida.\n\n";
+                system("pause");
+                break;
+        }
+    } while (1);
+    
 }
 
 
@@ -1662,7 +1660,6 @@ menuItem *helperMarketing(menuItem *parent) {
     m->parent = parent;
     m->comportamiento = controllerHelperMarketing;
     return m;
-    
 }
 
 
@@ -1682,7 +1679,7 @@ void run() {
     readBills(&branches, &clients);
     
     
-    context*ct = newContext(&products , &branches, &clients, NULL, NULL);
+    context*ct = newContext(&products , &branches, &clients);
     while (activo) {
         clScr(); // Refrescar la pantalla y borrar el terminal
         print(Mensajero->data);
