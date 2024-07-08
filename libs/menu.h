@@ -992,45 +992,84 @@ int controllerConsultBranchByDesc(menuItem **activo, int selec, context*ct) {
     return 1;
 }
 
+/*Functions Menu People */
 
-int controllerMenuModifyPeople(menuItem **activo, int selec, context *ct) {
+void headerPeople() {
+    cout << "\n\t- LISTA DE PERSONAS - \n\n";
+    cout << "CEDULA    NOMBRE Y APELLIDO\n";
+    cout << line << endl;
+}
+
+void printPersonInTable(people* P) {
+    printFmt(P->ID, 10);
+    printFmt(P->name, 30);
+    cout << endl;
+}
+
+void tablePeople(people* P) {
+    headerPeople();
+    while (P) {
+        printPersonInTable(P);
+        P = P->next;
+    }
+    cout << line << "\n\n";
+}
+
+
+int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
+    static people* cliente = NULL;
     string name = "";
     string id = "";
-    people* cliente = NULL;
+
+    if (cliente == NULL) {
+        cliente = *(ct->selectedClient);
+    }
+
+    cout << "\n\t- Informacion actual del cliente:\n" << endl;
+    cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
 
     switch (selec) {
         case 0:
             cout << "Volviendo al menu anterior..." << endl;
             print("Presione ENTER para continuar.");
             getchar(); // espera nuevo \n para tomar;
-            if (*activo) {
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
-            }
-            break;
+            cliente = NULL;  // Reset cliente for the next modification
+            return 1;
         case 1:
             obtenerEntrada2("\n\t - Ingrese el nuevo Nombre y Apellido: ", &name);
             if (!validateName(name)) {
                 cout << "El nombre y el apellido no deben contener numeros." << endl;
+                cout << "\nPresione Enter para continuar...";
+                getchar();
                 break;
             }
             cliente->name = name;
             cout << "\n\t- Nombre y Apellido modificados exitosamente! -" << endl;
+            cout << "\n\t- Informacion actualizada del cliente:\n" << endl;
+            cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
+            cout << "\nPresione Enter para continuar...";
+            getchar();
             break;
         case 2:
             obtenerEntrada2("\n\t - Ingrese la nueva Cedula: ", &id);
-            
             if (!validateID(id)) {
                 cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
+                cout << "\nPresione Enter para continuar...";
+                getchar();
                 break;
             }
             if (searchPeopleByID(*(ct->clients), id) != NULL) {
                 cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
+                cout << "\nPresione Enter para continuar...";
+                getchar();
                 break;
             }
             cliente->ID = id;
             cout << "\n\t- Cedula modificada exitosamente! -" << endl;
+            cout << "\n\t- Informacion actualizada del cliente:\n" << endl;
+            cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
+            cout << "\nPresione Enter para continuar...";
+            getchar();
             break;
         
         default:
@@ -1040,9 +1079,7 @@ int controllerMenuModifyPeople(menuItem **activo, int selec, context *ct) {
             break;
     }
     return 1;
-
 }
-
 
 int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
     string id = "";
@@ -1063,17 +1100,17 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
         case 1:
             clScr();
-            cout << "\nAGREGAR CLIENTE\n";
-            obtenerEntrada2("Ingrese su cedula: ", &id);
+            cout << "\n - AGREGAR CLIENTE - \n";
+            obtenerEntrada2("\n\t - Ingrese su cedula: ", &id);
             if (!validateID(id)) {
                 cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
                 cout << "\nPresione Enter para continuar...";
                 getchar();
                 break;
             }
-            obtenerEntrada2("Ingrese su nombre y apellido: ", &name);
+            obtenerEntrada2("\n\t - Ingrese su nombre y apellido: ", &name);
             if (!validateName(name)) {
-                cout << "El nombre y el apellido no deben contener numeros." << endl;
+                cout << "\nEl nombre y el apellido no deben contener numeros." << endl;
                 cout << "\nPresione Enter para continuar...";
                 getchar();
                 break;
@@ -1094,31 +1131,45 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
         case 2:
             clScr();
-            cout << "\nMODIFICAR CLIENTE" << endl;
-            showPeople(*(ct->clients));
+            cout << "\n\t - MODIFICAR CLIENTE - \n" << endl;
+            tablePeople(*(ct->clients));
             obtenerEntrada2("\n\t - Ingrese la cedula del cliente a modificar: ", &id);
-            selectPersonById(*(ct->clients));
-            /*if (cliente) {
-                clrScr();
-                cout << "\n\tInformacion actual del cliente:\n" << endl;
-                cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
-                *activo =  menuModifyPeople(*activo);
-                
+            client = searchPeopleByID(*(ct->clients), id); // Declarar y asignar client
+            if (client) {
+                ct->selectedClient = &client; // Save the client to the context for modification
+                clScr();
+                cout << "\n\t- Informacion actual del cliente:\n" << endl;
+                cout << "Cedula: " << client->ID << ", Nombre y Apellido: " << client->name << endl;
+                int option;
+                menuItem* dummyItem = NULL; // Dummy menuItem for passing as argument
+                do {
+                    cout << "\n\t- MODIFICAR CLIENTE -\n";
+                    cout << "1. Modificar Nombre y Apellido\n";
+                    cout << "2. Modificar Cedula\n";
+                    cout << "0. Volver al Menu Anterior\n";
+                    cout << "Su opcion (0-2): ";
+                    cin >> option;
+                    cin.ignore();
+                    clScr();
+                    controllerMenuModifyPeople(&dummyItem, option, ct);
+                } while (option != 0);
             } else {
                 cout << "No se encontro el cliente con la cedula indicada." << endl;
-            }*/
-            cout << "\nPresione Enter para continuar...";
-            getchar();
+                cout << "\nPresione Enter para continuar...";
+                getchar();
+            }
             break;
+
         case 3:
             clScr();
-            cout << "\nELIMINAR CLIENTE" << endl;
+            cout << "\n - ELIMINAR CLIENTE -\n" << endl;
             showPeople(*(ct->clients));
             obtenerEntrada2("\n\t - Ingrese la cedula del cliente a eliminar: ", &id);
+
             // Verificar si el cliente existe antes de intentar eliminarlo
             client = searchPeopleByID(*(ct->clients), id);
             if (client) {
-                showPeople(client);
+                cout << "Cedula: " << client->ID << ", Nombre y Apellido: " << client->name << endl;
                 if (confirm() == 1) {
                     deletePerson(ct->clients, client->ID);
                     cout << "\n\t- Cliente eliminado exitosamente! -" << endl;
@@ -1129,14 +1180,15 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             cout << "\nPresione Enter para continuar...";
             getchar();
             break;
+
         case 4:
-            //consultCustomer(*(ct->clients));
+            clScr();
+            consultCustomer(*(ct->clients));
             break;
 
         case 5:
-            clScr();
-            cout << "\n\tLISTA DE CLIENTES" << endl;
-            showPeople(*(ct->clients));
+            clScr(); // Limpia la pantalla antes de mostrar la lista de personas
+            tablePeople(*(ct->clients));
             cout << "\nPresione Enter para continuar...";
             getchar();
             break;
@@ -1574,7 +1626,7 @@ menuItem *menuModBranchs(menuItem *parent) {
 
 menuItem *menuPeople(menuItem *parent) {
     menuItem *m =  new menuItem;
-    m->encabezado = line + "\nMANTENIMIENTO PERSONAS\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line + "\nSu opcion (0-5): ";
+    m->encabezado = line + "\nMANTENIMIENTO PERSONAS\n" + line + "\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line + "\nSu opcion (0-5): \n";
     m->parent = parent;
     m->comportamiento = controllerMenuPeople;
     return m;
@@ -1582,7 +1634,7 @@ menuItem *menuPeople(menuItem *parent) {
 
 menuItem *menuModifyPeople(menuItem *parent) {
     menuItem *m = new menuItem;
-    m->encabezado = line + "\nMODIFICAR PERSONAS\n\t1. MODIFICAR NOMBRE Y APELLIDO\n\t2. MODIFICAR CEDULA\n\t0. VOLVER AL MENU ANTERIOR\n" + line + "\nSu opcion (0-2): ";
+    m->encabezado = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\n\t\nMANTENIMIENTO PERSONAS\n\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n\n" + line + "\nSu opcion (0-5): \n" + line + "\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón\n" + line;
     m->parent = parent;
     m->comportamiento = controllerMenuModifyPeople;
     return m;

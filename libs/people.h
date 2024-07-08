@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+
 using namespace std;
 
 struct people {
@@ -24,7 +25,6 @@ people *getLast(people *p) {
     } return NULL;
 
 }
-
 
 // Función para validar que el nombre y apellido no contengan números
 bool validateName(string name) {
@@ -51,14 +51,13 @@ bool validateID(string cedula) {
 
 // Función para encontrar una persona por su cédula
 people* searchPeopleByID(people* P, string id) {
-    /*if (id == "\0");
     while (P != NULL) {
         if (P->ID == id) {
             return P;
         }
         P = P->next;
     }
-    return NULL;*/
+    return NULL;
     while (P && P->ID != id) { P = P->next; } return P;
 }
 
@@ -130,5 +129,90 @@ void deletePerson(people** P, string id) {
         }
     }
 }
+
+void consultByName(people* P, string name) {
+    bool encontrado = false;
+
+    // Convertir el nombre ingresado a minúsculas
+    string lowerName = tolow(name);
+
+    while (P != NULL) {
+        // Convertir el nombre almacenado a minúsculas para la comparación
+        string lowerNameToCompare = tolow(P->name);
+
+        // Comparar las cadenas convertidas
+        if (find(lowerNameToCompare, lowerName)) {
+            cout << "CEDULA: " << P->ID << ", Nombre / Apellido: " << P->name << endl;
+            encontrado = true;
+        }
+        P = P->next;
+    }
+
+    if (!encontrado) {
+        cout << "No se encontraron personas con el nombre indicado." << endl;
+    }
+}
+
+// Función para consultar clientes por cédula
+void consultByID(people* P, string id) {
+    people* person = searchPeopleByID(P, id);
+    if (person) {
+        cout << "Cedula: " << person->ID << ", Nombre y Apellido: " << person->name << endl;
+    } else {
+        cout << "No se encontró el cliente con la cédula '" << id << "'." << endl;
+    }
+}
+
+// Función para imprimir todas las cédulas disponibles
+void printID(people* P) {
+    while (P != NULL) {
+        cout << "Cedula: " << P->ID << endl;
+        P = P->next;
+    }
+}
+
+// Módulo para consultar clientes
+void consultCustomer(people* P) {
+    int opcion;
+    string consulta; // Para almacenar el nombre, apellido o cédula a consultar                                                
+    do {
+        cout << "\n\t - CONSULTAR CLIENTE -\n" << endl;
+        cout << "\t1. Consultar por Nombre" << endl;
+        cout << "\t2. Consultar por Cedula" << endl;
+        cout << "\t0. Volver al Menu Anterior" << endl;
+        cout << "\t - Su opcion (0-3): \n";
+        cin >> opcion;
+        cin.ignore();
+
+        switch (opcion) {
+            case 1:
+                cout << "Ingrese el nombre a buscar: ";
+                getline(cin, consulta);
+                cout << "Resultados para el nombre '" << consulta << "':\n" << endl;
+                consultByName(P, consulta);
+                break;
+            case 2:
+                cout << "Cédulas disponibles en el sistema:" << endl;
+                printID(P);
+                cout << "Ingrese la cédula a buscar: ";
+                getline(cin, consulta);
+                consultByID(P, consulta);
+                break;
+            case 0:
+                cout << "Volviendo al menú anterior..." << endl;
+                break;
+            default:
+                cout << "Opción no válida. Intente de nuevo." << endl;
+                break;
+        }
+
+        if (opcion != 0) {
+            cout << "\nPresione Enter para continuar...";
+            getchar(); // Esperar a que el usuario presione Enter
+        }
+    } while (opcion != 0);
+}
+
+
 
 #endif
