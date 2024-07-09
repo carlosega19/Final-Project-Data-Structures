@@ -1,4 +1,0 @@
-101,Montalban,Caracas,D.C,212666699,Ed. Luna. PB. Av Paez. El paraiso
-103,La Vega,Caracas,D.C,212999966,Ed. Sol. PB. La india. El paraiso
-204,Chacaito,Caracas,D.C,212555777, Plaza Brion. CC. Chacaito L200. Chacaito.
-316,La Carlota,Caracas,D.C,212235555,CC. Milenium. L502. La Carlota
