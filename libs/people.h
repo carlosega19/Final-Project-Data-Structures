@@ -164,11 +164,15 @@ void consultByID(people* P, string id) {
 }
 
 // Función para imprimir todas las cédulas disponibles
-void printID(people* P) {
-    while (P != NULL) {
-        cout << "Cedula: " << P->ID << endl;
+void printIDs(people* P) {
+    cout << "\n\t- LISTA DE CÉDULAS - \n";
+    cout << "------------------------------------------------------------------------------------------------------------------------\n";
+    while (P) {
+        cout << "         - " << P->ID << endl;
         P = P->next;
     }
+    cout << "\n\n        0. CANCELAR\n";
+    cout << "\n        Ingrese la cédula del cliente: ";
 }
 
 // Módulo para consultar clientes
@@ -192,9 +196,7 @@ void consultCustomer(people* P) {
                 consultByName(P, consulta);
                 break;
             case 2:
-                cout << "Cédulas disponibles en el sistema:" << endl;
-                printID(P);
-                cout << "Ingrese la cédula a buscar: ";
+                printIDs(P);
                 getline(cin, consulta);
                 consultByID(P, consulta);
                 break;
@@ -208,7 +210,7 @@ void consultCustomer(people* P) {
 
         if (opcion != 0) {
             cout << "\nPresione Enter para continuar...";
-            getchar(); // Esperar a que el usuario presione Enter
+             // Esperar a que el usuario presione Enter
         }
     } while (opcion != 0);
 }
