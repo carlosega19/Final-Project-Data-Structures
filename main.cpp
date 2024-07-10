@@ -919,7 +919,7 @@ void stringToPerson(char *s, people**P) {
 }
 
 void readProducts(product**P) {
-    char *i = (char* ) calloc(1024, sizeof(char));
+    char* i = (char*) calloc(1024, sizeof(char));
     FILE *file;
     file = fopen("products.txt" , "r");
     if (!file) return;
@@ -978,7 +978,7 @@ void readInventory(branch*B , product*P) {
         }
     }
     // Vaciado de memoria
-    if (i) {delete i;}
+    if (i) delete i;
     destroy(&branchCode);
     fclose(file);
 }
@@ -1318,6 +1318,8 @@ int compareGen(ABBgen *a, ABBgen *b) {
                 return (((product*) a->data)->amount > ((product*) b->data)->amount);
                 break;
             case T_UNDEFINED:
+                return 0;
+            default:
                 return 0;
                 break;
         }
@@ -1776,24 +1778,6 @@ void statsMarketingByBranch(branch *branchs, string month) {
 }
 
 
-/*
-
-struct branchContainer {
-    branch *selBranch;
-    int totalSelled;
-    int earned;
-    
-    branchContainer *next;
-    ABBgen *clients;
-
-    /*
-    branchContainer temp = *a;
-    a->selBranch = b->selBranch;
-    a->totalSelled = b->totalSelled;
-    a->earned = b->earned;
-    a->clients = b->clients;
-    *b = temp;
-};*/
 
 void softSwap(branchContainer *a, branchContainer *b) {
     swap(a->selBranch, b->selBranch);
@@ -2033,7 +2017,6 @@ void menuModProduct(product* P) {
     
     int op;
     string input = "";
-    float userPrice;
     do
     {
         optionsModProduct(selected);
@@ -2327,8 +2310,9 @@ void tablePeople(people* P) {
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*          MENU INVENTORY MANAGMENT      */
 void menuAddProductToBranch(branch*B, product*P) {
-    int am, minAm;
-    float price;
+    int am = 0;
+    int minAm = 0;
+    float price = 0;
     string entrada = "";
     clScr();
     cout << header;
@@ -2430,8 +2414,9 @@ void optionsModProductOfBranch(product*selected){
 
 // inventory
 void menuModProductOfBranch(product* P) {
-    int op , userAm;
-    float userPrice;
+    int op = 0;
+    int userAm = 0;
+    float userPrice = 0;
     string input = "";
     product* selected = selectProductByCode(P);
     do
@@ -2807,6 +2792,8 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
+            } else {
+                return 0;
             }
         case 1:
             ct->selectedBranch = selectBranchByCode(*ct->branches);
@@ -2850,6 +2837,8 @@ int controllerMenuModBranch(menuItem **activo, int selec, context *ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
+            } else {
+                return 0;
             }
         case 1:
             cout <<"Nombre anterior: "<<selected->name<<endl;
@@ -2891,6 +2880,8 @@ int controllerConsultBranchByDesc(menuItem **activo, int selec, context*ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
+            } else {
+                return 0;
             }
         case 1:
             menuConsultByState(*(ct->branches));
@@ -3095,17 +3086,16 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
 
 int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
-    menuItem *temp = NULL;
-    //branch *cache = NULL;
     if (*activo) {
         switch (selec) {
             case 0:
                 if (!(*activo)->parent) {
                     return 0;
+                } else {
+                    actualizarMensaje("");
+                    *activo = (*activo)->parent;
+                    return 1;
                 }
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
             case 1:
                 *activo = menuMantenimiento(*activo);
                 return 1;
@@ -3115,6 +3105,7 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
                 return 1;
             case 3:
                 *activo = menuReports(*activo);
+                return 1;
             default:
                 actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
                 return 1;
@@ -3123,7 +3114,6 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
 }
 
 int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
-    menuItem *temp = NULL;
     if (*activo) {
         switch (selec) {
             case 0:
@@ -3141,7 +3131,6 @@ int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
                 return 1;
             case 3:
             {
-                people *p = getLast(*(ct->clients));
                 *activo = menuPeople(*activo);
                 return 1;
             }
@@ -3157,8 +3146,6 @@ int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
 
 int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
     string entrada = "";
-    int conf;
-    product *p = NULL;
     switch (selec) {
         case 0:
             if (*activo) {
@@ -3391,36 +3378,36 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
             if (*activo) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
-                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
                 return 1;
+            } else {
+                return 0;
             }
-            break;
         case 1:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByCode((*ct->branches), input);
             system("pause");
             // total ventas ordenado por codigo de producto
-            break;
+            return 1;
         case 2:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByBranch((*ct->branches), input);
             system("pause");
             // total ventas ordenado por codigo de tienda
-            break;
+            return 1;
         case 3:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByQty((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
             // 
-            break;
+            return 1;
         case 4:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
             // total ventas ordenado por codigo de tienda
-            break;
+            return 1;
         default:
-            break;
+            return 1;
     }
 }
 
@@ -3431,23 +3418,20 @@ int controllerMenuReports(menuItem **activo, int selec, context*ct) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
+            } else {
+                return 0;
             }
-            break;
         case 1: // cliente por c.i.
             helperClientInfo(ct);
             return 1;
-            break;
         case 2:
             helperBranchInfo(ct);
             return 1;
-            break;
         case 3:
             *activo  = helperMarketing(*activo);
             return 1;
-            break;
         default:
             return 1;
-            break;
 
     }
 
