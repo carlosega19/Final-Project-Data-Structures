@@ -1894,6 +1894,40 @@ void statsMarketingByClientBill(branch *branchs, people *clients, product *prod,
     }
 }
 
+// MERCADEO 3.5
+void statsMarketingAll(branch *branchs, string month) {
+    bill *ax = NULL;
+    detail *bx = NULL;
+
+    int selled = 0;
+    int earned = 0;
+
+    // IMPRIMIR UN ENCABEZADO
+
+    while (branchs) {
+        cout << "\n----------------------------------------------------------------------------" << "\n\t\tSUCURSAL: " << branchs->name << " [ " << branchs->code << " ]\n" << "----------------------------------------------------------------------------";
+
+        selled = 0;
+        earned = 0;
+        ax = branchs->bills->first;
+        while (ax) {
+            if (getMonth(ax->date) == month) {
+                bx = ax->detailBill;
+                while (bx) {
+                    earned += bx->price;
+                    selled += bx->amount;
+                    bx = bx->next;
+                }
+            }
+            ax = ax->next;
+        }
+        cout << "\n\tProductos vendidos =>  " << selled;
+        cout << "\n\tIngresos =>  " << earned << " Bs.\n" << "----------------------------------------------------------------------------\n\n";
+        
+        branchs = branchs->next;
+    }
+}
+
 
 
 /*------ MENU MANAGMENT ------*/
