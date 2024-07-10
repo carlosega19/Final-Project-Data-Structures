@@ -366,9 +366,9 @@ void addPerson(people** P, string id, string name) {
 
 // Función para buscar un patrón en una cadena
 bool find(string main, string pat) {
-    for (int i = 0; i <= main.length() - pat.length(); i++) {
+    for (size_t i = 0; i <= main.length() - pat.length(); i++) {
         bool found = true;
-        for (int j = 0; j < pat.length(); j++) {
+        for (size_t j = 0; j < pat.length(); j++) {
             if (main[i + j] != pat[j]) {
                 found = false;
                 break;
@@ -595,7 +595,7 @@ slista *split(string input, char charray) {
     slista *temp = NULL;
     if (input.length() > 0) {
     
-        for (int i = 0; i < input.length(); i++) {
+        for (size_t i = 0; i < input.length(); i++) {
             if (input[i] != charray) {
                 result->cont += input[i];
             }
@@ -928,7 +928,7 @@ void readProducts(product**P) {
         i[strcspn(i, "\n")] = '\0';
         stringToProduct(i,P);
     }
-    if (i) delete i;
+    if (i) free(i);
     fclose(file);
 }
 
@@ -943,7 +943,7 @@ void readBranches(branch**B) {
         stringToBranch(i,B);
     }
     
-    if (i) delete i;
+    if (i) free(i);
     fclose(file);
 }
 
@@ -978,7 +978,7 @@ void readInventory(branch*B , product*P) {
         }
     }
     // Vaciado de memoria
-    if (i) delete i;
+    if (i) free(i);
     destroy(&branchCode);
     fclose(file);
 }
@@ -993,7 +993,7 @@ void readClients(people**P){
         i[strcspn(i, "\n")] = '\0';
         stringToPerson(i , P);
     }
-    if (i) delete i;
+    if (i) free(i);
     fclose(file);
 }
 
@@ -1059,7 +1059,7 @@ void readBills(branch**B, people**C) {
             billsList = next(&billsList);
         }
     }
-    if (i) delete i;
+    if (i) free(i);
     fclose(file);
 }
 
@@ -2832,32 +2832,28 @@ int controllerMenuBilling(menuItem **activo, int selec, context *ct) {
         case 1:
             ct->selectedBranch = selectBranchByCode(*ct->branches);
             actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
-            system("pause");
-            return 1;
+	    break;
         case 2:
             ct->selectedClient = selectPersonById(*ct->clients);
             actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
-            system("pause");
-            return 1;
+	    break;
         case 3:
             if (ct->selectedBranch && ct->selectedClient) createBill(ct->selectedBranch, ct->selectedClient);
-            system("pause");
-            return 1;
+	    break;
         case 4:
             printBill(selectBillByCode(ct->selectedBranch, ct->selectedClient));
-            system("pause");
-            return 1;
+	    break;
         case 5:
             menuDeleteBill(ct->selectedBranch, ct->selectedClient);
-            system("pause");
-            return 1;
+	    break;
         case 6:
             showAllBills((ct->selectedBranch)->bills->first, (ct->selectedClient));
-            system("pause");
-            return 1;
+	    break;
         default:
-            return 1;
-    } 
+	    break;
+    }
+    system("pause");
+    return 1;
 }
 
 
@@ -2924,8 +2920,7 @@ int controllerConsultBranchByDesc(menuItem **activo, int selec, context*ct) {
             menuConsultByCity(*(ct->branches));
             break;
     }
-    print("Presione ENTER para continuar.");
-    getchar(); // espera nuevo \n para tomar;
+    system("pause");
     return 1;
 }
 
@@ -2945,18 +2940,20 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
 
     switch (selec) {
         case 0:
-            cout << "Volviendo al menu anterior..." << endl;
-            cout << "Presione ENTER para continuar...";
-            system("pause"); // espera nuevo \n para tomar;
-            cliente = NULL;  // Reset cliente for the next modification
-            return 1;
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            } else {
+                return 0;
+            }
         case 1:
             obtenerEntrada2("\n\t - Ingrese el nuevo Nombre y Apellido: ", &name);
             if (!validateName(name)) {
                 cout << "El nombre y el apellido no deben contener numeros." << endl;
                 cout << "\nPresione Enter para continuar...";
                 system("pause"); 
-                break;
+		return 1;
             }
             cliente->name = name;
             cout << "\n\t- Nombre y Apellido modificados exitosamente! -" << endl;
@@ -2964,20 +2961,20 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
             cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
             cout << "\nPresione Enter para continuar...";
             system("pause"); 
-            break;
+	    return 1;
         case 2:
             obtenerEntrada2("\n\t - Ingrese la nueva Cedula: ", &id);
             if (!validateID(id)) {
                 cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
                 cout << "\nPresione Enter para continuar...";
                 system("pause"); 
-                break;
+		return 1;
             }
             if (searchPeopleByID(*(ct->clients), id) != NULL) {
                 cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
                 cout << "\nPresione Enter para continuar...";
                 system("pause"); 
-                break;
+		return 1;
             }
             cliente->ID = id;
             cout << "\n\t- Cedula modificada exitosamente! -" << endl;
@@ -2985,15 +2982,14 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
             cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
             cout << "\nPresione Enter para continuar...";
             system("pause"); 
-            break;
+	    return 1;
         
         default:
             cout << "Opcion no valida. Intente de nuevo." << endl;
             cout << "Presione ENTER para continuar...";
             system("pause");
-            break;
+	    return 1;
     }
-    return 1;
 }
 
 int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
@@ -3003,15 +2999,13 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
     switch (selec) {
         case 0:
-            cout << "Volviendo al menu anterior..." << endl;
             if (*activo) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
                 return 1;
+            } else {
+                return 0;
             }
-            cout<< "Presione ENTER para continuar...";
-            system("pause");  
-            break;
 
         case 1:
             cout << "\n - AGREGAR CLIENTE - \n";
@@ -3114,65 +3108,61 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
             system("pause");  // espera nuevo \n para tomar;
             break;
     }
-    
     return 1;
 }
 
 
 int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
-    if (*activo) {
-        switch (selec) {
-            case 0:
-                if (!(*activo)->parent) {
-                    return 0;
-                } else {
-                    actualizarMensaje("");
-                    *activo = (*activo)->parent;
-                    return 1;
-                }
-            case 1:
-                *activo = menuMantenimiento(*activo);
-                return 1;
-            case 2:
-                actualizarMensaje("Tienda[   ]\tCliente[   ]");
-                *activo = menuBilling(*activo);
-                return 1;
-            case 3:
-                *activo = menuReports(*activo);
-                return 1;
-            default:
-                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-                return 1;
-        }
-    } return 0;
+	switch (selec) {
+	    case 0:
+		if (!(*activo)->parent) {
+		    return 0;
+		} else {
+		    actualizarMensaje("");
+		    *activo = (*activo)->parent;
+		    return 1;
+		}
+	    case 1:
+		*activo = menuMantenimiento(*activo);
+		break;
+	    case 2:
+		actualizarMensaje("Tienda[   ]\tCliente[   ]");
+		*activo = menuBilling(*activo);
+		break;
+	    case 3:
+		*activo = menuReports(*activo);
+		break;
+	    default:
+		actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+		break;
+	}
+	return 1;
 }
 
 int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
-    if (*activo) {
-        switch (selec) {
-            case 0:
-                if (!(*activo)->parent) {
-                    return 0;
-                } 
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
-            case 1:
-                *activo = controlProductos(*activo);
-                return 1;
-            case 2:
-                *activo = controlSucursales(*activo);
-                return 1;
-            case 3:
-            {
-                *activo = menuPeople(*activo);
-                return 1;
-            }
-            default:
-                actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-                return 1;
-        }
-    } return 0;
+	switch (selec) {
+	    case 0:
+		if (!(*activo)->parent) {
+		    return 0;
+		} else {
+		    actualizarMensaje("");
+		    *activo = (*activo)->parent;
+		    return 1;
+		}
+	    case 1:
+		*activo = controlProductos(*activo);
+		break;
+	    case 2:
+		*activo = controlSucursales(*activo);
+		break;
+	    case 3:
+		*activo = menuPeople(*activo);
+		break;
+	    default:
+		actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
+		break;
+	}
+	return 1;
 }
 
 
@@ -3182,47 +3172,42 @@ int controladorMenuProductos(menuItem **activo, int selec ,context*ct) {
     string entrada = "";
     switch (selec) {
         case 0:
-            if (*activo) {
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                return 1;
-            }
-            break;
+	    if (*activo) {
+		actualizarMensaje("");
+		*activo = (*activo)->parent;
+		return 1;
+	    } else {
+		return 0;
+	    }
         case 1:
             actualizarMensaje("");
             createProduct(ct->products);
-            system("pause"); 
-            break;
+	    break;
         case 2: // modificar
             actualizarMensaje("");
             menuModProduct(*ct->products);
-            system("pause"); 
             break;
         case 3: // eliminar
             actualizarMensaje("");
             menuDelProduct(ct->products);
-            system("pause"); 
             break;
         case 4: // consultar por codigo
             actualizarMensaje("");
             menuConsultProductByCode(*ct->products);
-            system("pause"); 
             break;
         case 5:
             actualizarMensaje("");
             menuConsultProductByDesc(*ct->products);
-            system("pause"); 
             break;
         case 6:
             actualizarMensaje("");
             tableProducts(*ct->products);
-            system("pause"); 
             break;
         default:
             actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-            return 1;
             break;
     }
+    system("pause"); 
     return 1;
 }
 
@@ -3232,55 +3217,48 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     string entrada = "";
     switch (selec) {
         case 0:
-            if (*activo) {
-                actualizarMensaje("");
-                *activo = (*activo)->parent;
-                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
-                return 1;
-            }
-            break;
+	    if (*activo) {
+		actualizarMensaje("");
+		*activo = (*activo)->parent;
+		return 1;
+	    } else {
+		return 0;
+	    }
         case 1: // agregar
             actualizarMensaje("");
             createBranch(ct->branches);
-            system("pause"); 
             break;
         case 2: // modificar
             actualizarMensaje("");
             *activo = menuModBranchs(*activo);
-            system("pause"); 
             break;
         case 3: // eliminar
             actualizarMensaje("");
             obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
             menuDeleBranch(ct->branches);
-            system("pause"); 
-            break;
+	    break;
         case 4: // consultar por codigo
             actualizarMensaje("");
             obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
             menuConsultBranchByCode(*ct->branches);
-            system("pause"); 
             break;
         case 5: // Consult by description
             actualizarMensaje("");
             *activo = menuConsultBranchByDesc(*activo); // listo
-            system("pause"); 
             break;
         case 6:
             actualizarMensaje("");
             tableBranchs(*ct->branches);
-            system("pause"); 
             break;
         case 7:
             actualizarMensaje("");
             menuInventory(*ct->branches , *ct->products);
-            system("pause"); 
             break;
         default:
             actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
-            return 1;
             break;
     }
+    system("pause"); 
     return 1;
 }
 
@@ -3419,30 +3397,25 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
         case 1:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByCode((*ct->branches), input);
-            system("pause");
             // total ventas ordenado por codigo de producto
-            return 1;
+	    break;
         case 2:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByBranch((*ct->branches), input);
-            system("pause");
             // total ventas ordenado por codigo de tienda
-            return 1;
+	    break;
         case 3:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByQty((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
-            system("pause");
-            // 
-            return 1;
+	    break;
         case 4:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
-            system("pause");
             // total ventas ordenado por codigo de tienda
-            return 1;
-        default:
-            return 1;
+	    break;
     }
+    system("pause");
+    return 1;
 }
 
 int controllerMenuReports(menuItem **activo, int selec, context*ct) {
@@ -3457,17 +3430,15 @@ int controllerMenuReports(menuItem **activo, int selec, context*ct) {
             }
         case 1: // cliente por c.i.
             helperClientInfo(ct);
-            return 1;
+	    break;
         case 2:
             helperBranchInfo(ct);
-            return 1;
+	    break;
         case 3:
             *activo  = helperMarketing(*activo);
-            return 1;
-        default:
-            return 1;
-
+	    break;
     }
+    return 1;
 
 }
 
