@@ -1,6 +1,8 @@
+// main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include <iostream>
 #include <string.h>
+
 using namespace std;
 
 #if defined(__linux__)
@@ -25,6 +27,59 @@ struct product {
     float price;
     product* next;
 };
+
+struct detail
+{
+    string code;
+    string name;
+    int amount;
+    int price;
+    /*POINTER*/
+    detail*next;
+};
+
+struct bill
+{
+    string code;
+    string clientId;
+    string date;
+    int total;
+    detail *detailBill;
+    
+    /* POINTERS */
+    bill *next;
+    bill *prev;
+};
+
+struct dipolo
+{
+    bill*first;
+    bill*last;
+};
+
+struct people {
+    string ID;
+    string name;
+    people* next;
+};
+
+struct branch {
+    string code;
+    string name;
+    string city;
+    string state;
+    string address;
+    string tlf;
+    /*Pointers*/
+    product *products;
+    dipolo *bills;
+    branch* next;
+};
+
+//  GLOBAL 
+int lineWidth = 120;
+string line(lineWidth, '-');
+//
 
 product* searchProductByCode(product* P, string str) {
     if (!P) return NULL;
@@ -77,34 +132,6 @@ void addProduct(product** P, string codeP, string name, string description, floa
 
 // ESTRUCTURAS Y NOMBRES PROVISIONALES
 
-struct detail
-{
-    string code;
-    string name;
-    int amount;
-    int price;
-    /*POINTER*/
-    detail*next;
-};
-
-struct bill
-{
-    string code;
-    string clientId;
-    string date;
-    int total;
-    detail *detailBill;
-    
-    /* POINTERS */
-    bill *next;
-    bill *prev;
-};
-
-struct dipolo
-{
-    bill*first;
-    bill*last;
-};
 
 detail *newDetail(string code, string name, int amount) {
     detail *r = new detail;
@@ -216,21 +243,6 @@ void addDeatail(detail**D, product*P, int amount) {
     *D = newD;
 }
 
-
-
-struct branch {
-    string code;
-    string name;
-    string city;
-    string state;
-    string address;
-    string tlf;
-    /*Pointers*/
-    product *products;
-    dipolo *bills;
-    branch* next;
-};
-
 branch* searchBranchByCode(branch* B, string codeB) {
     if (!B) return NULL;
     if (tolow(B->code) == tolow(codeB)) return B;
@@ -293,11 +305,7 @@ void addProductToBranch(branch*B , product*P ,int amount , int minAmount , float
     addProduct(&B->products, P->code, P->name, P->description, price , amount , minAmount);
 }
 
-struct people {
-    string ID;
-    string name;
-    people* next;
-};
+
 
 people *getLast(people *p) {
     if (p) {
@@ -307,7 +315,6 @@ people *getLast(people *p) {
         return p;
 
     } return NULL;
-
 }
 
 // Función para validar que el nombre y apellido no contengan números
@@ -334,7 +341,7 @@ bool validateID(string cedula) {
 }
 
 // Función para encontrar una persona por su cédula
-people* searchPeopleByID(people* P, string id) {
+people *searchPeopleByID(people* P, string id) {
     while (P != NULL) {
         if (P->ID == id) {
             return P;
@@ -342,7 +349,6 @@ people* searchPeopleByID(people* P, string id) {
         P = P->next;
     }
     return NULL;
-    while (P && P->ID != id) { P = P->next; } return P;
 }
 
 // Función para agregar una nueva persona a la lista
@@ -551,13 +557,11 @@ void printFmt(int p, int size) {
     cout << result;
 }
 
-
+//  MANEJO DE STRINGS
 struct slista {
     string cont;
     slista *prox;
 };
-
-
 
 void invertir(slista **s) {
     slista *actual = *s;
@@ -570,25 +574,19 @@ void invertir(slista **s) {
         actual = prox;
     }
     *s = prev;
-
 }
-
-
 slista *SL(string val, slista *p) {
     slista *r = new slista;
     r->cont = val;
     r->prox = p;
     return r;
 }
-
 void agregar(slista **s, string cont) {
     if (*s) {
         slista *r = SL(cont, *s);
         *s = r;
     }
 }
-
-
 slista *split(string input, char charray) {
     slista *result = SL("", NULL);
     slista *temp = NULL;
@@ -811,11 +809,6 @@ void replaceTrash(string& line) {
     }
     line = newline;
 }
-
-
-/*---------------------------------*/
-//        FILE MANAGMENT
-
 void destroy(slista **n) {
     slista *temp = NULL;
     while (*n) {
@@ -824,13 +817,11 @@ void destroy(slista **n) {
         delete temp;
     }
 }
-
 int len(slista *s) {
     int c = 0;
     while (s) { c++; s = s->prox; }
     return c;
 }
-
 slista *next(slista **n) {
     slista *temp = *n;
     *n = (*n)->prox;
@@ -838,13 +829,12 @@ slista *next(slista **n) {
     return *n;
 }
 
-
+//      MANEJO BASICO DE FECHAS
 struct date {
     unsigned int day;
     unsigned int month;
     unsigned int year;
 };
-
 date newDate(unsigned int day, unsigned int month, unsigned int year) {
     date r;
     r.day = day;
@@ -852,7 +842,6 @@ date newDate(unsigned int day, unsigned int month, unsigned int year) {
     r.year = year;
     return r;
 }
-
 date getDate(string prompt) {
     string input = "";
     obtenerEntrada2(prompt, &input);
@@ -862,7 +851,6 @@ date getDate(string prompt) {
     }
     return newDate(0, 0, 0);
 }
-
 string getMonth(string input) {
     slista *date = split(input, '/');
     if (len(date) == 3) {
@@ -870,21 +858,11 @@ string getMonth(string input) {
     }
     return "";
 }
-
-int laterThan(date fst, date scnd) {
-    if (fst.year > scnd.year) return 1;
-    else if (fst.year < scnd.year) return 0;
-
-    if (fst.month > scnd.month) return 1;
-    else if (fst.month < scnd.month) return 0;
-
-    if (fst.day > scnd.day) return 1;
-    return 0;
-}
-
 string repr(date d) {
     return to_string(d.day) + "/" + to_string(d.month) + "/" + to_string(d.year);
 }
+
+//-----------
 
 void stringToProduct(char* s , product **P) {
     if (s) {
@@ -945,7 +923,6 @@ void readBranches(branch**B) {
     if (i) free(i);
     fclose(file);
 }
-
 
 void readInventory(branch*B , product*P) {
     char *i = (char* ) calloc(1024, sizeof(char));
@@ -1020,8 +997,6 @@ void readBills(branch**B, people**C) {
         billsList = next(&billsList);
         while (billsList) {
             newDt = NULL;
-
-
             
             bill = split(billsList->cont, '|');
             
@@ -1034,17 +1009,14 @@ void readBills(branch**B, people**C) {
             newB = newBill(codes->cont, sC->ID, codes->prox->prox->cont);
             productsList = split(bill->prox->cont, ';');
             
-
             while (productsList) {
                 pttr = split(productsList->cont, ',');
-                
                 
                 if (!pttr) break;
                 sP = searchProductByCode(sB->products, pttr->cont);
                 
                 if (!sP) break;
 
-                
                 addDeatail(&newDt, sP, stoi(pttr->prox->cont));
 
                 productsList = next(&productsList);
@@ -1067,8 +1039,8 @@ void readBills(branch**B, people**C) {
 // Write branchs in .txt
 void saveBranchs(branch*B) { 
     FILE*file = fopen("branches.txt" , "w");
-    while (B)
-    {
+    
+    while (B) {
         fprintf(file , "%s,%s,%s,%s,%s,%s\n" , B->code.c_str(), 
             B->name.c_str(), B->city.c_str(), B->state.c_str(), B->tlf.c_str(), B->address.c_str());
         B = B->next;
@@ -1080,8 +1052,8 @@ void saveBranchs(branch*B) {
 // Write products in .txt
 void saveProducts(product* P) {
     FILE*file = fopen("products.txt" , "w");
-    while (P)
-    {
+    
+    while (P) {
         fprintf(file , "%s,%s,%s\n" , P->code.c_str(), P->name.c_str(), P->description.c_str());
         P = P->next;
     }
@@ -1091,12 +1063,10 @@ void saveProducts(product* P) {
 void saveProductsOfBranch(branch*B){
     FILE* file = fopen("inventory.txt" , "w");
     product*P;
-    while (B)
-    {
+    while (B) {
         fprintf(file, "%s|" , B->code.c_str());
         P = B->products;
-        while (P)
-        {
+        while (P) {
             fprintf(file , "%s,%d,%d,%.2f;" , P->code.c_str(), P->amount, P->minAmount, P->price);
             P = P->next;
         }
@@ -1108,22 +1078,21 @@ void saveProductsOfBranch(branch*B){
 
 void saveClients(people*C) {
     FILE*file = fopen("clients.txt" , "w");
-    while (C)
-    {
+    
+    while (C) {
         fprintf(file , "%s,%s\n" , C->ID.c_str(), C->name.c_str());
         C = C->next;
     }
     fclose(file);
 }
 
-// TODO: CAMBIAR LA ESTRUCTURA DEL TXT
 void saveBills(branch*B) {
     FILE*file = fopen("bills.txt" , "w");
     bill *bx;
     detail *dx;
     while (B) {
         bx = B->bills->first;
-        //if (!bx) continue;
+
         fprintf(file, "%s-", B->code.c_str());
         while (bx) {
             dx = bx->detailBill;
@@ -1153,10 +1122,7 @@ string formatNULL(people *b) {
     else return "C.I." + b->ID + " " + b->name;
 }
 
-
-// Se accede asi (a la referencia del nodo): (*(*N)->data)
-
-// abb generico
+//      MANEJO DE UN ARBOL BINARIO DE BUSQUEDA AUXILIAR
 enum TYPE {
     T_BILL = 1,
     T_DETAIL = 2,
@@ -1166,7 +1132,7 @@ enum TYPE {
     T_UNDEFINED = 0
 };
 
-
+//  ESTRUCTURA GENERAL
 struct ABBgen {
     void *data;
 
@@ -1178,7 +1144,6 @@ struct ABBgen {
     ABBgen *left;
     ABBgen *right;
 };
-
 
 //  ABB BRANCH
 ABBgen *NG(branch *b) {
@@ -1242,19 +1207,6 @@ ABBgen *NG(product *b) {
 }
 
 
-
-// MERCADEO 3.3
-/*
-    Dado un mes (y año) y un código de producto mostrar la cantidad total comprada
-    (mayor a cero) de cada cliente en toda las tiendas ordenado por cantidad (de mayor
-    a menor). Al final el total de producto comprados en todas las tiendas.
-
-    multilista
-    abb y volver a insertar en abb;
-*/
-
-
-
 struct branchContainer {
     branch *selBranch;
     int totalSelled;
@@ -1277,32 +1229,10 @@ branchContainer *constructor(branch *b, branchContainer *bc, ABBgen *c, int t, i
     return result;
 }
 
-// insertar por cabeza
 void insertContainer(branchContainer **b, branchContainer *h) {
     h->next = *b;
     *b = h;
 }
-
-
-
-
-
-//ordenar por cantidad comprada
-/*
-RESUMEN DE CAFE:
-
----------------------------------------
-FARMA:
-    30906652 Carlos      20       5042
-------------------------------------
-.
-.
-.
-
-*/
-
-
-
 
 int compareGen(ABBgen *a, ABBgen *b) {
     if (a->T == b->T) {
@@ -1373,7 +1303,7 @@ void insertABBgen(ABBgen**N, bill *data, string ax = "") {
     } else *N = temp;
 }
 
-// DETAIL AVBB
+// DETAIL ABB
 void insertABBgen(ABBgen**N, detail *data) {
     if (*N) {
         if (compare( ((detail*)(*N)->data)->code, data->code)) {
@@ -1430,7 +1360,6 @@ void insertABBgen(ABBgen**N, people *data, int am, int pr) {
     }else *N = NG(data, am, pr);
 }
 
-
 void inorderGen(ABBgen**N) {
     if (*N)
     {
@@ -1447,17 +1376,12 @@ void inorderGen(ABBgen**N) {
     }
 }
 
-// log(n)
-// MAX                                   V
-// [ 4 ] [ 2 ] [ 1 ] [ 8 ] [ 5 ] [ 3 ] [ 7 ]  lon(7)
-
 void sortByAm(ABBgen **arr, int size) {
     int end = size-1;
     int l = 0;
     int r = 0;
 
     for (int i = 0; i < size; i++) {
-
         for (int j = (end/2); j > -1; j--) {
             l = (2*j)+1;
             r = (2*j)+2;
@@ -1480,7 +1404,6 @@ void showArr(ABBgen**arr, int len) {
         cout << "\n";
     }
 }
-
 
 int lenAbb(ABBgen*N) {
     if (N) {
@@ -1514,14 +1437,14 @@ void sortAnddShow(ABBgen*N, product*prod) {
     sortByAm(arr, size);
     
     cout << "\tRESUMEN VENTAS DE [ " << prod->name << " ] por cliente";
-    cout << "\n----------------------------------------------------------------------------\n";
+    cout << "\n" << line << "\n";
     printFmt("C.I. ", 15);
     printFmt("NOMBRE ", 25);
     printFmt("COMPRADOS ", 15);
     printFmt("GANANCIA ", 15);
-    cout << "\n----------------------------------------------------------------------------\n";
+    cout << "\n" << line << "\n";
     showArr(arr, size);
-    cout << "\n----------------------------------------------------------------------------\n";
+    cout << "\n" << line << "\n";
     
     delete[] arr;
 }
@@ -1530,18 +1453,17 @@ void showContainers(branchContainer **b, product *prod) {
     branchContainer *t;
     while (*b) {
         t = *b;
-        cout << "\n----------------------------------------------------------------------------\n";
-
+        cout << "\n" << line << "\n";
 
         printFmt("SUCURSAL", 15);
         printFmt("TOTAL VENDIDO", 15);
         printFmt("TOTAL INGRESOS", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         printFmt((*b)->selBranch->name, 15);
         printFmt((*b)->totalSelled, 15);
         printFmt((*b)->earned, 15);
         
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         sortAnddShow((*b)->clients, prod);
         cout << "\n\n";
         *b = (*b)->next;
@@ -1570,15 +1492,15 @@ void billsClientResume(branch *branches, people *client) {
         branches = branches->next;
     }
     if (resume) {
-        cout << "\n\t3.1 Resumen de facturas\n\n\tCliente: [ "<<client->name<<"]\n";
-        cout << "\n----------------------------------------------------------------------------\n\t\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        cout << line << "\n\tResumen de facturas\n\n\tCliente: [ "<<client->name<<"]";
+        cout << "\n" << line << "\n\t\tRESUMEN DE FACTURAS\n" << line << "\n";
         printFmt("Factura ", 15);
         printFmt("Fecha ", 15);
         printFmt("Monto (Bs.) ", 15);
         printFmt("Tienda ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n\n\t";
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1587,8 +1509,7 @@ void productClientResume(branch *branches, people *client) {
     detail *dt;
     ABBgen *resume = NULL;
 
-    while (branches)
-    {
+    while (branches) {
         ax = branches->bills->first;
         while (ax) {
             dt = ax->detailBill;
@@ -1601,17 +1522,17 @@ void productClientResume(branch *branches, people *client) {
         }
         branches = branches->next;
     }
-    if (resume) {
-        
-        cout << "\n\t3.2 Resumen de productos adquiridos\n\n\tCliente: [ "<<client->name<<"]\n";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+
+    if (resume) {    
+        cout << line << "\n\tResumen de productos adquiridos\n\n\tCliente: [ "<<client->name<<"]";
+        cout << "\n" << line <<  "\n\tRESUMEN DE FACTURAS\n" << line << "\n";
         printFmt("CODIGO ", 15);
         printFmt("DESCRIPCION ", 25);
         printFmt("CANTIDAD ", 15);
         printFmt("PRECIO (Bs.) ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n\n\t";
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1638,19 +1559,19 @@ void branchUnitsResume(branch *selected) {
     }
     
     if (resume) {
-        cout << "\n\t3.2.1 Resumen de [ " << selected->name << " ]\n";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        cout << "\n\tResumen de [ " << selected->name << " ]";
+        cout << "\n" << line << "\n\tRESUMEN DE FACTURA\n" << line << "\n";
         printFmt("CODIGO ", 15);
         printFmt("DESCRIPCION ", 25);
         printFmt("VENDIDOS ", 15);
         printFmt("GENERADO ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n\n";
+        cout << "\n" << line << "\n";
         cout << "\tCANTIDAD VENDIDA: " << totalSelled << "\n";
         cout << "\tCOSTO TOTAL: " << totalBills << "Bs.\n";
         cout << "\tPROMEDIO DE GASTO POR COMPRA: " << totalBills/i << "Bs.\n";
-        cout << "\n----------------------------------------------------------------------------\n\n\n";
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1663,15 +1584,14 @@ void branchInventoryResume(branch *selected) {
     }
     if (resume) {
         cout << "\n\t\tResumen Inventario de [ " << selected->name << " ]\n";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        cout << "\n" << line <<  "\n\tRESUMEN DE FACTURAS\n" << line << "\n";
         printFmt("CODIGO ", 15);
         printFmt("NOMBRE ", 25);
         printFmt("EXISTENCIA ", 15);
         printFmt("MIN. EXISTENCIA ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n\n\n";
-
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1697,21 +1617,19 @@ void branchMonthlyResume(branch *selected, string month) {
 
     if (resume) {
         cout << "\n\t\tResumen Inventario de [ " << selected->name << " ("<<selected->code<<") ]\n";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        cout << "\n" << line <<  "\n\tRESUMEN DE FACTURAS\n" << line << "\n";
         printFmt("CODIGO ", 15);
         printFmt("NOMBRE ", 25);
         printFmt("TOTAL VENDIDO ", 15);
         printFmt("MIN. EXISTENCIA ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         cout << "\tTotal ingresado: " << earned;
         cout << "\n\tProductos vendidos: " << totalProducts;
-        cout << "\n----------------------------------------------------------------------------\n\n\n";
+        cout << "\n" << line << "\n\n";
     }
 }
-
-
 
 // MERCADERO 3.1
 void statsMarketingByCode(branch *branchs, string month) {
@@ -1741,17 +1659,17 @@ void statsMarketingByCode(branch *branchs, string month) {
 
     if (resume) {
         cout << "\n\tRESUMEN VENTAS GLOBALES ";
-        cout << "\n----------------------------------------------------------------------------\n\tRESUMEN DE FACTURAS \n----------------------------------------------------------------------------\n";
+        cout << "\n" << line <<  "\n\tRESUMEN DE FACTURAS\n" << line << "\n";
         printFmt("CODIGO ", 15);
         printFmt("NOMBRE ", 25);
         printFmt("TOTAL VENDIDO ", 15);
         printFmt("GANANCIA ", 15);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         inorderGen(&resume);
-        cout << "\n----------------------------------------------------------------------------\n";
+        cout << "\n" << line << "\n";
         cout << "\tTotal ingresado: " << earned;
         cout << "\n\tProductos vendidos: " << totalProducts;
-        cout << "\n----------------------------------------------------------------------------\n\n\n";
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1785,7 +1703,6 @@ void softSwap(branchContainer *a, branchContainer *b) {
     swap(a->clients, b->clients);
 }
 
-// mayor a menor
 void sortContainer(branchContainer **bc) {
     bool sorted = false;
     branchContainer *ax = *bc, *last = NULL;
@@ -1805,8 +1722,6 @@ void sortContainer(branchContainer **bc) {
         ax = *bc;
     }
 }
-//        V                  V
-// A2 -> C5 -> B1 -> D7 -> NULL
 
 void statsMarketingByQty(branch *branchs, people *clients, product *prod, string month) {
     bill *ax = NULL;
@@ -1815,7 +1730,7 @@ void statsMarketingByQty(branch *branchs, people *clients, product *prod, string
     ABBgen *resume = NULL;
     branchContainer *container = NULL;
     
-    int totalPerBranch = 0; // total de ventas por branch
+    int totalPerBranch = 0;
     int totalEarned = 0;
 
     while (branchs) {
@@ -1847,13 +1762,11 @@ void statsMarketingByQty(branch *branchs, people *clients, product *prod, string
 
         branchs = branchs->next;
     }
-
     
     sortContainer(&container);
     showContainers(&container, prod);
-
 }
-// B-> ARBOL
+
 // MERCADEO 3.4
 void statsMarketingByClientBill(branch *branchs, people *clients, product *prod, string month) {
     bill *ax = NULL;
@@ -1901,8 +1814,6 @@ void statsMarketingAll(branch *branchs, string month) {
     int selled = 0;
     int earned = 0;
 
-    // IMPRIMIR UN ENCABEZADO
-
     while (branchs) {
         cout << "\n----------------------------------------------------------------------------" << "\n\t\tSUCURSAL: " << branchs->name << " [ " << branchs->code << " ]\n" << "----------------------------------------------------------------------------";
 
@@ -1930,8 +1841,6 @@ void statsMarketingAll(branch *branchs, string month) {
 
 
 /*------ MENU MANAGMENT ------*/
-int lineWidth = 120;
-string line(lineWidth, '-');
 const string header = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line;
 
 struct mensajeInformativo {
@@ -3104,25 +3013,25 @@ int controllerMenuPeople(menuItem **activo, int selec, context *ct) {
 
 int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
 	switch (selec) {
-	    case 0:
-		if (!(*activo)->parent) {
-		    return 0;
-		} else {
-		    actualizarMensaje("");
-		    *activo = (*activo)->parent;
-		    return 1;
-		}
-	    case 1:
-		*activo = menuMantenimiento(*activo);
-		break;
-	    case 2:
-		actualizarMensaje("Tienda[   ]\tCliente[   ]");
-		*activo = menuBilling(*activo);
-		break;
-	    case 3:
-		*activo = menuReports(*activo);
-		break;
-	    default:
+        case 0:
+            if (!(*activo)->parent) {
+                return 0;
+            } else {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            }
+        case 1:
+            *activo = menuMantenimiento(*activo);
+            break;
+        case 2:
+            actualizarMensaje("Tienda[   ]\tCliente[   ]");
+            *activo = menuBilling(*activo);
+            break;
+        case 3:
+            *activo = menuReports(*activo);
+            break;
+        default:
 		actualizarMensaje("La opcion seleccionada no corresponde a una accion. Intente nuevamente.\n");
 		break;
 	}
@@ -3131,7 +3040,7 @@ int operarMenuPrincipal(menuItem **activo, int selec, context*ct) {
 
 int operarMenuMantenimiento(menuItem **activo, int selec, context*ct) {
 	switch (selec) {
-	    case 0:
+        case 0:
 		if (!(*activo)->parent) {
 		    return 0;
 		} else {
@@ -3207,13 +3116,13 @@ int controladorMenuSucursales(menuItem **activo, int selec, context*ct) {
     string entrada = "";
     switch (selec) {
         case 0:
-	    if (*activo) {
-		actualizarMensaje("");
-		*activo = (*activo)->parent;
-		return 1;
-	    } else {
-		return 0;
-	    }
+            if (*activo) {
+                actualizarMensaje("");
+                *activo = (*activo)->parent;
+                return 1;
+            } else {
+                return 0;
+            }
         case 1: // agregar
             actualizarMensaje("");
             createBranch(ct->branches);
@@ -3296,24 +3205,6 @@ void helperClientInfo(context *ct) {
     } while (1);
 }
 
-/*
-pedir codigo sucursal y buscar
-mostrar opciones 
-interpretar opciones
-
-3.2.1
-Mostrar el total de unidades vendidas de cada producto, el ingreso total en cada uno y
-el inventario en existencia. Los totales de unidades vendidas, su cantidad y el promedio total al final del
-listado. Ordenado por descripción de producto.
-
-3.2.2
-Mostrar el total de unidades en existencia de cada producto y el inventario mínimo.
-Debe ordenarse por cantidad en existencia de menor a mayor.
-
-3.2.3
-Dado un mes y una cédula de cliente. Mostrar el resumen de sus facturas indicando el
-total ingresado y la cantidad de productos comprados. 
-*/
 void helperBranchInfo(context *ct) {
     string info = "";
     branch *selected = NULL;
@@ -3573,16 +3464,7 @@ void run() {
 
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 int main() {
-    setlocale(LC_ALL, "es_ES.UTF-8");
+
+    setlocale(LC_ALL, "utf-8");
     run();
 }
-
-/*
-TODO
-
-    - Modificar los menus de reportes
-    - Mejorar impresion de TODOS los menus
-    - Terminar el proyecto
-
-    !!!!!!!!!!!! PROBARLO EN LAS MAQUINAS DE LA UCAB !!!!!!!!!!!!!!
-*/
