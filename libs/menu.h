@@ -1497,36 +1497,36 @@ int controllerHelperMarketing(menuItem **activo, int selec, context *ct) {
             if (*activo) {
                 actualizarMensaje("");
                 *activo = (*activo)->parent;
-                // ELIMINAR CUANDO SE TERMINE DE PROBAR CODIFICACION
                 return 1;
+            } else {
+                return 0;
             }
-            break;
         case 1:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByCode((*ct->branches), input);
             system("pause");
-            // total ventas ordenado por codigo de producto
-            break;
+            return 1;
         case 2:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByBranch((*ct->branches), input);
             system("pause");
-            // total ventas ordenado por codigo de tienda
-            break;
         case 3:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByQty((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
-            // 
-            break;
+            return 1;
         case 4:
             obtenerEntrada2("Escribe el MES deseado: ", &input);
             statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
             system("pause");
-            // total ventas ordenado por codigo de tienda
-            break;
+            return 1;
+        case 5:
+            obtenerEntrada2("Escribe el MES deseado: ", &input);
+            statsMarketingAll((*ct->branches), input);
+            system("pause");
+            return 1;
         default:
-            break;
+            return 1;
     }
 }
 
