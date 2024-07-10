@@ -455,8 +455,8 @@ void printIDs(people* P) {
         cout << "         - " << P->ID << endl;
         P = P->next;
     }
-    cout << "\n\n        0. CANCELAR\n";
-    cout << "\n        Ingrese la cédula del cliente: ";
+    cout << "\n\n\t0. CANCELAR\n";
+    cout << "\n\t\tIngrese la cédula del cliente: ";
 }
 
 // Módulo para consultar clientes
@@ -494,7 +494,6 @@ void consultCustomer(people* P) {
 
         if (opcion != 0) {
             cout << "\nPresione Enter para continuar...";
-             // Esperar a que el usuario presione Enter
         }
     } while (opcion != 0);
 }
@@ -627,12 +626,12 @@ const int NS = 10;
 
 void obtenerEntrada(string input, string *res) {
     cout << input << endl;
-    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+    getline(cin, *res); 
 }
 
 void obtenerEntrada2(string input, string *res) {
     cout << input;
-    getline(cin, *res); // antes era cin >> *res; esta permite agregar espacios a la entrada.
+    getline(cin, *res);
 }
 
 int entradaValidar(string entrada) {
@@ -2042,8 +2041,7 @@ void menuModProduct(product* P) {
     cout << "CONSULTAR PRODUCTO POR DESCRIPCION\n0. VOLVER AL MENU ANTERIOR.\n" << line << endl;
     
     product* selected = selectProductByCode(P); // THE USER SELECT A PRODUCT
-    if (!selected)
-    {
+    if (!selected) {
         cout << "\n\n\t\t\t-- PRODUCTO NO SELECCIONADO --\n\n";
         system("pause");
         return;
@@ -2051,16 +2049,15 @@ void menuModProduct(product* P) {
     
     int op;
     string input = "";
-    do
-    {
+    do {
         optionsModProduct(selected);
-        obtenerEntrada2("\nSu opcion (0-5): _|", &input);
+        obtenerEntrada2("\n\n\tSu opcion (0-3): ", &input);
         op = entradaValidar(input);
-        switch (op)
-        {
+        switch (op) {
             case 1:
                 cout << "Nombre anterior: " << selected->name << endl;
                 obtenerEntrada2("Nuevo nombre: ", &input);
+                
                 if (confirm()) selected->name = input;
                 break;
             case 2:
@@ -2073,16 +2070,15 @@ void menuModProduct(product* P) {
             {
                 bool invalidCode = true;
                 cout << "Codigo anterior: " << selected->code << endl;
-                do
-                {
+                do {
                     obtenerEntrada2("Nuevo codigo: ", &input);
                     if (input == "0") return;
                     invalidCode = searchProductByCode(P , input);
-                    if (invalidCode)
-                    {
+                    if (invalidCode) {
                         cout << "\n\t\t\t-- CODIGO YA EXISTENTE --\n\n";
                     }
                 } while (invalidCode);
+
                 if (confirm()) selected->code = input;
                 break;
             }
@@ -2094,8 +2090,8 @@ void menuConsultProductByCode(product* B) {
     cout << header;
     cout << "\nCONSULTAR product POR CODIGO\n" << line << endl;
     product* selected = selectProductByCode(B);
-    if (selected)
-    {
+
+    if (selected) {
         cout << "\n\tPRODUCTO ENCONTRADO: \n";
         cout << "\n\t - " << selected->name << " [" << selected->code << "]";
         cout << "\n\t\t ~ Descripcion: " << selected->description << "\n\n";
@@ -2120,8 +2116,8 @@ void menuConsultProductByType(product* B) { // CAMBIAR EL "TYPE"
         return;
     }
     headerProducts();
-    while (selected)
-    {
+
+    while (selected) {
         printProductsInTable(selected);
         selected = searchProductByType(selected->next, userInput);
     }
@@ -2132,8 +2128,7 @@ void menuConsultProductByType(product* B) { // CAMBIAR EL "TYPE"
 void menuConsultProductByDesc(product* B) {
     string input = "";
     int op = 0;
-    do
-    {
+    do {
         clScr();
         cout << header;
         cout << "\nCONSULTAR product POR DESCRIPCION\n\t1. DESCRIPCION\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
@@ -2196,9 +2191,6 @@ void printBranchs(branch*B) {
 	printBranchs(B->next);
 }
 
-
-
-
 void headerBranchs() {
 	cout << line << "\nLISTA DE SUCURSALES\n" << endl;
 	printFmt("CODIGO", 10);
@@ -2258,21 +2250,24 @@ void menuConsultByState(branch*B ){
     cout << header << endl;
     string userInput = "";
     cout << "\n\tCONSULTAR SUCURSAL POR ESTADO\n\t0.VOLVER AL MENU ANTERIOR\n" << line << endl;
+    
     obtenerEntrada2("\nIngresa el estado: " , &userInput);
+    
     if (userInput == "0") return;
+    
     cout << "\n\tSUCURSALES ENCONTRADAS: \n";
     branch* selected = searchBranchByState(B , userInput);
     if (!selected) {
         cout << "\n\n\t\tNINGUNA...\n\n\t";
         return;
     }
+
     headerBranchs();
-    while (selected)
-    {
+    while (selected) {
         printBranchsInTable(selected);
         selected = searchBranchByState(selected->next, userInput);
     }
-    cout << line << "\n\n\t\t\t";
+    cout << line << "\n\n\t";
 }
 
 void menuConsultByCity(branch* B) {
@@ -2280,7 +2275,9 @@ void menuConsultByCity(branch* B) {
     cout << "\n\tCONSULTAR SUCURSAL POR CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
     string userInput = "";
     obtenerEntrada2("\nIngresa la ciudad: ", &userInput);
+
     if (userInput == "0") return;
+    
     cout << "\n\tSUCURSALES ENCONTRADAS: \n";
     branch* selected = searchBranchByCity(B, userInput);
     if (!selected) {
@@ -2288,9 +2285,9 @@ void menuConsultByCity(branch* B) {
         system("pause");
         return;
     }
+
     headerBranchs();
-    while (selected)
-    {
+    while (selected) {
         printBranchsInTable(selected);
         selected = searchBranchByCity(selected->next, userInput);
     }
@@ -2304,8 +2301,8 @@ void menuDeleBranch(branch**B){
     clScr();
     cout << line << "\nELIMINAR SUSCURSAL\n" << line << endl;
     branch*selected = selectBranchByCode(*B);
-    if (selected)
-    {
+    
+    if (selected) {
         cout << "\n\tSUCURSAL ENCONTRADA: \n";
         cout << "\n\t - " << selected->name << " [" << selected->code << "]";
         cout << "\n\t\t ~ Direccion: " << selected->city << ", " << selected->state << ", " << selected->address;
@@ -2315,7 +2312,7 @@ void menuDeleBranch(branch**B){
     else {
         cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
     }
-    getchar();
+    system("pause");
 }
 /*---------------------------------------------------------------------------*/
 /* PEOPLE */
@@ -2352,10 +2349,8 @@ void menuAddProductToBranch(branch*B, product*P) {
     cout << header;
     cout << "\n\t0. VOLVER\n\n";
     product* selected = selectProductByCode(P);
-    if (selected)
-    {
-        if (searchProductByCode(B->products , selected->code))
-        {
+    if (selected) {
+        if (searchProductByCode(B->products , selected->code)) {
             cout << "\n\n\t-- Este product ya esta agregado --\n\n\n";
             system("pause");
             return;
@@ -2377,7 +2372,8 @@ void menuAddProductToBranch(branch*B, product*P) {
         else if (confirm()) addProductToBranch(B, selected , am , minAm , price);
     }
     else cout << "\n -- PRODUCTO INEXISTENTE --\n\n\n";
-    getchar();
+    
+    system("pause");
 }
 
 void printProductssOfBranch(product*P) {
@@ -2418,8 +2414,7 @@ void menuDelProductOfBranch(product**P) {
     cout << header << "\n\tBORRAR PRODUCTO DE SUCURSAL\n\t0. VOLVER A MENU ANTERIOR.\n";
     cout << line << endl;
     product* selected = selectProductByCode(*P);
-    if (selected)
-    {
+    if (selected) {
         cout << "\n\t - " << selected->name << " [" << selected->code << "]";
         cout << "\n\t\t ~ Descripcion: " << selected->description << "\n\t\t ~ Precio: " << selected->price << "$\n\n";
         if(confirm()) {
@@ -2428,6 +2423,7 @@ void menuDelProductOfBranch(product**P) {
         }
     }
     else cout << "\n -- PRODUCTO INEXISTENTE --\n\n";
+    
     system("pause");
 }
 
@@ -2436,7 +2432,9 @@ void menuDelProductOfBranch(product**P) {
 void optionsModProductOfBranch(product*selected){
     cout << header << "\n\tMODIFICAR\n\t1. NOMBRE\n\t2. DESCRIPCION\n\t3. PRECIO\n\t4. CODIGO\n\t5. CANTIDAD\n\t6. CANTIDAD MINIMA\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
     cout << "\n\tPRODUCTO ENCONTRADO: \n";
+    
     if (!selected) return;
+    
     cout << "\n\t - " << selected->name << " [" << selected->code << "]";
     cout << "\n\t\t ~ Descripcion: " << selected->description;
     cout << "\n\t\t ~ Precio: " << selected->price << "$";
@@ -2453,22 +2451,17 @@ void menuModProductOfBranch(product* P) {
     float userPrice = 0;
     string input = "";
     product* selected = selectProductByCode(P);
-    do
-    {
+    do {
         clScr();
         optionsModProductOfBranch(selected);
         obtenerEntrada2("", &input);
         op = entradaValidar(input);
-        switch (op)
-        {
+        switch (op) {
             case 1:
                 cout << "Nombre anterior: " << selected->name << endl;
                 obtenerEntrada2("Nuevo nombre: ", &input);
 
-                if (confirm()) {
-                    selected->name = input;
-                    break;
-                }
+                if (confirm()) selected->name = input;
                 break;
             case 2:
                 cout << "Descripcion anterior: " << selected->description << endl;
@@ -2478,8 +2471,9 @@ void menuModProductOfBranch(product* P) {
             case 3:
                 cout << "Precio anterior: " << selected->price << endl;
                 obtenerEntrada2("Nuevo precio: ", &input);
-                userPrice = stof(input); // FIXME revisar si el dato es float y evitar errores de entrada
+                userPrice = stof(input);
                 cin >> userPrice;
+
                 if (confirm()) selected->description = input;
                 break;
             case 4:
@@ -2526,20 +2520,18 @@ void optionsMenuInventory(branch*selected){
 void menuInventory(branch*B , product*P) {
     branch* selected = NULL;
     char op = '\0';
-    do
-    {
+    do {
         clScr();
         optionsMenuInventory(selected);
         cin >> op;
-	cin.ignore();
-        if (!selected && (op != '1' && op != '0'))
-        {
+
+        cin.ignore();
+        if (!selected && (op != '1' && op != '0')) {
             cout << "\n\t\t\t-- SUCURSAL NO SELECCIONADA --\n\n\n";
             op = '\0';
             getchar();
         }
-        switch (op)
-        {
+        switch (op) {
             case '1':
                 selected = selectBranchByCode(B);
                 cout << "\n\n";
@@ -2558,6 +2550,7 @@ void menuInventory(branch*B , product*P) {
                 tableProductsOfBranch(selected->products);
                 break;
         }
+
         system("pause");
     } while (op != '0');
 }
@@ -2599,20 +2592,17 @@ void printBill(bill*B) {
     printFmt("Fecha: " + B->date, 20);
     printFmt("Factura " + B->code, 30);
     cout << endl;
-    //printFmt("Cliente: " + client->name, 30);
     printFmt("C.I.: " + B->clientId, 20);
     cout << endl << line << endl;
     printDetailBill(B->detailBill);
     cout << endl << line << endl;
     cout << "\tTOTAL:   " << B->total;
-    //printFmt("TOTAL: " + B->total, 30);
     cout << endl << line << endl;    
 }
 
 // Print all bills of a client
 void showAllBills(bill *B, people *client) {
-    while (B)
-    {
+    while (B) {
         if (B->clientId == client->ID) {
             printBill(B);
             cout << "\n\n";
@@ -2620,16 +2610,16 @@ void showAllBills(bill *B, people *client) {
         B = B->next;
     }
 }
+
 /*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
 void billsResume(branch*B, people*C) {
     bill *ax = B->bills->first;
-    cout << "\n--------------------------------------\n\tRESUMEN DE FACTURAS \n--------------------------------------\n";
+    cout << line << "\n\tRESUMEN DE FACTURAS\n" << line;
     printFmt("Factura ", 15);
     printFmt("Fecha ", 15);
     printFmt("Monto ", 15);
-    cout << "\n--------------------------------------\n";
-    while (ax)
-    {
+    cout << "\n" << line << "\n";
+    while (ax) {
         if (ax->clientId == C->ID) {
             printFmt(ax->code, 10);
             printFmt(ax->date, 20);
