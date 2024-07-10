@@ -1384,6 +1384,7 @@ void helperClientInfo(context *ct) {
                 return;
                 break;
             case 1:
+                tablePeople(*(ct->clients));
                 obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
                 client = searchPeopleByID(*(ct->clients), info);
                 if (!client) {
@@ -1395,6 +1396,7 @@ void helperClientInfo(context *ct) {
                 system("pause");
                 break;
             case 2:
+                tablePeople(*(ct->clients));
                 obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
                 client = searchPeopleByID(*(ct->clients), info);
                 if (!client) {
@@ -1446,6 +1448,7 @@ void helperBranchInfo(context *ct) {
                 return;
                 break;
             case 1:
+                tableBranchs(*ct->branches);
                 obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
                 selected = searchBranchByCode(*(ct->branches), info);
                 if (!selected) {
@@ -1457,6 +1460,7 @@ void helperBranchInfo(context *ct) {
                 system("pause");
                 break;
             case 2:
+                tableBranchs(*ct->branches);
                 obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
                 selected = searchBranchByCode(*(ct->branches), info);
                 if (!selected) {
@@ -1468,6 +1472,7 @@ void helperBranchInfo(context *ct) {
                 system("pause");
                 break;
             case 3:
+                tableBranchs(*ct->branches);
                 obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
                 selected = searchBranchByCode(*(ct->branches), info);
                 if (!selected) {

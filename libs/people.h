@@ -210,7 +210,7 @@ void consultCustomer(people* P) {
 
         if (opcion != 0) {
             cout << "\nPresione Enter para continuar...";
-             // Esperar a que el usuario presione Enter
+            // Esperar a que el usuario presione Enter
         }
     } while (opcion != 0);
 }
