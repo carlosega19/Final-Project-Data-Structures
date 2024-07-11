@@ -1,7 +1,7 @@
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include <iostream>
-#include <string>
+#include <string.h>
 
 using namespace std;
 
@@ -28,8 +28,7 @@ struct product {
     product* next;
 };
 
-struct detail
-{
+struct detail {
     string code;
     string name;
     int amount;
@@ -38,8 +37,7 @@ struct detail
     detail* next;
 };
 
-struct bill
-{
+struct bill {
     string code;
     string clientId;
     string date;
@@ -51,8 +49,7 @@ struct bill
     bill* prev;
 };
 
-struct dipolo
-{
+struct dipolo {
     bill* first;
     bill* last;
 };
@@ -80,6 +77,14 @@ struct branch {
 int lineWidth = 120;
 string line(lineWidth, '-');
 
+
+long int pow(int num, int e) {
+    long int result = 1;
+    for (int i = 0; i < e; i++) {
+        result *= num;
+    }
+    return result;
+}
 
 long int to_int(string s) {
     int index = 0;
@@ -135,7 +140,33 @@ long int to_int(string s) {
     return result;
 }
 
-//
+string to_string(int num) {
+    char *str = new char[50];
+
+    int i = 0;
+    while (num > 0) {
+        str[i++] = (num % 10) + '0';
+        num /= 10;
+    }
+
+    str[i] = '\0';
+
+    for (int j = 0; j < i / 2; j++) {
+        char tmp = str[j];
+        str[j] = str[i - 1 - j];
+        str[i - 1 - j] = tmp;
+    }
+
+    return str;
+}
+
+void obtenerEntrada(string input, string* res) {
+    cout << endl << input << "\n\t=> ";
+    cin >> *res;
+    cin.clear();
+}
+
+/////////////////////
 
 product* searchProductByCode(product* P, string str) {
     if (!P) return NULL;
@@ -188,7 +219,6 @@ void addProduct(product** P, string codeP, string name, string description, floa
 
 // ESTRUCTURAS Y NOMBRES PROVISIONALES
 
-
 detail* newDetail(string code, string name, int amount) {
     detail* r = new detail;
     r->code = code;
@@ -197,17 +227,12 @@ detail* newDetail(string code, string name, int amount) {
     return r;
 }
 
-//  Idea (hacer un dipolo?)
-
-
-// Nombre provisional (no se como ponerle)
 dipolo* createBillsList() {
     dipolo* bills = new dipolo;
     bills->first = NULL;
     bills->last = NULL;
     return bills;
 }
-
 
 bill* newBill(string code, string cId, string date) {
     bill* nbill = new bill;
@@ -236,8 +261,7 @@ int totalPrice(detail* B) {
 
 // Insertar ordenadamente por codigo de factura CUIDADO
 bool addBill(dipolo** P, bill* newB, detail* prods) {
-    if (newB->code != "" && (!(*P)->first || compare((*P)->first->code, newB->code)))
-    {
+    if (newB->code != "" && (!(*P)->first || compare((*P)->first->code, newB->code))) {
         if ((*P)->first && (*P)->first->code == newB->code) return false;
 
         newB->detailBill = prods;
@@ -373,7 +397,7 @@ people* getLast(people* p) {
     } return NULL;
 }
 
-// FunciÃ³n para validar que el nombre y apellido no contengan nÃºmeros
+// Función para validar que el nombre y apellido no contengan números
 bool validateName(string name) {
     for (char c : name) {
         if (isdigit(c)) {
@@ -383,7 +407,7 @@ bool validateName(string name) {
     return true;
 }
 
-// FunciÃ³n para validar que la cedula tenga solo nÃºmeros y tenga entre 7 y 8 dÃ­gitos
+// Función para validar que la cedula tenga solo números y tenga entre 7 y 8 dígitos
 bool validateID(string cedula) {
     if (cedula.length() < 7 || cedula.length() > 8) {
         return false;
@@ -396,7 +420,7 @@ bool validateID(string cedula) {
     return true;
 }
 
-// FunciÃ³n para encontrar una persona por su cÃ©dula
+// Función para encontrar una persona por su cédula
 people* searchPeopleByID(people* P, string id) {
     while (P != NULL) {
         if (P->ID == id) {
@@ -407,7 +431,7 @@ people* searchPeopleByID(people* P, string id) {
     return NULL;
 }
 
-// FunciÃ³n para agregar una nueva persona a la lista
+// Función para agregar una nueva persona a la lista
 void addPerson(people** P, string id, string name) {
     people* newP = new people;
     newP->ID = id;
@@ -427,7 +451,7 @@ void addPerson(people** P, string id, string name) {
 }
 
 
-// FunciÃ³n para buscar un patrÃ³n en una cadena
+// Función para buscar un patrón en una cadena
 bool find(string main, string pat) {
     for (size_t i = 0; i <= main.length() - pat.length(); i++) {
         bool found = true;
@@ -442,7 +466,7 @@ bool find(string main, string pat) {
     return false;
 }
 
-// FunciÃ³n para mostrar todas las personas en la lista
+// Función para mostrar todas las personas en la lista
 void showPeople(people* P) {
     if (!P) {
         cout << "\t - No hay clientes en la lista" << endl;
@@ -455,7 +479,7 @@ void showPeople(people* P) {
     }
 }
 
-// FunciÃ³n para eliminar una persona de la lista
+// Función para eliminar una persona de la lista
 void deletePerson(people** P, string id) {
     if (!P) return;
 
@@ -481,11 +505,11 @@ void deletePerson(people** P, string id) {
 void consultByName(people* P, string name) {
     bool encontrado = false;
 
-    // Convertir el nombre ingresado a minÃºsculas
+    // Convertir el nombre ingresado a minúsculas
     string lowerName = tolow(name);
 
     while (P != NULL) {
-        // Convertir el nombre almacenado a minÃºsculas para la comparaciÃ³n
+        // Convertir el nombre almacenado a minúsculas para la comparación
         string lowerNameToCompare = tolow(P->name);
 
         // Comparar las cadenas convertidas
@@ -501,33 +525,32 @@ void consultByName(people* P, string name) {
     }
 }
 
-// FunciÃ³n para consultar clientes por cÃ©dula
+// Función para consultar clientes por cédula
 void consultByID(people* P, string id) {
     people* person = searchPeopleByID(P, id);
     if (person) {
         cout << "Cedula: " << person->ID << ", Nombre y Apellido: " << person->name << endl;
     }
     else {
-        cout << "No se encontrÃ³ el cliente con la cÃ©dula '" << id << "'." << endl;
+        cout << "No se encontró el cliente con la cédula '" << id << "'." << endl;
     }
 }
 
-// FunciÃ³n para imprimir todas las cÃ©dulas disponibles
+// Función para imprimir todas las cédulas disponibles
 void printIDs(people* P) {
-    cout << "\n\t- LISTA DE CÃ‰DULAS - \n";
-    cout << "------------------------------------------------------------------------------------------------------------------------\n";
+    cout << "\n\t- LISTA DE CÉDULAS - \n";
+    cout << "\n" << line << "\n";
     while (P) {
-        cout << "         - " << P->ID << endl;
+        cout << "\t\t- " << P->ID << endl;
         P = P->next;
     }
     cout << "\n\n\t0. CANCELAR\n";
-    cout << "\n\t\tIngrese la cÃ©dula del cliente: ";
 }
 
-// MÃ³dulo para consultar clientes
+// Módulo para consultar clientes
 void consultCustomer(people* P) {
     int opcion;
-    string consulta; // Para almacenar el nombre, apellido o cÃ©dula a consultar                                                
+    string consulta; // Para almacenar el nombre, apellido o cédula a consultar                                                
     do {
         cout << "\n\t - CONSULTAR CLIENTE -\n" << endl;
         cout << "\t1. Consultar por Nombre" << endl;
@@ -539,21 +562,20 @@ void consultCustomer(people* P) {
 
         switch (opcion) {
         case 1:
-            cout << "Ingrese el nombre a buscar: ";
-            getline(cin, consulta);
+            obtenerEntrada("\n\n\tIngrese el nombre a buscar: ", &consulta);
             cout << "Resultados para el nombre '" << consulta << "':\n" << endl;
             consultByName(P, consulta);
             break;
         case 2:
             printIDs(P);
-            getline(cin, consulta);
+            obtenerEntrada("\n\t\tIngrese la cédula del cliente: ", &consulta);
             consultByID(P, consulta);
             break;
         case 0:
-            cout << "Volviendo al menÃº anterior..." << endl;
+            cout << "\n\n\tVolviendo al menú anterior...\n\n";
             break;
         default:
-            cout << "OpciÃ³n no vÃ¡lida. Intente de nuevo." << endl;
+            cout << "\n\n\t\t-- Opción no válida --\n\n";
             break;
         }
 
@@ -563,17 +585,9 @@ void consultCustomer(people* P) {
     } while (opcion != 0);
 }
 
-
-
-
-
-
-
-
-
 void clScr() {
     if (PLATFORM_NAME == "linux") {
-        cout << "\033c\033[2J\033[H"; // Refrescar la pantalla y borrar el terminal
+        cout << "\033c\033[2J\033[H";
     }
     else {
         system("cls");
@@ -684,15 +698,6 @@ slista* split(string input, char charray) {
 const string NUM_VALIDO = "1234567890";
 const int NS = 10;
 
-void obtenerEntrada(string input, string* res) {
-    cout << input << endl;
-    getline(cin, *res);
-}
-
-void obtenerEntrada2(string input, string* res) {
-    cout << input;
-    getline(cin, *res);
-}
 
 int entradaValidar(string entrada) {
     int i = 0;
@@ -711,64 +716,9 @@ int entradaValidar(string entrada) {
     }
 }
 
-long int pow(int num, int e) {
-    long int result = 1;
-    for (int i = 0; i < e; i++) {
-        result *= num;
-    }
-    return result;
-}
-
-
-string to_string(long int* f) {
-    int e = *f;
-    string resultado = "";
-
-    while (e > 0) {
-        switch (e / 10) {
-        case 1:
-            resultado += "1";
-            break;
-        case 2:
-            resultado += "2";
-            break;
-        case 3:
-            resultado += "3";
-            break;
-        case 4:
-            resultado += "4";
-            break;
-        case 5:
-            resultado += "5";
-            break;
-        case 6:
-            resultado += "6";
-            break;
-        case 7:
-            resultado += "7";
-            break;
-        case 8:
-            resultado += "8";
-            break;
-        case 9:
-            resultado += "9";
-            break;
-        case 0:
-            resultado += "0";
-            break;
-        default:
-            break;
-        }
-        e = e / 10;
-    }
-    return resultado;
-}
-
-
-
 int confirm() {
     string entrada = "";
-    obtenerEntrada2("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ", &entrada);
+    obtenerEntrada("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ", &entrada);
     if (entradaValidar(entrada)) return 1;
     return 0;
 }
@@ -852,7 +802,7 @@ date newDate(unsigned int day, unsigned int month, unsigned int year) {
 }
 date getDate(string prompt) {
     string input = "";
-    obtenerEntrada2(prompt, &input);
+    obtenerEntrada(prompt, &input);
     slista* fields = split(input, '/');
     if (len(fields) >= 3) {
         return newDate(to_int(fields->cont), to_int(fields->prox->cont), to_int(fields->prox->prox->cont));
@@ -905,7 +855,7 @@ void stringToPerson(char* s, people** P) {
 
 void readProducts(product** P) {
     char* i = (char*)calloc(1024, sizeof(char));
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "products.txt", "r");
     if (!file) return;
 
@@ -919,7 +869,7 @@ void readProducts(product** P) {
 
 void readBranches(branch** B) {
     char* i = (char*)calloc(1024, sizeof(char));
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "branches.txt", "r");
     if (!file) return;
 
@@ -934,7 +884,7 @@ void readBranches(branch** B) {
 
 void readInventory(branch* B, product* P) {
     char* i = (char*)calloc(1024, sizeof(char));
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "inventory.txt", "r");
     if (!file) return;
     branch* sB = NULL;
@@ -954,8 +904,7 @@ void readInventory(branch* B, product* P) {
                 pttr = split(productList->cont, ',');
                 if (pttr && len(pttr) >= 4) {
                     sP = searchProductByCode(P, pttr->cont);
-                    if (!sP) continue;
-                    addProductToBranch(sB, sP, to_int(pttr->prox->cont), to_int(pttr->prox->prox->cont), to_int(pttr->prox->prox->prox->cont));
+                    if (sP) addProductToBranch(sB, sP, to_int(pttr->prox->cont), to_int(pttr->prox->prox->cont), to_int(pttr->prox->prox->prox->cont));
                 }
 
                 productList = next(&productList);
@@ -963,7 +912,7 @@ void readInventory(branch* B, product* P) {
             }
         }
     }
-    // Vaciado de memoria
+
     if (i) free(i);
     destroy(&branchCode);
     fclose(file);
@@ -971,7 +920,7 @@ void readInventory(branch* B, product* P) {
 
 void readClients(people** P) {
     char* i = (char*)calloc(1024, sizeof(char));
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "clients.txt", "r");
     if (!file) return;
 
@@ -985,15 +934,15 @@ void readClients(people** P) {
 
 void readBills(branch** B, people** C) {
     char* i = (char*)calloc(1024, sizeof(char));
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "bills.txt", "r");
     if (!file) return;
 
     bill* newB = NULL;
     detail* newDt = NULL;
 
-    slista* billsList, * bill, * codes, * productsList, * pttr;
-    product* sP;
+    slista* billsList = NULL, * bill = NULL, * codes = NULL, * productsList = NULL, * pttr = NULL;
+    product* sP = NULL;
     people* sC = NULL;
     branch* sB = NULL;
 
@@ -1049,7 +998,7 @@ void readBills(branch** B, people** C) {
 
 // Write branchs in .txt
 void saveBranchs(branch* B) {
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "branches.txt", "w");
     while (B) {
         fprintf(file, "%s,%s,%s,%s,%s,%s\n", B->code.c_str(),
@@ -1072,14 +1021,14 @@ void saveProducts(product* P) {
 }
 
 void saveProductsOfBranch(branch* B) {
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "inventory.txt", "w");
     product* P;
     while (B) {
         fprintf(file, "%s|", B->code.c_str());
         P = B->products;
         while (P) {
-            fprintf(file, "%s,%d,%d,%.2f;", P->code.c_str(), P->amount, P->minAmount, P->price);
+            fprintf(file, "%s,%d,%d,%d;", P->code.c_str(), P->amount, P->minAmount, P->price);
             P = P->next;
         }
         fprintf(file, "\n");
@@ -1089,7 +1038,7 @@ void saveProductsOfBranch(branch* B) {
 }
 
 void saveClients(people* C) {
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "clients.txt", "w");
     while (C) {
         fprintf(file, "%s,%s\n", C->ID.c_str(), C->name.c_str());
@@ -1099,7 +1048,7 @@ void saveClients(people* C) {
 }
 
 void saveBills(branch* B) {
-    FILE* file;
+    FILE* file = NULL;
     fopen_s(&file, "bills.txt", "w");
     bill* bx;
     detail* dx;
@@ -1821,7 +1770,7 @@ void statsMarketingByClientBill(branch* branchs, people* clients, product* prod,
         sortAnddShow(resume, prod);
         cout << "\tTotal ingresado: " << earned;
         cout << "\n\tProductos vendidos: " << totalProducts;
-        cout << "\n----------------------------------------------------------------------------\n\n\n";
+        cout << "\n" << line << "\n\n";
     }
 }
 
@@ -1834,7 +1783,7 @@ void statsMarketingAll(branch* branchs, string month) {
     int earned = 0;
 
     while (branchs) {
-        cout << "\n----------------------------------------------------------------------------" << "\n\t\tSUCURSAL: " << branchs->name << " [ " << branchs->code << " ]\n" << "----------------------------------------------------------------------------";
+        cout << "\n" << line << "\n\t\tSUCURSAL: " << branchs->name << " [ " << branchs->code << " ]\n" << line;
 
         selled = 0;
         earned = 0;
@@ -1851,7 +1800,7 @@ void statsMarketingAll(branch* branchs, string month) {
             ax = ax->next;
         }
         cout << "\n\tProductos vendidos =>  " << selled;
-        cout << "\n\tIngresos =>  " << earned << " Bs.\n" << "----------------------------------------------------------------------------\n\n";
+        cout << "\n\tIngresos =>  " << earned << " Bs.\n" << line << "\n\n";
 
         branchs = branchs->next;
     }
@@ -1860,7 +1809,7 @@ void statsMarketingAll(branch* branchs, string month) {
 
 
 /*------ MENU MANAGMENT ------*/
-const string header = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line;
+const string header = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\n";
 
 struct mensajeInformativo {
     string data;
@@ -1879,7 +1828,7 @@ void actualizarMensaje(string m) {
 }
 
 void printCreators() {
-    cout << line << "\nREALIZADO POR: Carlos GaliÃ±o, AndrÃ©s De Quintal y Manuel NegrÃ³n;\n" << line << endl;
+    cout << line << "\nREALIZADO POR: Carlos Galiño, Andrés De Quintal y Manuel Negrón;\n" << line << endl;
 }
 
 /*--------------- BRANCHES AND PRODUCTS MENUS ---------------*/
@@ -1888,14 +1837,14 @@ void createProduct(product** P) {
     bool invalidCode = true;
     do
     {
-        obtenerEntrada2("\n\t- Escribe el CODIGO del nuevo producto: ", &code);
+        obtenerEntrada("\n\t- Escribe el CODIGO del nuevo producto: ", &code);
         if (code == "0") return;
         invalidCode = searchProductByCode(*P, code);
         if (invalidCode) cout << "\n\t\t-- CODIGO YA EXISTENTE --\n\n";
     } while (invalidCode);
 
-    obtenerEntrada2("\n\t- Escribe el NOMBRE del nuevo producto: ", &name);
-    obtenerEntrada2("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &description);
+    obtenerEntrada("\n\t- Escribe el NOMBRE del nuevo producto: ", &name);
+    obtenerEntrada("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &description);
 
     if (confirm()) {
         if ((isValid(code) && isValid(name) && isValid(description))) {
@@ -1948,7 +1897,7 @@ void tableProducts(product* P) {
 product* selectProductByCode(product* P) {
     string codeSelect = "";
     showAllProducts(P);
-    obtenerEntrada2("\n\t0. CANCELAR\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
+    obtenerEntrada("\n\t0. CANCELAR\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;
     return searchProductByCode(P, codeSelect);
 }
@@ -1965,7 +1914,7 @@ void optionsModProduct(product* selected) {
 
 void menuModProduct(product* P) {
     clScr();
-    cout << header;
+    cout << header << endl;
     cout << "CONSULTAR PRODUCTO POR DESCRIPCION\n0. VOLVER AL MENU ANTERIOR.\n" << line << endl;
 
     product* selected = selectProductByCode(P); // THE USER SELECT A PRODUCT
@@ -1979,18 +1928,18 @@ void menuModProduct(product* P) {
     string input = "";
     do {
         optionsModProduct(selected);
-        obtenerEntrada2("\n\n\tSu opcion (0-3): ", &input);
+        obtenerEntrada("\n\n\tSu opcion (0-3): ", &input);
         op = entradaValidar(input);
         switch (op) {
         case 1:
             cout << "Nombre anterior: " << selected->name << endl;
-            obtenerEntrada2("Nuevo nombre: ", &input);
+            obtenerEntrada("Nuevo nombre: ", &input);
 
             if (confirm()) selected->name = input;
             break;
         case 2:
             cout << "Descripcion anterior: " << selected->description << endl;
-            obtenerEntrada2("Nueva descripcion: ", &input);
+            obtenerEntrada("Nueva descripcion: ", &input);
 
             if (confirm()) selected->description = input;
             break;
@@ -1999,7 +1948,7 @@ void menuModProduct(product* P) {
             bool invalidCode = true;
             cout << "Codigo anterior: " << selected->code << endl;
             do {
-                obtenerEntrada2("Nuevo codigo: ", &input);
+                obtenerEntrada("Nuevo codigo: ", &input);
                 if (input == "0") return;
                 invalidCode = searchProductByCode(P, input);
                 if (invalidCode) {
@@ -2034,7 +1983,7 @@ void menuConsultProductByType(product* B) { // CAMBIAR EL "TYPE"
     string userInput = "";
     cout << header;
     cout << "\nCONSULTAR PRODUCTOS POR DESCRIPCION\n0. VOLVER A MENU ANTERIOR.\n" << line << endl;
-    obtenerEntrada2("\n\tIngresa la descripcion: ", &userInput);
+    obtenerEntrada("\n\tIngresa la descripcion: ", &userInput);
     if (userInput == "0") return;
 
     cout << "\n\tPRODUCTOS ENCONTRADOS: \n";
@@ -2060,7 +2009,7 @@ void menuConsultProductByDesc(product* B) {
         clScr();
         cout << header;
         cout << "\nCONSULTAR product POR DESCRIPCION\n\t1. DESCRIPCION\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
-        obtenerEntrada2("", &input);
+        obtenerEntrada("", &input);
         op = entradaValidar(input);
         if (op == 1) {
             menuConsultProductByType(B);
@@ -2082,14 +2031,14 @@ void menuDelProduct(product** P) {
         }
     }
 }
+
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*----------- BRANCHES -----------*/
 void createBranch(branch** B) {
     string name, city, state, address, tlf, code;
     bool invalidCode = true;
-    do
-    {
-        obtenerEntrada2("\n\t- Escribe el CODIGO de la nueva branch: ", &code);
+    do {
+        obtenerEntrada("\n\t- Escribe el CODIGO de la nueva branch: ", &code);
         invalidCode = searchBranchByCode(*B, code);
         if (invalidCode)
         {
@@ -2097,11 +2046,11 @@ void createBranch(branch** B) {
         }
     } while (invalidCode);
 
-    obtenerEntrada2("\n\t- Escribe el NOMBRE de la nueva branch (max.30): ", &name);
-    obtenerEntrada2("\n\t- Escribe el ESTADO de la nueva branch (max.30): ", &state);
-    obtenerEntrada2("\n\t- Escribe la CIUDAD de la nueva branch (max.30): ", &city);
-    obtenerEntrada2("\n\t- Escribe la DIRECCION de la nueva branch (max.30): ", &address);
-    obtenerEntrada2("\n\t- Escribe el NUMERO TELEFONICO de la nueva branch - (xxx) xxxxxxx: ", &tlf);
+    obtenerEntrada("\n\t- Escribe el NOMBRE de la nueva branch (max.30): ", &name);
+    obtenerEntrada("\n\t- Escribe el ESTADO de la nueva branch (max.30): ", &state);
+    obtenerEntrada("\n\t- Escribe la CIUDAD de la nueva branch (max.30): ", &city);
+    obtenerEntrada("\n\t- Escribe la DIRECCION de la nueva branch (max.30): ", &address);
+    obtenerEntrada("\n\t- Escribe el NUMERO TELEFONICO de la nueva branch - (xxx) xxxxxxx: ", &tlf);
 
     if (!isValid(name) || !isValid(city) || !isValid(state) || !isValid(address) || !isValid(address) || !isValid(code)) {
         cout << " \n\n\t\t-- CAMPOS LLENADOS INCORRECTAMENTE --\n\n";
@@ -2154,7 +2103,7 @@ void tableBranchs(branch* B) {
 branch* selectBranchByCode(branch* B) {
     string codeSelect = "";
     printBranchs(B);
-    obtenerEntrada2("\n\n\n\tIngrese el codigo de la branch: ", &codeSelect);
+    obtenerEntrada("\n\n\n\tIngrese el codigo de la branch: ", &codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;
     return searchBranchByCode(B, codeSelect);
 }
@@ -2170,7 +2119,6 @@ void menuConsultBranchByCode(branch* B) {
         cout << "\n\t\t ~ Telefono: " << selected->tlf << "\n\n";
     }
     else cout << "\n -- SUCURSAL INEXISTENTE --\n\n\n";
-    getchar();
 }
 
 
@@ -2179,7 +2127,7 @@ void menuConsultByState(branch* B) {
     string userInput = "";
     cout << "\n\tCONSULTAR SUCURSAL POR ESTADO\n\t0.VOLVER AL MENU ANTERIOR\n" << line << endl;
 
-    obtenerEntrada2("\nIngresa el estado: ", &userInput);
+    obtenerEntrada("\nIngresa el estado: ", &userInput);
 
     if (userInput == "0") return;
 
@@ -2202,7 +2150,7 @@ void menuConsultByCity(branch* B) {
     cout << header << endl;
     cout << "\n\tCONSULTAR SUCURSAL POR CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" << line << endl;
     string userInput = "";
-    obtenerEntrada2("\nIngresa la ciudad: ", &userInput);
+    obtenerEntrada("\nIngresa la ciudad: ", &userInput);
 
     if (userInput == "0") return;
 
@@ -2220,7 +2168,6 @@ void menuConsultByCity(branch* B) {
         selected = searchBranchByCity(selected->next, userInput);
     }
     cout << line << "\n\n\t\t\t";
-    system("pause");
 }
 
 
@@ -2240,7 +2187,6 @@ void menuDeleBranch(branch** B) {
     else {
         cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
     }
-    system("pause");
 }
 /*---------------------------------------------------------------------------*/
 /* PEOPLE */
@@ -2287,21 +2233,19 @@ void menuAddProductToBranch(branch* B, product* P) {
         cout << "\n\t - " << selected->name << " [" << selected->code << "]";
         cout << "\n\t\t ~ Descripcion: " << selected->description << "\n\n";
 
-        obtenerEntrada2("\n\tIngresa la cantidad minima del producto: ", &entrada);
+        obtenerEntrada("\n\tIngresa la cantidad minima del producto: ", &entrada);
         minAm = to_int(entrada);
 
-        obtenerEntrada2("\n\tIngresa la cantidad del producto: ", &entrada);
+        obtenerEntrada("\n\tIngresa la cantidad del producto: ", &entrada);
         am = to_int(entrada);
 
-        obtenerEntrada2("\n\tIngresa el precio del producto: ", &entrada);
+        obtenerEntrada("\n\tIngresa el precio del producto: ", &entrada);
         price = to_int(entrada);
 
         if ((am < minAm) || price < 0) cout << "\n\t-- DATOS INVALIDOS --\n\n";
         else if (confirm()) addProductToBranch(B, selected, am, minAm, price);
     }
     else cout << "\n -- PRODUCTO INEXISTENTE --\n\n\n";
-
-    system("pause");
 }
 
 void printProductssOfBranch(product* P) {
@@ -2351,8 +2295,6 @@ void menuDelProductOfBranch(product** P) {
         }
     }
     else cout << "\n -- PRODUCTO INEXISTENTE --\n\n";
-
-    system("pause");
 }
 
 
@@ -2382,24 +2324,24 @@ void menuModProductOfBranch(product* P) {
     do {
         clScr();
         optionsModProductOfBranch(selected);
-        obtenerEntrada2("", &input);
+        obtenerEntrada("", &input);
         op = entradaValidar(input);
         switch (op) {
         case 1:
             cout << "Nombre anterior: " << selected->name << endl;
-            obtenerEntrada2("Nuevo nombre: ", &input);
+            obtenerEntrada("Nuevo nombre: ", &input);
 
             if (confirm()) selected->name = input;
             break;
         case 2:
             cout << "Descripcion anterior: " << selected->description << endl;
-            obtenerEntrada2("Nueva descripcion: ", &input);
+            obtenerEntrada("Nueva descripcion: ", &input);
             if (confirm()) selected->description = input;
             break;
         case 3:
             cout << "Precio anterior: " << selected->price << endl;
-            obtenerEntrada2("Nuevo precio: ", &input);
-            userPrice = stof(input);
+            obtenerEntrada("Nuevo precio: ", &input);
+            userPrice = to_int(input);
             cin >> userPrice;
 
             if (confirm()) selected->description = input;
@@ -2410,7 +2352,7 @@ void menuModProductOfBranch(product* P) {
             cout << "Codigo anterior: " << selected->code << endl;
             do
             {
-                obtenerEntrada2("Nuevo codigo: ", &input);
+                obtenerEntrada("Nuevo codigo: ", &input);
                 invalidCode = searchProductByCode(P, input);
                 if (invalidCode)
                 {
@@ -2422,7 +2364,7 @@ void menuModProductOfBranch(product* P) {
         }
         case 5:
             cout << "Cantidad anterior: " << selected->amount << endl;
-            obtenerEntrada2("Nueva cantidad: ", &input);
+            obtenerEntrada("Nueva cantidad: ", &input);
             userAm = to_int(input);
             if (confirm() && selected->minAmount < userAm) {
                 selected->amount = userAm;
@@ -2431,7 +2373,7 @@ void menuModProductOfBranch(product* P) {
             break;
         case 6:
             cout << "Minima cantidad anterior: " << selected->minAmount << endl;
-            obtenerEntrada2("Nueva cantidad: ", &input);
+            obtenerEntrada("Nueva cantidad: ", &input);
             userAm = to_int(input);
             if (confirm() && userAm < selected->amount) selected->minAmount = userAm;
             break;
@@ -2440,7 +2382,7 @@ void menuModProductOfBranch(product* P) {
 }
 
 void optionsMenuInventory(branch* selected) {
-    cout << line << "\n1. SELECCIONAR SUCURSAL\n\t2. AGREGAR PRODUCTOS\n\t3. ELIMINAR PRODUCTOS\n\t4. MODIFICAR INVENTARIO\n\t5. MOSTRAR TODOS LOS PRODUCTOS\n\t0. VOLVER A MENU ANTERIOR.\n" << line;
+    cout << header << "\n\t1. SELECCIONAR SUCURSAL\n\t2. AGREGAR PRODUCTOS\n\t3. ELIMINAR PRODUCTOS\n\t4. MODIFICAR INVENTARIO\n\t5. MOSTRAR TODOS LOS PRODUCTOS\n\t0. VOLVER A MENU ANTERIOR.\n" << line;
     cout << "\n\n\t\tSucursal seleccionada: ";
     if (!selected) cout << "\tSeleccone una sucursal para continuar...\n";
     else cout << selected->name << " [" << selected->code << "]\n\n";
@@ -2458,7 +2400,6 @@ void menuInventory(branch* B, product* P) {
         if (!selected && (op != '1' && op != '0')) {
             cout << "\n\t\t\t-- SUCURSAL NO SELECCIONADA --\n\n\n";
             op = '\0';
-            getchar();
         }
         switch (op) {
         case '1':
@@ -2477,17 +2418,16 @@ void menuInventory(branch* B, product* P) {
         case '5':
             cout << "\n\n\t\tPRODUCTOS DE " << selected->name << "\n\n";
             tableProductsOfBranch(selected->products);
+            system("pause");
             break;
         }
-
-        system("pause");
     } while (op != '0');
 }
 
 people* selectPersonById(people* P) {
     tablePeople(P); // Reemplazar showPeople con tablePeople
     string input;
-    obtenerEntrada2("\nIngrese la cedula: ", &input);
+    obtenerEntrada("\nIngrese la cedula: ", &input);
     return searchPeopleByID(P, input);
 }
 
@@ -2570,7 +2510,7 @@ void createBill(branch* B, people* C) {
         prod = selectProductByCode(B->products);
         if (prod) {
             //cout << prod->amount << endl;
-            obtenerEntrada2("Ingrese la cantidad a agregar: ", &recycle);
+            obtenerEntrada("Ingrese la cantidad a agregar: ", &recycle);
             int cant = to_int(recycle);
             if (cant > 0 && cant <= prod->amount) {
                 addDeatail(&dt, prod, cant);
@@ -2579,7 +2519,7 @@ void createBill(branch* B, people* C) {
         }
         else break;
     }
-    obtenerEntrada2("\n\tIngrese el codigo de factura: ", &recycle);
+    obtenerEntrada("\n\tIngrese el codigo de factura: ", &recycle);
     newD = getDate("\n\tIngrese la fecha dd/mm/yyyy: ");
 
     if (!dt) {
@@ -2597,13 +2537,13 @@ void createBill(branch* B, people* C) {
         cout << "\n\t-- FACTURA AGREGADA --\n\n";
     }
     else cout << "\n\t-- FINALIZADO --\n\n";
-    getchar();
+    system("pause");
 }
 
 bill* selectBillByCode(branch* B, people* C) {
     billsResume(B, C);
     string input = "";
-    obtenerEntrada2("\n\tIngrese el codigo de la factura: ", &input);
+    obtenerEntrada("\n\tIngrese el codigo de la factura: ", &input);
     return searchBillByCode(B->bills->first, input);
 }
 
@@ -2622,8 +2562,6 @@ void menuDeleteBill(branch* B, people* C) {
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-
-
 // ------------------------------------------
 // ------------------------------------------
 // ------------------------------------------
@@ -2640,8 +2578,6 @@ void menuDeleteBill(branch* B, people* C) {
 // ------------------------------------------
 // ------------------------------------------
 // ------------------------------------------
-
-
 
 struct context {
     product** products;
@@ -2683,11 +2619,6 @@ void mostrarMenuActivo(menuItem* mi) {
     print(mi->encabezado);
 }
 
-
-
-
-
-// signature de las funciones de menu
 
 // ------------------------------------------
 // ------------------------------------------
@@ -2739,6 +2670,7 @@ PASOS PARA IMPLEMENTAR MENUITEM
 //obtenerEntrada("Indique el codigo de product para eliminar: ", &entrada);
 
 int controllerMenuBilling(menuItem** activo, int selec, context* ct) {
+
     switch (selec) {
     case 0:
         if (*activo) {
@@ -2751,11 +2683,11 @@ int controllerMenuBilling(menuItem** activo, int selec, context* ct) {
         }
     case 1:
         ct->selectedBranch = selectBranchByCode(*ct->branches);
-        actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
+        actualizarMensaje("\n\t\tTienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
         break;
     case 2:
         ct->selectedClient = selectPersonById(*ct->clients);
-        actualizarMensaje("Tienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
+        actualizarMensaje("\n\t\tTienda[ " + formatNULL(ct->selectedBranch) + " ]\tCliente[ " + formatNULL(ct->selectedClient) + " ]");
         break;
     case 3:
         if (ct->selectedBranch && ct->selectedClient) createBill(ct->selectedBranch, ct->selectedClient);
@@ -2871,7 +2803,7 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
             return 0;
         }
     case 1:
-        obtenerEntrada2("\n\t - Ingrese el nuevo Nombre y Apellido: ", &name);
+        obtenerEntrada("\n\t - Ingrese el nuevo Nombre y Apellido: ", &name);
         if (!validateName(name)) {
             cout << "El nombre y el apellido no deben contener numeros." << endl;
             cout << "\nPresione Enter para continuar...";
@@ -2886,7 +2818,7 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
         system("pause");
         return 1;
     case 2:
-        obtenerEntrada2("\n\t - Ingrese la nueva Cedula: ", &id);
+        obtenerEntrada("\n\t - Ingrese la nueva Cedula: ", &id);
         if (!validateID(id)) {
             cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
             cout << "\nPresione Enter para continuar...";
@@ -2933,14 +2865,14 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
 
     case 1:
         cout << "\n - AGREGAR CLIENTE - \n";
-        obtenerEntrada2("\n\t - Ingrese su cedula: ", &id);
+        obtenerEntrada("\n\t - Ingrese su cedula: ", &id);
         if (!validateID(id)) {
             cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
             cout << "\nPresione Enter para continuar...";
             system("pause");
             break;
         }
-        obtenerEntrada2("\n\t - Ingrese su nombre y apellido: ", &name);
+        obtenerEntrada("\n\t - Ingrese su nombre y apellido: ", &name);
         if (!validateName(name)) {
             cout << "\nEl nombre y el apellido no deben contener numeros." << endl;
             cout << "\nPresione Enter para continuar...";
@@ -2965,7 +2897,7 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
     case 2:
         cout << "\n\t - MODIFICAR CLIENTE - \n" << endl;
         tablePeople(*(ct->clients));
-        obtenerEntrada2("\n\t - Ingrese la cedula del cliente a modificar: ", &id);
+        obtenerEntrada("\n\t - Ingrese la cedula del cliente a modificar: ", &id);
         client = searchPeopleByID(*(ct->clients), id); // Declarar y asignar client
         if (client) {
             ct->selectedClient = client;
@@ -2996,7 +2928,7 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
     case 3:
         cout << "\n - ELIMINAR CLIENTE -\n" << endl;
         tablePeople(*(ct->clients));
-        obtenerEntrada2("\n\t - Ingrese la cedula del cliente a eliminar: ", &id);
+        obtenerEntrada("\n\t - Ingrese la cedula del cliente a eliminar: ", &id);
 
         // Verificar si el cliente existe antes de intentar eliminarlo
         client = searchPeopleByID(*(ct->clients), id);
@@ -3008,7 +2940,7 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
             }
         }
         else {
-            cout << "\n\t- No se encontrÃ³ el cliente con la cedula indicada." << endl;
+            cout << "\n\t- No se encontró el cliente con la cedula indicada." << endl;
         }
         cout << "\nPresione Enter para continuar...";
         system("pause");
@@ -3053,10 +2985,11 @@ int operarMenuPrincipal(menuItem** activo, int selec, context* ct) {
         *activo = menuMantenimiento(*activo);
         break;
     case 2:
-        actualizarMensaje("Tienda[   ]\tCliente[   ]");
+        actualizarMensaje("\n\t\tTienda[   ]\tCliente[   ]");
         *activo = menuBilling(*activo);
         break;
     case 3:
+        actualizarMensaje("");
         *activo = menuReports(*activo);
         break;
     default:
@@ -3164,12 +3097,10 @@ int controladorMenuSucursales(menuItem** activo, int selec, context* ct) {
         break;
     case 3: // eliminar
         actualizarMensaje("");
-        obtenerEntrada("Indique el codigo de la branch a eliminar: ", &entrada);
         menuDeleBranch(ct->branches);
         break;
     case 4: // consultar por codigo
         actualizarMensaje("");
-        obtenerEntrada("Indique el codigo de la branch a consultar: ", &entrada);
         menuConsultBranchByCode(*ct->branches);
         break;
     case 5: // Consult by description
@@ -3200,39 +3131,35 @@ void helperClientInfo(context* ct) {
 
     do {
         clScr();
-        obtenerEntrada2(line + "\nESTADISTICAS DE CLIENTE\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
+        obtenerEntrada(line + "\nESTADISTICAS DE CLIENTE\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
         selec = entradaValidar(info);
         switch (selec) {
         case 0:
             return;
             break;
         case 1:
-            obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
-            client = searchPeopleByID(*(ct->clients), info);
+            obtenerEntrada("Ingrese la cedula de identidad del cliente a buscar: ", &info);
+            client = searchPeopleByID((*ct->clients), info);
             if (!client) {
                 cout << "\n\t-- Cliente no encontrado --\n\n";
-                system("pause");
                 break;
             }
             billsClientResume(*(ct->branches), client);
-            system("pause");
             break;
         case 2:
-            obtenerEntrada2("Ingrese la cedula de identidad del cliente a buscar: ", &info);
-            client = searchPeopleByID(*(ct->clients), info);
+            obtenerEntrada("Ingrese la cedula de identidad del cliente a buscar: ", &info);
+            client = searchPeopleByID((*ct->clients), info);
             if (!client) {
                 cout << "\n\t-- Cliente no encontrado --\n\n";
-                system("pause");
                 break;
             }
-            productClientResume(*(ct->branches), client);
-            system("pause");
+            productClientResume((*ct->branches), client);
             break;
         default:
             cout << "La Opcion es invalida.\n";
-            system("pause");
             break;
         }
+        system("pause");
     } while (1);
 }
 
@@ -3244,14 +3171,14 @@ void helperBranchInfo(context* ct) {
 
     do {
         clScr();
-        obtenerEntrada2(line + "\nESTADISTICAS DE SUCURSAL\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
+        obtenerEntrada(line + "\nESTADISTICAS DE SUCURSAL\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
         selec = entradaValidar(info);
         switch (selec) {
         case 0:
             return;
             break;
         case 1:
-            obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+            obtenerEntrada("Ingrese el codigo de la sucursal a buscar: ", &info);
             selected = searchBranchByCode(*(ct->branches), info);
             if (!selected) {
                 cout << "\n\t-- Sucursal no encontrada --\n\n";
@@ -3262,7 +3189,7 @@ void helperBranchInfo(context* ct) {
             system("pause");
             break;
         case 2:
-            obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+            obtenerEntrada("Ingrese el codigo de la sucursal a buscar: ", &info);
             selected = searchBranchByCode(*(ct->branches), info);
             if (!selected) {
                 cout << "\n\t-- Sucursal no encontrada --\n\n";
@@ -3273,14 +3200,14 @@ void helperBranchInfo(context* ct) {
             system("pause");
             break;
         case 3:
-            obtenerEntrada2("Ingrese el codigo de la sucursal a buscar: ", &info);
+            obtenerEntrada("Ingrese el codigo de la sucursal a buscar: ", &info);
             selected = searchBranchByCode(*(ct->branches), info);
             if (!selected) {
                 cout << "\n\t-- Sucursal no encontrada --\n\n";
                 system("pause");
                 break;
             }
-            obtenerEntrada2("Escribe el MES deseado: ", &info);
+            obtenerEntrada("Escribe el MES deseado: ", &info);
             branchMonthlyResume(selected, info);
             system("pause");
             break;
@@ -3296,7 +3223,7 @@ void helperBranchInfo(context* ct) {
 
 
 int controllerHelperMarketing(menuItem** activo, int selec, context* ct) {
-    string input = "";;
+    string input = "";
     switch (selec) {
     case 0:
         if (*activo) {
@@ -3308,23 +3235,20 @@ int controllerHelperMarketing(menuItem** activo, int selec, context* ct) {
             return 0;
         }
     case 1:
-        obtenerEntrada2("Escribe el MES deseado: ", &input);
+        obtenerEntrada("Escribe el MES deseado: ", &input);
         statsMarketingByCode((*ct->branches), input);
-        // total ventas ordenado por codigo de producto
         break;
     case 2:
-        obtenerEntrada2("Escribe el MES deseado: ", &input);
+        obtenerEntrada("Escribe el MES deseado: ", &input);
         statsMarketingByBranch((*ct->branches), input);
-        // total ventas ordenado por codigo de tienda
         break;
     case 3:
-        obtenerEntrada2("Escribe el MES deseado: ", &input);
+        obtenerEntrada("Escribe el MES deseado: ", &input);
         statsMarketingByQty((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
         break;
     case 4:
-        obtenerEntrada2("Escribe el MES deseado: ", &input);
+        obtenerEntrada("Escribe el MES deseado: ", &input);
         statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
-        // total ventas ordenado por codigo de tienda
         break;
     }
     system("pause");
@@ -3360,10 +3284,8 @@ int controllerMenuReports(menuItem** activo, int selec, context* ct) {
 
 menuItem* controlSucursales(menuItem* parent) {
     menuItem* m = new menuItem;
-    // refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE SUCURSALES GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t6. MOSTRAR TODAS LAS SUCURSALES\n\t7. MOSTRAR INVENTARIO\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos GaliÃ±o, AndrÃ©s de Quintal y Manuel NegrÃ³n;\n---------------------------------------------------------------------------";
+    m->encabezado = header + "\tCONTROL DE SUCURSALES\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t6. MOSTRAR TODAS LAS SUCURSALES\n\t7. MOSTRAR INVENTARIO\n\t0. SALIR\n" + line + "\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón\n" + line;
     m->parent = parent->parent;
-    // refactor m->prox = NULL;
     m->comportamiento = controladorMenuSucursales;
     return m;
 }
@@ -3371,10 +3293,8 @@ menuItem* controlSucursales(menuItem* parent) {
 
 menuItem* controlProductos(menuItem* parent) {
     menuItem* m = new menuItem;
-    // refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nCONTROL DE PRODUCTOS GLOBAL\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t6. MOSTRAR PRODUCTOS\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos GaliÃ±o, AndrÃ©s de Quintal y Manuel NegrÃ³n;\n---------------------------------------------------------------------------";
+    m->encabezado = header + "\n\tCONTROL DE PRODUCTOS\n\t1. AGREGAR\n\t2. MODIFICAR\n\t3. ELIMINAR\n\t4. CONSULTAR POR CODIGO\n\t5. CONSULTAR POR DESCRIPCION\n\t6. MOSTRAR PRODUCTOS\n\t0. SALIR\n" + line + "\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón\n" + line;
     m->parent = parent;
-    //refactor m->prox = controlSucursales(m);
     m->comportamiento = controladorMenuProductos;
     return m;
 }
@@ -3382,10 +3302,8 @@ menuItem* controlProductos(menuItem* parent) {
 
 menuItem* menuMantenimiento(menuItem* parent) {
     menuItem* m = new menuItem;
-    //refactor m->cabeza = parent->cabeza;
-    m->encabezado = "---------------------------------------------------------------------------\n\t\t1. MANTENIMIENTO\n---------------------------------------------------------------------------\nOPCIONES DE MENU\n\t1. PRODUCTOS\n\t2. SUCURSALES\n\t3. PERSONAS\n\t0. REGRESAR\n---------------------------------------------------------------------------";
+    m->encabezado = header + "\t\tMANTENIMIENTO\n" + line + "\n\tOPCIONES DE MENU\n\t1. PRODUCTOS\n\t2. SUCURSALES\n\t3. PERSONAS\n\t0. REGRESAR\n" + line;
     m->parent = parent;
-    // refactor m->prox = controlProductos(m);
     m->comportamiento = operarMenuMantenimiento;
     return m;
 
@@ -3393,10 +3311,8 @@ menuItem* menuMantenimiento(menuItem* parent) {
 
 menuItem* menuPrincipal() {
     menuItem* m = new menuItem;
-    // refactor m->cabeza = cargarLocal("Data.txt");
-    m->encabezado = "---------------------------------------------------------------------------\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n---------------------------------------------------------------------------\nMENU PRINCIPAL\n\t1. MANTENIMIENTO\n\t2. FACTURACION\n\t3. REPORTES\n\t0. SALIR\n---------------------------------------------------------------------------\nRealizado por Carlos GaliÃ±o, AndrÃ©s de Quintal y Manuel NegrÃ³n;\n---------------------------------------------------------------------------";
+    m->encabezado = header + "\tMENU PRINCIPAL\n\t1. MANTENIMIENTO\n\t2. FACTURACION\n\t3. REPORTES\n\t0. SALIR\n" + line + "\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón;\n" + line;
     m->parent = NULL;
-    // refactor m->prox = menuMantenimiento(m);
     m->comportamiento = operarMenuPrincipal;
     return m;
 }
@@ -3404,7 +3320,7 @@ menuItem* menuPrincipal() {
 
 menuItem* menuConsultBranchByDesc(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\nCONSULTAR SUCURSAL POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-2): ";
+    m->encabezado = line + "\n\tCONSULTAR SUCURSAL POR DESCRIPCION\n\t1. ESTADO\n\t2. CIUDAD\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-2): ";
     m->parent = parent;
     m->comportamiento = controllerConsultBranchByDesc;
     return m;
@@ -3412,7 +3328,7 @@ menuItem* menuConsultBranchByDesc(menuItem* parent) {
 
 menuItem* menuModBranchs(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\nMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-6): ";
+    m->encabezado = line + "\n\tMODIFICAR\n\t1. NOMBRE\n\t2. ESTADO\n\t3. CIUDAD\n\t4. DIRECCION\n\t5. TELEFONO\n\t6. CODIGO\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-6): ";
     m->parent = parent;
     m->comportamiento = controllerConsultBranchByDesc;
     return m;
@@ -3420,7 +3336,7 @@ menuItem* menuModBranchs(menuItem* parent) {
 
 menuItem* menuPeople(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\n\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\nMANTENIMIENTO PERSONAS\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line + "\nSu opcion (0-5): \n";
+    m->encabezado = header + "\nMANTENIMIENTO PERSONAS\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n" + line + "\nSu opcion (0-5): \n";
     m->parent = parent;
     m->comportamiento = controllerMenuPeople;
     return m;
@@ -3428,7 +3344,7 @@ menuItem* menuPeople(menuItem* parent) {
 
 menuItem* menuModifyPeople(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\n\t\nMANTENIMIENTO PERSONAS\n\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n\n" + line + "\nSu opcion (0-5): \n" + line + "\nRealizado por Carlos GaliÃ±o, AndrÃ©s de Quintal y Manuel NegrÃ³n\n" + line;
+    m->encabezado = header + "\n\t\nMANTENIMIENTO PERSONAS\n\n\t1. AGREGAR CLIENTE\n\t2. MODIFICAR CLIENTE\n\t3. ELIMINAR CLIENTE\n\t4. CONSULTAR\n\t5. MOSTRAR TODOS LOS CLIENTES\n\t0. VOLVER AL MENU ANTERIOR.\n\n" + line + "\nSu opcion (0-5): \n" + line + "\nRealizado por Carlos Galiño, Andrés de Quintal y Manuel Negrón\n" + line;
     m->parent = parent;
     m->comportamiento = controllerMenuModifyPeople;
     return m;
@@ -3436,7 +3352,7 @@ menuItem* menuModifyPeople(menuItem* parent) {
 
 menuItem* menuBilling(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "---------------------------------------------------------------------------\n\t\t2. FACTURACION\n---------------------------------------------------------------------------\n\t1. SELECCIONAR TIENDA\n\t2. SELECCIONAR CLIENTE\n\t3. AGREGAR PRODUCTOS\n\t4. MOSTRAR FACTURA\n\t5. ELIMINAR FACTURA\n\t6. MOSTRAR RESUMEN FACTURAS\n\t0. VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion (0-6): ";
+    m->encabezado = header + "\n\t\t2.FACTURACION\n" + line + "\n\t1.SELECCIONAR TIENDA\n\t2.SELECCIONAR CLIENTE\n\t3.AGREGAR PRODUCTOS\n\t4.MOSTRAR FACTURA\n\t5.ELIMINAR FACTURA\n\t6.MOSTRAR RESUMEN FACTURAS\n\t0.VOLVER A MENU ANTERIOR.\n" + line + "\nSu opcion(0 - 6) : ";
     m->parent = parent;
     m->comportamiento = controllerMenuBilling;
     return m;
@@ -3444,7 +3360,7 @@ menuItem* menuBilling(menuItem* parent) {
 
 menuItem* menuReports(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\nREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n\t0. VOLVER AL MENU\n" + line;
+    m->encabezado = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\n\tREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerMenuReports;
     return m;
@@ -3452,7 +3368,7 @@ menuItem* menuReports(menuItem* parent) {
 
 menuItem* helperMarketing(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\nREPORTES\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t3. VER ESTADISTICAS DE PRODUCTO POR SUCURSAL\n\t0. VOLVER AL MENU\n" + line;
+    m->encabezado = line + "\nREPORTES DE MERCADEO\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t3. VER ESTADISTICAS DE PRODUCTO POR SUCURSAL\n\t4. VER MONTO TOTAL DE CADA CLIENTE\n\t5. VER INFORMACION DE INGRESOS POR TIENDA\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerHelperMarketing;
     return m;
@@ -3462,8 +3378,10 @@ menuItem* helperMarketing(menuItem* parent) {
 void run() {
     int activo = 1;
     int val = 0;
+
     string entrada = "";
     menuItem* menuActivo = menuPrincipal();
+
     branch* branches = NULL;
     product* products = NULL;
     people* clients = NULL;
@@ -3474,10 +3392,9 @@ void run() {
     readClients(&clients);
     readBills(&branches, &clients);
 
-
-    context* ct = newContext(&products, &branches, &clients);
+    context* ct = newContext(&products, &branches, &clients); // Almacenador
     while (activo) {
-        clScr(); // Refrescar la pantalla y borrar el terminal
+        clScr();
         print(Mensajero->data);
         if (menuActivo) {
             obtenerEntrada(menuActivo->encabezado, &entrada);
@@ -3494,13 +3411,10 @@ void run() {
     saveProductsOfBranch(branches);
     saveClients(clients);
     saveBills(branches);
-
-    clScr(); // Refrescar la pantalla y borrar el terminal
 }
 
-// main.cpp : This file contains the 'main' function. Program execution begins and ends there.
-int main() {
 
-    setlocale(LC_ALL, "utf-8");
+int main() {
+    setlocale(LC_ALL, "es_ES.UTF-8");
     run();
 }
