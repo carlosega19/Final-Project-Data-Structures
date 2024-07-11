@@ -1,6 +1,12 @@
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
-
+/*
+INTEGRANTES
+MANUEL NEGRON
+CARLOS GALI�O
+ANDRES DE QUINTAL
+*/
 #include <iostream>
+#include <string>
 #include <string.h>
 
 using namespace std;
@@ -24,7 +30,7 @@ struct product {
     string description;
     int amount;
     int minAmount;
-    float price;
+    int price;
     product* next;
 };
 
@@ -57,6 +63,8 @@ struct dipolo {
 struct people {
     string ID;
     string name;
+	string city; // No lo tenia
+
     people* next;
 };
 
@@ -139,7 +147,7 @@ long int to_int(string s) {
     }
     return result;
 }
-
+/*
 string to_string(int num) {
     char *str = new char[50];
 
@@ -159,11 +167,10 @@ string to_string(int num) {
 
     return str;
 }
-
+*/
 void obtenerEntrada(string input, string* res) {
     cout << endl << input << "\n\t=> ";
-    cin >> *res;
-    cin.clear();
+    getline(cin, *res);
 }
 
 /////////////////////
@@ -258,6 +265,27 @@ int totalPrice(detail* B) {
     return B ? B->price + totalPrice(B->next) : 0;
 }
 
+void deleteAsociatedBills(branch **branches, string clientId) {
+    branch *act = *branches;
+    bill *ax = NULL;
+    bill *t = NULL;
+    while (act) {
+        ax = (act)->bills->first;
+        while (ax) { 
+            if (ax->clientId == clientId) {
+                t = ax;
+                ax = ax->next;
+                if (t == (act)->bills->first) (act)->bills->first = (act)->bills->first->next;
+                if (t == (act)->bills->last) (act)->bills->last = (act)->bills->last->prev;
+                if (t->prev) t->prev->next = t->next;
+                if (t->next) t->next->prev = t->prev;
+                delete t;
+                t = NULL;
+            } else ax = ax->next;
+        }
+        act = act->next;
+    }
+}
 
 // Insertar ordenadamente por codigo de factura CUIDADO
 bool addBill(dipolo** P, bill* newB, detail* prods) {
@@ -292,7 +320,7 @@ bool addBill(dipolo** P, bill* newB, detail* prods) {
 }
 
 // Eliminar una factura
-void deleteBill(dipolo** P, string code) {
+void deleteBill(dipolo **P, string code) {
     bill* ax = (*P)->first;
     while (ax && !isEqual(ax->code, code)) {
         ax = ax->next;
@@ -409,7 +437,7 @@ bool validateName(string name) {
 
 // Función para validar que la cedula tenga solo números y tenga entre 7 y 8 dígitos
 bool validateID(string cedula) {
-    if (cedula.length() < 7 || cedula.length() > 8) {
+    if (cedula.length() < 3 || cedula.length() > 10) {
         return false;
     }
     for (char c : cedula) {
@@ -432,10 +460,12 @@ people* searchPeopleByID(people* P, string id) {
 }
 
 // Función para agregar una nueva persona a la lista
-void addPerson(people** P, string id, string name) {
+void addPerson(people** P, string id, string name, string city) {
     people* newP = new people;
     newP->ID = id;
     newP->name = name;
+	newP->city = city;
+
     newP->next = NULL;
     if (*P) {
         people* aux = *P;
@@ -474,13 +504,13 @@ void showPeople(people* P) {
     }
 
     while (P != NULL) {
-        cout << "Cedula: " << P->ID << ", Nombre y Apellido: " << P->name << endl;
+        cout << "Cedula: " << P->ID << ", Nombre: " << P->name << ",   Ciudad: " << P->city << endl;
         P = P->next;
     }
 }
 
 // Función para eliminar una persona de la lista
-void deletePerson(people** P, string id) {
+void deletePerson(branch **branches, people** P, string id) {
     if (!P) return;
 
     people* ax = *P;
@@ -489,6 +519,7 @@ void deletePerson(people** P, string id) {
     if (ax->ID == id) {
         temp = ax;
         *P = (*P)->next;
+        deleteAsociatedBills(branches, ax->ID);
         delete temp;
         return;
     }
@@ -497,6 +528,7 @@ void deletePerson(people** P, string id) {
         if (ax->next) {
             temp = ax->next;
             ax->next = temp->next;
+            deleteAsociatedBills(branches, ax->ID);
             delete temp;
         }
     }
@@ -701,7 +733,7 @@ const int NS = 10;
 
 int entradaValidar(string entrada) {
     int i = 0;
-    char t;
+    char t = '\0';
     if (entrada[0]) {
         t = entrada[0];
     }
@@ -718,7 +750,7 @@ int entradaValidar(string entrada) {
 
 int confirm() {
     string entrada = "";
-    obtenerEntrada("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n\t=> ", &entrada);
+    obtenerEntrada("\n\tSeguro que desea confirmar? \n\t(1) CONFIRMAR\n\t(0) Cancelar\n ", &entrada);
     if (entradaValidar(entrada)) return 1;
     return 0;
 }
@@ -848,7 +880,7 @@ void stringToPerson(char* s, people** P) {
         slista* attrs = split(s, ',');
         int sl = len(attrs);
         if (sl >= 2) {
-            addPerson(P, attrs->cont, attrs->prox->cont);
+            addPerson(P, attrs->cont, attrs->prox->cont, attrs->prox->prox->cont);
         }
     }
 }
@@ -1041,7 +1073,7 @@ void saveClients(people* C) {
     FILE* file = NULL;
     fopen_s(&file, "clients.txt", "w");
     while (C) {
-        fprintf(file, "%s,%s\n", C->ID.c_str(), C->name.c_str());
+		fprintf(file, "%s,%s,%s\n", C->ID.c_str(), C->name.c_str(), C->city.c_str());
         C = C->next;
     }
     fclose(file);
@@ -1131,11 +1163,12 @@ ABBgen* NG(bill* b, string ax = "") {
 }
 
 //  ABB CLIENT
-ABBgen* NG(people* b, int am, int pr) {
+ABBgen* NG(people* b, int am, int pr, string axS) {
     ABBgen* r = new ABBgen;
     r->data = b;
     r->axAm = am;
     r->axPr = pr;
+	r->axS = axS;
 
     r->T = T_CLIENT;
     r->left = NULL;
@@ -1145,11 +1178,13 @@ ABBgen* NG(people* b, int am, int pr) {
 }
 
 // ABB DETAIL
-ABBgen* NG(detail* b, int pr, int am) {
+ABBgen* NG(detail* b, int pr, int am, string axS) {
     ABBgen* r = new ABBgen;
     r->data = b;
     r->axAm = am;
     r->axPr = pr;
+    r->axS = axS;
+
     r->T = T_DETAIL;
     r->left = NULL;
     r->right = NULL;
@@ -1232,6 +1267,7 @@ void tableData(ABBgen* t) {
             printFmt(((detail*)t->data)->name, 25);
             printFmt(to_string(t->axAm), 15);
             printFmt(to_string(t->axPr), 15);
+            printFmt(t->axS, 15);
             break;
         case T_PRODUCT:
             printFmt(((product*)t->data)->code, 15);
@@ -1244,6 +1280,7 @@ void tableData(ABBgen* t) {
             printFmt(((people*)t->data)->name, 25);
             printFmt(to_string(t->axAm), 15);
             printFmt(to_string(t->axPr), 15);
+			if (t->axS != "") printFmt(t->axS, 15); 
             break;
         default:
             cout << "<Undefined type object>";
@@ -1267,21 +1304,22 @@ void insertABBgen(ABBgen** N, bill* data, string ax = "") {
 }
 
 // DETAIL ABB
-void insertABBgen(ABBgen** N, detail* data) {
+void insertABBgen(ABBgen** N, detail* data, string axS = "") {
     if (*N) {
         if (compare(((detail*)(*N)->data)->code, data->code)) {
-            insertABBgen(&(*N)->left, data);
+            insertABBgen(&(*N)->left, data, axS);
         }
         else if (compare(data->code, ((detail*)(*N)->data)->code)) {
-            insertABBgen(&(*N)->right, data);
+            insertABBgen(&(*N)->right, data, axS);
         }
         else {
             (*N)->axAm += data->amount;
             (*N)->axPr += data->price;
         };
     }
-    else *N = NG(data, data->price, data->amount);
+    else *N = NG(data, data->price, data->amount, axS);
 }
+
 
 // INSERT ABB PRODUCTS 
 void insertABBgen(ABBgen** N, product* data) {
@@ -1312,7 +1350,7 @@ void insertABBgen(ABBgen** N, branch* data) {
 }
 
 // INSERT ABB CLIENTS
-void insertABBgen(ABBgen** N, people* data, int am, int pr) {
+void insertABBgen(ABBgen** N, people* data, int am, int pr, string axS = "") {
     if (*N) {
         if (compare(((people*)(*N)->data)->ID, data->ID)) {
             insertABBgen(&(*N)->left, data, am, pr);
@@ -1325,7 +1363,7 @@ void insertABBgen(ABBgen** N, people* data, int am, int pr) {
             (*N)->axPr += pr;
         }
     }
-    else *N = NG(data, am, pr);
+    else *N = NG(data, am, pr, axS);
 }
 
 void inorderGen(ABBgen** N) {
@@ -1354,10 +1392,10 @@ void sortByAm(ABBgen** arr, int size) {
             l = (2 * j) + 1;
             r = (2 * j) + 2;
 
-            if (l <= end && arr[j] < arr[l]) {
+            if (l <= end && arr[j]->axAm > arr[l]->axAm) {
                 swap(arr[j], arr[l]);
             }
-            if (r <= end && arr[j] < arr[r]) {
+            if (r <= end && arr[j]->axAm > arr[r]->axAm) {
                 swap(arr[j], arr[r]);
             }
         }
@@ -1504,6 +1542,7 @@ void productClientResume(branch* branches, people* client) {
     }
 }
 
+// 3.2.1
 void branchUnitsResume(branch* selected) {
     ABBgen* resume = NULL;
     bill* ax = selected->bills->first;
@@ -1515,7 +1554,7 @@ void branchUnitsResume(branch* selected) {
         detail* bx = ax->detailBill;
         cost = 0;
         while (bx) {
-            insertABBgen(&resume, bx);
+            insertABBgen(&resume, bx, to_string(searchProductByCode(selected->products, bx->code)->amount) );
             totalSelled += bx->amount;
             cost += bx->price;
             bx = bx->next;
@@ -1533,6 +1572,8 @@ void branchUnitsResume(branch* selected) {
         printFmt("DESCRIPCION ", 25);
         printFmt("VENDIDOS ", 15);
         printFmt("GENERADO ", 15);
+        printFmt("EXISTENCIA ", 15);
+
         cout << "\n" << line << "\n";
         inorderGen(&resume);
         cout << "\n" << line << "\n";
@@ -1775,7 +1816,7 @@ void statsMarketingByClientBill(branch* branchs, people* clients, product* prod,
 }
 
 // MERCADEO 3.5
-void statsMarketingAll(branch* branchs, string month) {
+void statsMarketingAll(branch *branchs, string month) {
     bill* ax = NULL;
     detail* bx = NULL;
 
@@ -1800,12 +1841,13 @@ void statsMarketingAll(branch* branchs, string month) {
             ax = ax->next;
         }
         cout << "\n\tProductos vendidos =>  " << selled;
-        cout << "\n\tIngresos =>  " << earned << " Bs.\n" << line << "\n\n";
-
+        cout << "\n\tIngresos =>  " << earned << " Bs.";
+        if (selled) { cout << "\n\tPromedio de ingresos por producto: " << (float) earned / (float) selled << " Bs. \n" << line << "\n\n"; }
+        else { cout << "\n\tNo hubo ingreso\n" << line << "\n\n"; } 
+        
         branchs = branchs->next;
     }
 }
-
 
 
 /*------ MENU MANAGMENT ------*/
@@ -1844,6 +1886,7 @@ void createProduct(product** P) {
     } while (invalidCode);
 
     obtenerEntrada("\n\t- Escribe el NOMBRE del nuevo producto: ", &name);
+	cin.ignore();
     obtenerEntrada("\n\t- Escribe la DESCRIPCION del nuevo producto: ", &description);
 
     if (confirm()) {
@@ -1897,7 +1940,7 @@ void tableProducts(product* P) {
 product* selectProductByCode(product* P) {
     string codeSelect = "";
     showAllProducts(P);
-    obtenerEntrada("\n\t0. CANCELAR\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
+    obtenerEntrada("\n\t0. FINALIZAR\n\n\n\tIngrese el codigo del product entre []: ", &codeSelect);
     if (codeSelect.empty() || codeSelect == "0") return NULL;
     return searchProductByCode(P, codeSelect);
 }
@@ -2185,7 +2228,7 @@ void menuDeleBranch(branch** B) {
         if (confirm()) deleteBranch(B, selected->code);
     }
     else {
-        cout << "\n\n\t\t-- branch NO SELECCIONADA --\n\n";
+        cout << "\n\n\t\t-- SUCURSAL NO SELECCIONADA --\n\n";
     }
 }
 /*---------------------------------------------------------------------------*/
@@ -2193,13 +2236,16 @@ void menuDeleBranch(branch** B) {
 
 void headerPeople() {
     cout << "\n\t- LISTA DE PERSONAS - \n\n";
-    cout << "CEDULA    NOMBRE Y APELLIDO\n";
-    cout << line << endl;
+    printFmt("CEDULA", 10);
+    printFmt("NOMBRE Y APELLIDO", 30);
+	printFmt("CIUDAD", 10);
+    cout << endl << line << endl;
 }
 
 void printPersonInTable(people* P) {
     printFmt(P->ID, 10);
     printFmt(P->name, 30);
+	printFmt(P->city, 10);
     cout << endl;
 }
 
@@ -2482,8 +2528,10 @@ void showAllBills(bill* B, people* client) {
 
 /*  ARREGLAR IMPRIMIR RESUMEN TODO: PULIR ESTA (no se como funciona printFmt())  */
 void billsResume(branch* B, people* C) {
+    if (!B || !B->bills || !B->bills->first) return;
     bill* ax = B->bills->first;
-    cout << line << "\n\tRESUMEN DE FACTURAS\n" << line;
+    
+    cout << line << "\n\tRESUMEN DE FACTURAS\n" << line << "\n";
     printFmt("Factura ", 15);
     printFmt("Fecha ", 15);
     printFmt("Monto ", 15);
@@ -2524,7 +2572,6 @@ void createBill(branch* B, people* C) {
 
     if (!dt) {
         cout << "\n\t-- NO SE AGREGO NADA --\n\n";
-        system("pause");
         return;
     }
     bill* newB = newBill(recycle, C->ID, repr(newD));
@@ -2537,10 +2584,11 @@ void createBill(branch* B, people* C) {
         cout << "\n\t-- FACTURA AGREGADA --\n\n";
     }
     else cout << "\n\t-- FINALIZADO --\n\n";
-    system("pause");
 }
 
-bill* selectBillByCode(branch* B, people* C) {
+bill* selectBillByCode(branch *B, people *C) {
+    if (!B || !C) return NULL;
+    
     billsResume(B, C);
     string input = "";
     obtenerEntrada("\n\tIngrese el codigo de la factura: ", &input);
@@ -2806,50 +2854,41 @@ int controllerMenuModifyPeople(menuItem** activo, int selec, context* ct) {
         obtenerEntrada("\n\t - Ingrese el nuevo Nombre y Apellido: ", &name);
         if (!validateName(name)) {
             cout << "El nombre y el apellido no deben contener numeros." << endl;
-            cout << "\nPresione Enter para continuar...";
-            system("pause");
             return 1;
         }
         cliente->name = name;
         cout << "\n\t- Nombre y Apellido modificados exitosamente! -" << endl;
         cout << "\n\t- Informacion actualizada del cliente:\n" << endl;
         cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
-        cout << "\nPresione Enter para continuar...";
-        system("pause");
         return 1;
     case 2:
         obtenerEntrada("\n\t - Ingrese la nueva Cedula: ", &id);
         if (!validateID(id)) {
-            cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
-            cout << "\nPresione Enter para continuar...";
-            system("pause");
+            cout << "\nCedula invalida. Debe contener entre 3 y 10 digitos numericos." << endl;
             return 1;
         }
         if (searchPeopleByID(*(ct->clients), id) != NULL) {
             cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
-            cout << "\nPresione Enter para continuar...";
-            system("pause");
             return 1;
         }
         cliente->ID = id;
         cout << "\n\t- Cedula modificada exitosamente! -" << endl;
         cout << "\n\t- Informacion actualizada del cliente:\n" << endl;
         cout << "Cedula: " << cliente->ID << ", Nombre y Apellido: " << cliente->name << endl;
-        cout << "\nPresione Enter para continuar...";
-        system("pause");
         return 1;
 
     default:
         cout << "Opcion no valida. Intente de nuevo." << endl;
-        cout << "Presione ENTER para continuar...";
-        system("pause");
         return 1;
     }
+	system("pause");
 }
 
 int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
     string id = "";
     string name = "";
+	string city = "";
+
     people* client = NULL;
 
     switch (selec) {
@@ -2867,29 +2906,28 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
         cout << "\n - AGREGAR CLIENTE - \n";
         obtenerEntrada("\n\t - Ingrese su cedula: ", &id);
         if (!validateID(id)) {
-            cout << "\nCedula invalida. Debe contener entre 7 y 8 digitos numericos." << endl;
-            cout << "\nPresione Enter para continuar...";
+            cout << "\nCedula invalida. Debe contener entre 3 y 10 digitos numericos." << endl;
             system("pause");
             break;
         }
         obtenerEntrada("\n\t - Ingrese su nombre y apellido: ", &name);
         if (!validateName(name)) {
             cout << "\nEl nombre y el apellido no deben contener numeros." << endl;
-            cout << "\nPresione Enter para continuar...";
             system("pause");
             break;
         }
+
+		obtenerEntrada("Ingrese la ciudad: ", &city);
 
         if (searchPeopleByID(*(ct->clients), id) != NULL) {
             cout << "\nCedula ya existente. Ingrese una cedula unica." << endl;
-            cout << "\nPresione Enter para continuar...";
             system("pause");
             break;
         }
 
-        addPerson(ct->clients, id, name);
+
+        addPerson(ct->clients, id, name, city);
         cout << "\n\t- Cliente agregado exitosamente! -" << endl;
-        cout << "\nPresione Enter para continuar...";
         system("pause");
         clScr();
         break;
@@ -2919,7 +2957,6 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
         }
         else {
             cout << "No se encontro el cliente con la cedula indicada." << endl;
-            cout << "\nPresione Enter para continuar...";
             system("pause");
             clScr();
         }
@@ -2935,14 +2972,13 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
         if (client) {
             cout << "Cedula: " << client->ID << ", Nombre y Apellido: " << client->name << endl;
             if (confirm() == 1) {
-                deletePerson(ct->clients, client->ID);
+                deletePerson(ct->branches, ct->clients, client->ID);
                 cout << "\n\t- Cliente eliminado exitosamente! -" << endl;
             }
         }
         else {
             cout << "\n\t- No se encontró el cliente con la cedula indicada." << endl;
         }
-        cout << "\nPresione Enter para continuar...";
         system("pause");
         clScr();
         break;
@@ -2955,14 +2991,12 @@ int controllerMenuPeople(menuItem** activo, int selec, context* ct) {
 
     case 5:
         tablePeople(*(ct->clients));
-        cout << "\nPresione Enter para continuar...";
         system("pause");
         clScr();
         break;
 
     default:
         cout << "Opcion no valida. Intente de nuevo." << endl;
-        cout << "Presione ENTER para continuar...";
         system("pause");  // espera nuevo \n para tomar;
         break;
     }
@@ -3131,7 +3165,7 @@ void helperClientInfo(context* ct) {
 
     do {
         clScr();
-        obtenerEntrada(line + "\nESTADISTICAS DE CLIENTE\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
+        obtenerEntrada(header + "\nESTADISTICAS DE CLIENTE\n\t1. MOSTRAR EL RESUMEN DE TODAS SUS FACTURAS ORDENADO\n\t2. MOSTRAR EL RESUMEN DE LOS PRODUCTOS ADQUIRIDOS\n\t0. VOLVER\n" + line + "\n", &info);
         selec = entradaValidar(info);
         switch (selec) {
         case 0:
@@ -3171,7 +3205,7 @@ void helperBranchInfo(context* ct) {
 
     do {
         clScr();
-        obtenerEntrada(line + "\nESTADISTICAS DE SUCURSAL\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
+        obtenerEntrada(header + "\nESTADISTICAS DE SUCURSAL\n\t1. MOSTRAR INFORMACION DE VENTAS\n\t2. MOSTRAR EL RESUMEN DEL INVENTARIO\n\t3. MOSTRAR EL RESUMEN DE COMPRAS DE UN CLIENTE\n\t0. VOLVER\n" + line + "\n", &info);
         selec = entradaValidar(info);
         switch (selec) {
         case 0:
@@ -3250,34 +3284,44 @@ int controllerHelperMarketing(menuItem** activo, int selec, context* ct) {
         obtenerEntrada("Escribe el MES deseado: ", &input);
         statsMarketingByClientBill((*ct->branches), (*ct->clients), selectProductByCode(*ct->products), input);
         break;
+    case 5:
+        obtenerEntrada("Escribe el MES deseado: ", &input);
+        statsMarketingAll(*ct->branches,  input);
+        break;
     }
     system("pause");
     return 1;
 }
 
-int controllerMenuReports(menuItem** activo, int selec, context* ct) {
-    switch (selec) {
-    case 0:
-        if (*activo) {
-            actualizarMensaje("");
-            *activo = (*activo)->parent;
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    case 1: // cliente por c.i.
-        helperClientInfo(ct);
-        break;
-    case 2:
-        helperBranchInfo(ct);
-        break;
-    case 3:
-        *activo = helperMarketing(*activo);
-        break;
-    }
-    return 1;
 
+
+int controllerMenuReports(menuItem** activo, int selec, context* ct) {
+	string city = "";
+	string month = "";
+	product *sc = NULL;
+    switch (selec) {
+		case 0:
+			if (*activo) {
+				actualizarMensaje("");
+				*activo = (*activo)->parent;
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		case 1:
+			helperClientInfo(ct);
+			break;
+		case 2:
+			helperBranchInfo(ct);
+			break;
+		case 3:
+			*activo = helperMarketing(*activo);
+            return 1;
+    }
+
+	system("pause");
+    return 1;
 }
 
 
@@ -3360,7 +3404,7 @@ menuItem* menuBilling(menuItem* parent) {
 
 menuItem* menuReports(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\n\t\tSISTEMA DE INVENTARIO Y FACTURACION\n" + line + "\n\tREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n\t0. VOLVER AL MENU\n" + line;
+    m->encabezado = header + "\n\tREPORTES\n\t1. INGRESAR CLIENTE POR CEDULA\n\t2. INGRESAR TIENDA POR CODIGO\n\t3. MERCADEO\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerMenuReports;
     return m;
@@ -3368,7 +3412,7 @@ menuItem* menuReports(menuItem* parent) {
 
 menuItem* helperMarketing(menuItem* parent) {
     menuItem* m = new menuItem;
-    m->encabezado = line + "\nREPORTES DE MERCADEO\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t3. VER ESTADISTICAS DE PRODUCTO POR SUCURSAL\n\t4. VER MONTO TOTAL DE CADA CLIENTE\n\t5. VER INFORMACION DE INGRESOS POR TIENDA\n\t0. VOLVER AL MENU\n" + line;
+    m->encabezado = header + "\n\tREPORTES DE MERCADEO\n\t1. ESTADISTICAS DE VENTAS ORDENADAS POR CODIGO\n\t2. ESTADISTICAS DE VENTAS ORDENADAS POR TIENDA\n\t3. VER ESTADISTICAS DE PRODUCTO POR SUCURSAL\n\t4. VER MONTO TOTAL DE CADA CLIENTE\n\t5. VER INFORMACION DE INGRESOS POR TIENDA\n\t0. VOLVER AL MENU\n" + line;
     m->parent = parent;
     m->comportamiento = controllerHelperMarketing;
     return m;
@@ -3418,3 +3462,11 @@ int main() {
     setlocale(LC_ALL, "es_ES.UTF-8");
     run();
 }
+
+/*
+MINI TODO:
+- Cuando se borra cliente borrar facturas
+    - Revisar TODAS las de reportes:
+    en sucursales 3.1 tiene que imprimirse la existencia
+*/
+

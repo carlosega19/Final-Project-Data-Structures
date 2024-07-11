@@ -1,6 +1,3 @@
-30906652,Carlos Galiño
-31804452,Manuel Negron
-36525474,Josue Felipe
-35102207,Jose Cafecito
-77777777,Vegetta Willy
-31047718,Andres De Quintal
+123444,Pedro Perez,Caracas
+456777,Ana Garcia,Merida
+890111,Luis Diaz,Caracas
